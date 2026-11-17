@@ -184,7 +184,7 @@ extern char g_path_l17_table[];
 extern char g_path_point_template[];
 extern u8 g_hero_state[];
 extern void matrix_mul_vec3(void *, void *, void *);
-extern void func_2EEEB8(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Same body as func_L17_003C3250, with this function's own callees. */
 /* Moves a set of seven local points to follow the moby, and stores them in a shared table entry. */
@@ -213,7 +213,7 @@ void path_update_attached_point_table(char *moby)
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(outPoint, sourcePoint, matrix);
         sourcePoint += 0x10;
-        func_2EEEB8(outPoint, outPoint, position);
+        FastVecAdd(outPoint, outPoint, position);
         outPoint += 0x10;
     }
     base = g_hero_state;
