@@ -22,7 +22,7 @@ extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int a
 extern void level_set_rect_pal(int alpha, int color, float top, float bottom, float left, float right);
 extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, int);
 extern void text_draw_window_medium(unsigned short *, unsigned long long, unsigned char *, int);
-extern void subtitle_box_draw_nothing_pal(void);
+extern void subtitle_empty_b(void);
 
 /* Draws the subtitle box and its text, growing, fading and shrinking it by state (PAL: level_set_rect_pal draws the border). */
 void DrawSubtitleBox_pal(void)
@@ -56,12 +56,12 @@ void DrawSubtitleBox_pal(void)
                           g_subtitle_state.x - g_subtitle_state.box_half_width,
                           g_subtitle_state.x + g_subtitle_state.box_half_width);
         } else {
-            subtitle_box_draw_nothing_pal();
+            subtitle_empty_b();
         }
         break;
     }
     case 2:
-        subtitle_box_draw_nothing_pal();
+        subtitle_empty_b();
         break;
     case 3: {
         int frames, width, height, y, x, offset;
@@ -87,7 +87,7 @@ void DrawSubtitleBox_pal(void)
                           g_subtitle_state.x - g_subtitle_state.box_half_width,
                           g_subtitle_state.x + g_subtitle_state.box_half_width);
         } else {
-            subtitle_box_draw_nothing_pal();
+            subtitle_empty_b();
         }
         break;
     }
@@ -128,7 +128,7 @@ void DrawSubtitleBox_pal(void)
                           g_subtitle_state.y + g_subtitle_state.offset, 16, 3);
             text_draw_window_medium(layout, color, text, -1);
         } else {
-            subtitle_box_draw_nothing_pal();
+            subtitle_empty_b();
         }
         break;
     }
@@ -156,7 +156,7 @@ void DrawSubtitleBox_pal(void)
                           g_subtitle_state.y + height + g_subtitle_state.offset,
                           g_subtitle_state.x - width, g_subtitle_state.x + width);
         } else {
-            subtitle_box_draw_nothing_pal();
+            subtitle_empty_b();
         }
         break;
     }

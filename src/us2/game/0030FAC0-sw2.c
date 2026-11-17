@@ -22,7 +22,7 @@ extern s32 g_game_time[] __attribute__((sda));
 extern s32 g_ammo_pickup_time[] __attribute__((sda));
 extern s32 D_001B24A8_gp SDATA(D_001B24A8);
 extern s32 math_fast_float_d(s32 *);
-extern u32 stub_empty_8(s32, s32);
+extern u32 stub_empty_7(s32, s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void FastVecAdd(void *, void *, void *);

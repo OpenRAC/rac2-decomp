@@ -10,7 +10,7 @@ extern void cam_select_coll_masks(void);
 extern void cam_update_follow_hero(void);
 extern int cam_update_active(void);
 extern void cam_begin_mode_change(void *);
-extern int stub_empty_22(void);
+extern int stub_empty_21(void);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);
@@ -44,7 +44,7 @@ void cam_update_state_us2(void) {
         qcopy(cam + 0x380, target + 0x10);
         qcopy(cam + 0x390, target + 0x20);
     }
-    if (stub_empty_22()) {
+    if (stub_empty_21()) {
         p = g_active_camera + 0x140;
         qcopy(p, g_camera_state_block);
         qcopy(p + 0x230, g_camera_state_block + 0x10);

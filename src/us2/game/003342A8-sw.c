@@ -18,8 +18,8 @@ extern void CalculateAimedLaunchVelocity_us2(void *, void *, char *, float, floa
 extern int coll_trace_projectile_to_impact(float *, float *, float *, float *, void *, void *, int *, float);
 extern void moby_set_entry_list_flag_byte(int, int);
 extern float IntToFloat(int);
-extern void stub_empty_12(void);
-extern void stub_empty_12(void);
+extern void stub_empty_11(void);
+extern void stub_empty_11(void);
 extern char *part_spawn_flying_chunk_b(int, void *, void *);
 extern char *part_spawn_flying_chunk_a(int, void *, void *);
 extern int math_fast_float_d(void *);
@@ -67,7 +67,7 @@ typedef struct BeamVars {
     int reverse;
     int disabled;
 } BeamVars;
-extern void stub_empty_11(void);
+extern void stub_empty_10(void);
 
 /* Updates the Thermanator beam: traces the shot to its impact, fires chunks at a target while the button is held, and shows the gauge (v2.00 copy). */
 void thermanator_update_us2(Target *moby)
@@ -124,7 +124,7 @@ void thermanator_update_us2(Target *moby)
         break;
     case 2:
         if ((g_pad_pressed_flags & g_hero_state.input) && vars->hit && vars->valid && !vars->disabled) {
-            stub_empty_11();
+            stub_empty_10();
             moby->state = 3;
             if (!vars->reverse) {
                 part_spawn_flying_chunk_b((int)moby, vars->position, dir);
@@ -141,7 +141,7 @@ void thermanator_update_us2(Target *moby)
         break;
     case 3:
         if (!(g_pad_pressed_flags & g_hero_state.input) || !vars->hit || !vars->valid || vars->disabled) {
-            stub_empty_12();
+            stub_empty_11();
             moby->state = 2;
         } else if (math_fast_float_d(&vars->countdown)) {
             qcopy(spread, dir);

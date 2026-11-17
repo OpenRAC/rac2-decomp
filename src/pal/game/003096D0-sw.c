@@ -47,7 +47,7 @@ typedef struct {
 } O_4198;
 extern G_4198 g_hero_state;
 extern s32 g_pad_pressed_flags;
-extern s32 stub_empty_30(s32), math_fast_float_d(void *);
+extern s32 stub_empty_29(s32), math_fast_float_d(void *);
 extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
 extern void draw_joint_aligned_beam_effect_pal(void), beam_spawn_trail_particles_pal(void *);
 extern s32 ref_PAL_0030A560_00(s32), math_fast_float_d(void *);

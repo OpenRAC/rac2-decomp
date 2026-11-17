@@ -27,8 +27,8 @@ extern Light g_dynamic_lights[];
 extern int g_tether_reset_flag __attribute__((sda)), g_tether_timer __attribute__((sda));
 extern u32 g_frame_counter, g_current_map_index;
 extern Statistics g_statistics_table[], g_progress_statistics[];
-extern int stub_empty_7(int);
-extern int stub_empty_6(int, int);
+extern int stub_empty_6(int);
+extern int stub_empty_5(int, int);
 extern int math_fast_float_d(int *), FastDecTimer(short *);
 extern void hud_add_moby_marker(void *, u32, void *, int, int, int, float, float, float);
 extern s16 gfx_add_point_light(void *, int, float, float);
@@ -40,8 +40,8 @@ extern void matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *,
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void InitializeElectricWaterBoltEffect(char *), lock_on_update_tether_chain(char *), beam_draw_ribbons(void *);
 extern void gfx_register_overlay_draw_callback(void (*)(void *), void *), snd_stop_voice(int);
-extern void stub_empty_12(void), stub_empty_12(void), gfx_free_point_light(int);
 extern void stub_empty_11(void), stub_empty_11(void), gfx_free_point_light(int);
+extern void stub_empty_10(void), stub_empty_10(void), gfx_free_point_light(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
 void tesla_claw_update_us2(char *moby) {
@@ -59,10 +59,10 @@ void tesla_claw_update_us2(char *moby) {
     g_beam_scale_factor = 0.9f;
     active = 0;
     permitted = 1;
-    ammo_count = stub_empty_7(-1);
+    ammo_count = stub_empty_6(-1);
     if (g_hero_state.i[0x2294 / 4] == 1) {
         if (!math_fast_float_d(&g_hero_state.i[0x2534 / 4])) permitted = 0;
-        else hud_add_moby_marker(moby, !stub_empty_7(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
+        else hud_add_moby_marker(moby, !stub_empty_6(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
     } else g_hero_state.i[0x2534 / 4] = 40;
     if ((g_pad_state[0x1A0 / 4] & g_hero_state.u[0x1230 / 4]) && (u8)moby[0x20] != 4 && (u8)moby[0x20] &&
         !g_hero_state.b[0x22BC] && g_hero_state.i[0x2294 / 4] != 0x6F && g_hero_state.i[0x1240 / 4] >= 23 && permitted) {
@@ -71,7 +71,7 @@ void tesla_claw_update_us2(char *moby) {
             if (FastDecTimer(&beam->ammoTimer)) {
                 FastDecTimer(&beam->targetTimer);
                 FastDecTimer(&beam->secondaryTimer);
-                stub_empty_6(-1, 1);
+                stub_empty_5(-1, 1);
                 beam->ammoTimer = 10;
             }
             if (beam->light == -1) beam->light = gfx_add_point_light(moby + 0x10, 0, 7.5f, 0);
@@ -187,7 +187,7 @@ void tesla_claw_update_us2(char *moby) {
     case 1:
         math_fast_float_d(&beam->timer);
         if (active) {
-            stub_empty_11();
+            stub_empty_10();
             moby[0x20] = 3;
         }
         if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) {
@@ -195,7 +195,7 @@ void tesla_claw_update_us2(char *moby) {
                 if (g_statistics_table[18].count < 0xFFFF) g_statistics_table[18].count++;
                 if (g_frame_counter > g_statistics_table[18].maximum) g_statistics_table[18].maximum = g_frame_counter;
                 g_statistics_table[18].levels = (g_statistics_table[18].levels | (1u << g_current_map_index)) | 0x80000000u;
-                stub_empty_11();
+                stub_empty_10();
                 moby[0x20] = 3;
             } else {
                 beam->target = 0;
@@ -204,7 +204,7 @@ void tesla_claw_update_us2(char *moby) {
                 beam->secondaryReady = 0;
                 moby[0x20] = 1;
                 PlayMobySound(0, 0, moby);
-                stub_empty_12();
+                stub_empty_11();
             }
         }
         break;
@@ -222,7 +222,7 @@ void tesla_claw_update_us2(char *moby) {
         beam->targetReady = 0;
         beam->secondaryReady = 0;
         beam->length = 0;
-        stub_empty_12();
+        stub_empty_11();
         moby[0x20] = 1;
         break;
     case 2:

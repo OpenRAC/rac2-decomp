@@ -12,7 +12,7 @@ extern float g_camera_eye_state[];
 #define CAMERA_BASIS (&D_001B5340[0x230 / 4])
 extern void FastVecScale(void *,void *,float);
 extern void cam_compute_view_direction(char *,char *,int);
-extern unsigned int stub_empty_9_pal(int,int);
+extern unsigned int stub_empty_8(int,int);
 extern void vec_scale_to_length(void *,void *,float);
 extern float FastVecDot(void *,void *);
 extern void FastVecSub(void *,void *,void *);
@@ -58,7 +58,7 @@ void CalculateAimedLaunchVelocity_pal(Vector *output, Vector *origin, char *targ
     else cam_compute_view_direction((char *)&sourcePosition,(char *)&normal,0);
     reach=maximum;
     if(!targetObject) {
-        if(H->i[0x2294/4]==1) stub_empty_9_pal(29,1);
+        if(H->i[0x2294/4]==1) stub_empty_8(29,1);
         if((g_pad_pressed_flags&4)!=0 && H->b[0x22bc]==0) {
             vec_scale_to_length(&forward,CAMERA_BASIS,1.0f);
             projection=FastVecDot(&forward,&normal);

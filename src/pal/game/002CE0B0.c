@@ -3,20 +3,20 @@
 #include "common.h"
 extern int g_menu_input_flags;
 extern int menu_update_choice_list_pal(int);
-extern unsigned int stub_empty_26(void);
-extern unsigned int stub_empty_26(void);
-extern unsigned int stub_empty_26(void);
+extern unsigned int stub_empty_25(void);
+extern unsigned int stub_empty_25(void);
+extern unsigned int stub_empty_25(void);
+extern unsigned int stub_empty_27(void);
+extern unsigned int stub_empty_27(void);
 extern unsigned int stub_empty_28(void);
-extern unsigned int stub_empty_28(void);
-extern unsigned int stub_empty_29(void);
 extern int menu_handle_step_simple(int);
 extern int menu_handle_mode_action(int);
 extern int menu_run_action_by_index(int);
 extern int menu_handle_command_pal(int);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern unsigned int stub_empty_23(void);
 extern unsigned int stub_empty_24(void);
-extern unsigned int stub_empty_25(void);
-extern unsigned int stub_empty_27(void);
+extern unsigned int stub_empty_26(void);
 
 /* Reads the menu input flags and runs the handler for the current menu kind, playing a click when the input was handled (PAL). */
 int menu_handle_button_input_pal(void)
@@ -28,17 +28,17 @@ int menu_handle_button_input_pal(void)
         result = 1;
     } else if (flags & 0x40) {
         result = menu_update_choice_list_pal(flags);
-        if (stub_empty_24() && stub_empty_25()) {
+        if (stub_empty_23() && stub_empty_24()) {
             result = menu_handle_command_pal(result);
-        } else if (stub_empty_27()) {
-            result = menu_handle_mode_action(result);
         } else if (stub_empty_26()) {
+            result = menu_handle_mode_action(result);
+        } else if (stub_empty_25()) {
             result = menu_handle_step_with_reset_pal(result);
-        } else if (stub_empty_29() == 0x31) {
+        } else if (stub_empty_28() == 0x31) {
             result = menu_handle_step_simple(result);
-        } else if (stub_empty_28()) {
+        } else if (stub_empty_27()) {
             result = menu_handle_step_simple(result);
-        } else if (stub_empty_29() == 0x1C) {
+        } else if (stub_empty_28() == 0x1C) {
             result = menu_handle_step_simple(result);
         } else {
             result = menu_run_action_by_index(result);

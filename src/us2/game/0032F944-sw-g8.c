@@ -67,7 +67,7 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern unsigned int stub_empty_9_us2(int, int);
+extern unsigned int stub_empty_8(int, int);
 extern void part_setup_object_effect_entry(void *, void *, void *);
 extern void anim_start_blended(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
@@ -176,7 +176,7 @@ void vehicle_update_ridden_us2(char *moby)
                 break;
             qcopy(moby + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);
-            stub_empty_9_us2(28, 1);
+            stub_empty_8(28, 1);
             part_setup_object_effect_entry(moby + 0x10, moby + 0xF0, moby);
             STATE(moby) = 2;
             anim_start_blended(moby, 1, 0, 10);
@@ -278,7 +278,7 @@ void vehicle_update_ridden_us2(char *moby)
         break;
     case 8:
         if (g_game_mode == 28)
-            stub_empty_9_us2(0, 1);
+            stub_empty_8(0, 1);
         if (*(short *)(g_camera_state_ptr + 0x86) == 27)
             cam_call_helper();
         table_clear_entry_flag(update_handle);

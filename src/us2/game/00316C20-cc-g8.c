@@ -44,13 +44,13 @@ typedef struct { char pad0[0x70]; float range; char pad74[0x6C]; } Level_00315E2
 extern Level_00315E20 g_weapon_table[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern unsigned int stub_empty_9_us2(int, int);
+extern unsigned int stub_empty_8(int, int);
 extern char *FindNearestEligibleTarget(void *);
 extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
 extern void hud_add_moby_marker(float, float, float, void *, u32, void *, int, int, int);
 extern void FastVecSub(void *, void *, void *);
-extern void stub_empty_11(void);
+extern void stub_empty_10(void);
 extern int math_fast_float_d(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern void QueueMobyImpact(void *, void *);
@@ -84,7 +84,7 @@ void dynamo_update_us2(u8 *moby)
     moby_transform_joint_to_world(moby, 0, g_emitter_origin);
     hero_ptr = g_hero_state;
     if (*(int *)(hero_ptr + 0x2294) == 1)
-        stub_empty_9_us2(0x1D, 1);
+        stub_empty_8(0x1D, 1);
     moby_transform_joint_to_world(moby, 0, aim);
 
     switch (moby[0x20]) {
@@ -112,7 +112,7 @@ void dynamo_update_us2(u8 *moby)
         else
             g_dynamo_launch_mode = 4;
         moby[0x20] = 2;
-        stub_empty_11();
+        stub_empty_10();
         break;
     case 2: {
         char *hero;

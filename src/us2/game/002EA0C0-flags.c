@@ -123,7 +123,7 @@ extern short g_hud_offset_flag;
 extern float g_hero_attach_offset[] SDATA(D_001AC1B0);
 extern float g_companion_attach_offset[] SDATA(D_001AC1C0);
 extern void game_reset_frame_counters(void), moby_update_visible_objects(void), snd_run_callbacks(void);
-extern void stub_empty_3(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
+extern void stub_empty_2(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
 extern void load_select_segment_update_world(int), FadeToBlack(int), UpdateViewContext(void);
 extern void moby_mark_spawned(void *), update_moby_animation_state(void *), func_002A0F48(void *);
 extern int request_begin_slot(int,int,int,int,int);
@@ -135,7 +135,7 @@ extern float FastAddRotations(float,float), IntToFloat(int), fast_subtract_rotat
 extern void func_00129178(void *), pad_vib_routine_f(void *,void *,float);
 extern void pad_vib_routine_g(void *,void *,float), pad_vib_routine_e(void *,void *,float);
 extern void FastVecScale(void *,void *,float), moby_run_ground_check(void *);
-extern void stub_empty_18(void *), stub_empty_17(void *,int), UpdateEquipmentPieces_us2(void *);
+extern void stub_empty_17(void *), stub_empty_16(void *,int), UpdateEquipmentPieces_us2(void *);
 extern void gfx_register_overlay_draw_callback(void *,void *), gfx_register_world_draw_callback(void *,void *);
 extern void render_environment_mapped_object(void), gfx_draw_ground_shadow(void), part_draw_glow_quads(void);
 extern float math_fast_sin_or_cos_a(float);
@@ -161,7 +161,7 @@ extern void gfx_compute_light_direction(void), game_update_idle_frame_counters(v
 extern int transition_update_scene_us2(void);
 
 extern void ref_US2_002EA0C0_00(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
-extern void ref_US2_002EA0C0_01(void *), stub_empty_17(void *,int), UpdateEquipmentPieces_us2(void *);
+extern void ref_US2_002EA0C0_01(void *), stub_empty_16(void *,int), UpdateEquipmentPieces_us2(void *);
 
 /* Runs one frame of a story cutscene: moves the camera and every actor along their paths, handles skipping and fades, and ends the scene (USA v2.00). */
 int UpdatePlaybackScene_us2(void)
@@ -332,7 +332,7 @@ int UpdatePlaybackScene_us2(void)
                     }
                     if (object->shadow_radius) moby_run_ground_check(object);
                     if (object->class_id==10) ref_US2_002EA0C0_01(object);
-                    if (object->class_id==0) stub_empty_17(object,0);
+                    if (object->class_id==0) stub_empty_16(object,0);
                     if (object->class_id==0xD54) {
                         PlaybackMoby *p;
                         int j, cast;

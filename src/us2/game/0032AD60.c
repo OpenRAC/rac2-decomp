@@ -11,7 +11,7 @@ extern int g_surface_height_tiles[] __attribute__((sda));
 extern int g_surface_box_count[] __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
-extern int actuator_calc_power_us2(void);
+extern int stub_empty_30(void);
 
 /* Checks whether a falling object is above a surface-grid object and records on it whether it landed, sinking or was over water (v2.00 copy). */
 void hero_check_under_falling_object_us2(char *moby)
@@ -51,7 +51,7 @@ void hero_check_under_falling_object_us2(char *moby)
                 }
                 if (object_vars[0x14] == 0) {
                     RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.03f);
-                    if (actuator_calc_power_us2() == 0) {
+                    if (stub_empty_30() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
                             context = g_music_state;

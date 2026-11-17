@@ -84,7 +84,7 @@ extern void level_forward_value(int);
 extern void level_forward_pair(int, int);
 extern int PlayMobySound(int, int, void *);
 extern void subtitle_clear_state(void);
-extern unsigned int stub_empty_9_us2(int, int);
+extern unsigned int stub_empty_8(int, int);
 extern void ref_US2_002F8FF8_00(void);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float FastAddRotations(float, float);
@@ -211,7 +211,7 @@ void OpenVendorMenu_us2(char *moby)
     g_current_game_mode = 5;
     g_screen_fade = 0.0f;
     g_screen_flash_alpha = 0;
-    stub_empty_9_us2(97, 1);
+    stub_empty_8(97, 1);
     g_hero_state.flag22BC = 1;
     g_hero_state.flag22B5 = 1;
     ref_US2_002F8FF8_00();

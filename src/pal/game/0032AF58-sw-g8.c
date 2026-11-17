@@ -27,7 +27,7 @@ extern void *part_spawn_bubble_pal(void *, void *, float, float);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 extern void gfx_register_overlay_draw_callback(void *, void *);
-extern void moby_do_nothing_pal(void);
+extern void moby_do_nothing(void);
 
 /* Per-frame update of a falling chunk: it falls and spins, drops dust while it moves, lands on
    the ground or on the hero and bursts into sparks, then fades out and is freed (PAL: 50 Hz rates). */
@@ -141,5 +141,5 @@ void falling_chunk_update_pal(char *self)
         }
         break;
     }
-    gfx_register_overlay_draw_callback(moby_do_nothing_pal, self);
+    gfx_register_overlay_draw_callback(moby_do_nothing, self);
 }

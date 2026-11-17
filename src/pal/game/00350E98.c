@@ -29,7 +29,7 @@ typedef struct {
     char *f58;
     char *f5c;
 } SlotObject;
-extern void stub_empty_17(char *, long long);
+extern void stub_empty_16(char *, long long);
 extern void func_PAL_002A0F68(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
@@ -40,7 +40,7 @@ void menu_attach_slot_packets_pal(char *menu)
     char *slot_base = menu + 0xC00;
     SlotObject *slot = (SlotObject *)slot_base;
 
-    stub_empty_17(slot_base, 0);
+    stub_empty_16(slot_base, 0);
     func_PAL_002A0F68(slot_base);
     if (slot->f42 != 0xFF) {
         EntryTable *entry_table = slot->f24;

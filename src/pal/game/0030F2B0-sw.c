@@ -22,7 +22,7 @@ extern s32 g_game_time[] __attribute__((sda));
 extern s32 g_ammo_pickup_time[] __attribute__((sda));
 extern s32 D_001B24A8_gp SDATA(D_001B24A8);
 extern s32 math_fast_float_d(s32 *);
-extern u32 stub_empty_8(s32, s32);
+extern u32 stub_empty_7(s32, s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void FastVecAdd(void *, void *, void *);
@@ -98,7 +98,7 @@ void ammo_pickup_update_game_pal(u8 *object)
         if (EF(object,0x18)<EF(vars,0x28)-2.0f) eligible=1;
         if (!g_hero_state.health) eligible=0;
         if (eligible) {
-            stub_empty_8(item,EI(vars,0));
+            stub_empty_7(item,EI(vars,0));
             sound_item=EI(vars,8);
             current=counts[sound_item];
             if (old<current) {

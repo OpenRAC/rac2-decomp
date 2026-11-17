@@ -123,7 +123,7 @@ extern short g_hud_offset_flag;
 extern float g_hero_attach_offset[] SDATA(D_001AC1B0);
 extern float g_companion_attach_offset[] SDATA(D_001AC1C0);
 extern void game_reset_frame_counters(void), moby_update_visible_objects(void), snd_run_callbacks(void);
-extern void stub_empty_3(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
+extern void stub_empty_2(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
 extern void load_select_segment_update_world(int), FadeToBlack(int), UpdateViewContext(void);
 extern void moby_mark_spawned(void *), update_moby_animation_state(void *), func_002A0F48(void *);
 extern int request_begin_slot(int,int,int,int,int);
@@ -135,7 +135,7 @@ extern float FastAddRotations(float,float), IntToFloat(int), fast_subtract_rotat
 extern void func_00129178(void *), pad_vib_routine_f(void *,void *,float);
 extern void pad_vib_routine_g(void *,void *,float), pad_vib_routine_e(void *,void *,float);
 extern void FastVecScale(void *,void *,float), moby_run_ground_check(void *);
-extern void stub_empty_18(void *), stub_empty_17(void *,int), UpdateEquipmentPieces(void *);
+extern void stub_empty_17(void *), stub_empty_16(void *,int), UpdateEquipmentPieces(void *);
 extern void gfx_register_overlay_draw_callback(void *,void *), gfx_register_world_draw_callback(void *,void *);
 extern void render_environment_mapped_object(void), gfx_draw_ground_shadow(void), part_draw_glow_quads(void);
 extern float math_fast_sin_or_cos_a(float);
@@ -176,7 +176,7 @@ int update_playback_scene_pal(void)
         game_reset_frame_counters();
         moby_update_visible_objects();
         snd_run_callbacks();
-        stub_empty_3();
+        stub_empty_2();
         part_update_all();
         (&g_scene_playback_state)->stream_frame++;
         (&g_scene_playback_state)->frame++;
@@ -328,8 +328,8 @@ int update_playback_scene_pal(void)
                         else if ((&g_scene_playback_state)->frame>=174) object->shadow_range=24;
                     }
                     if (object->shadow_range) moby_run_ground_check(object);
-                    if (object->class_id==10) stub_empty_18(object);
-                    if (object->class_id==0) stub_empty_17(object,0);
+                    if (object->class_id==10) stub_empty_17(object);
+                    if (object->class_id==0) stub_empty_16(object,0);
                     if (object->class_id==0xD54) {
                         PlaybackMoby *p;
                         int j, cast;
@@ -390,7 +390,7 @@ int update_playback_scene_pal(void)
         game_reset_frame_counters();
         moby_update_visible_objects();
         snd_run_callbacks();
-        stub_empty_3();
+        stub_empty_2();
         part_update_all();
         if ((&g_hero_moby_default)->frame==0) {
             music_Pause(0);

@@ -18,8 +18,8 @@ extern void CalculateAimedLaunchVelocity_pal(void *, void *, char *, float, floa
 extern int coll_trace_projectile_to_impact_pal(float *, float *, float *, float *, void *, void *, int *, float);
 extern void moby_set_entry_list_flag_byte(int, int);
 extern float IntToFloat(int);
+extern void stub_empty_10(void);
 extern void stub_empty_11(void);
-extern void stub_empty_12(void);
 extern char *part_spawn_flying_chunk_b_pal(int, void *, void *);
 extern char *part_spawn_flying_chunk_a_pal(int, void *, void *);
 extern int math_fast_float_d(void *);
@@ -124,7 +124,7 @@ void thermanator_update_pal(Target *obj)
         break;
     case 2:
         if ((g_pad_pressed_flags & g_hero_state.input) && vars->hit && vars->valid && !vars->disabled) {
-            stub_empty_11();
+            stub_empty_10();
             obj->state = 3;
             if (!vars->reverse) {
                 part_spawn_flying_chunk_b_pal((int)obj, vars->position, dir);
@@ -141,7 +141,7 @@ void thermanator_update_pal(Target *obj)
         break;
     case 3:
         if (!(g_pad_pressed_flags & g_hero_state.input) || !vars->hit || !vars->valid || vars->disabled) {
-            stub_empty_12();
+            stub_empty_11();
             obj->state = 2;
         } else if (math_fast_float_d(&vars->countdown)) {
             qcopy(spread, dir);

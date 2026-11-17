@@ -6,13 +6,13 @@ extern int g_mission_select_enabled __attribute__((sda));
 extern char g_mission_menu_field __attribute__((sda));
 extern char g_mission_circle_menu __attribute__((sda));
 extern char g_mission_menu_items[];
-extern int stub_empty_25(void), stub_empty_25(void);
+extern int stub_empty_24(void), stub_empty_24(void);
 extern void mission_select_reset_us2(void), mission_menu_refresh_items_us2(void);
 extern void menu_set_field_144(void *, int);
 extern void circle_menu_init_entries_us2(void *,void *,void *);
 extern void circle_menu_set_radius_us2(void *,float);
 extern void circle_menu_set_selection_us2(void *,int);
-extern int stub_empty_24(void), stub_empty_24(void);
+extern int stub_empty_23(void), stub_empty_23(void);
 
 extern int ref_US2_0029C818_00(void), ref_US2_0029C818_00(void);
 extern int ref_US2_0029C818_01(void), ref_US2_0029C818_01(void);

@@ -115,8 +115,8 @@ extern void music_Pause(int);
 extern s16 snd_pump_music_and_disc_read_pal(int);
 extern void mem_clear(void *, int, int);
 extern void subtitle_clear_state(void);
-extern unsigned int stub_empty_9_pal(int, int);
-extern void stub_empty_4(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_3(void);
 extern int load_chunk_part_from_disc_pal(int);
 extern void load_relocate_world_object_parts(void);
 extern void gfx_empty_stub(void);
@@ -171,9 +171,9 @@ void cutscene_start_pal(int cutscene_id)
     g_screen_flash_alpha = 0;
     g_mode_fade_scale = 0;
     if (g_hero_state.active) {
-        stub_empty_9_pal(0x61, 2);
+        stub_empty_8(0x61, 2);
         g_hero_state.flag = 1;
-        stub_empty_4();
+        stub_empty_3();
     }
     if (g_dialogue_talk_state.moby)
         *(unsigned short *)(g_dialogue_talk_state.moby + 0x34) |= 1;
@@ -223,11 +223,11 @@ extern void cam_set_transition_frames(float);
 extern void game_reset_frame_counters(void);
 extern void UpdateViewContext(void);
 extern void moby_mark_spawned(void *);
-extern void stub_empty_10(int);
+extern void stub_empty_9(int);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float math_fabs(float);
-extern void stub_empty_5_pal(void);
-extern void stub_empty_15(void *, void *, int, int);
+extern void stub_empty_4(void);
+extern void stub_empty_14(void *, void *, int, int);
 extern void cutscene_run_dialogue_node(void *, void *, int);
 extern void music_set_active_track_value(int);
 extern void hero_destroy_equipment_pieces(void);
@@ -269,20 +269,20 @@ void cutscene_end_pal(void)
     }
     hero = &g_hero_state;
     if (hero->active) {
-        stub_empty_10(1);
+        stub_empty_9(1);
         hero_ground = coll_probe_ground_height_below(hero->pos, 0, 0.5f);
         if (2.0f < hero_ground) {
             if (math_fabs(hero->pos[2] - hero_ground) < 4.5f)
                 hero->pos[2] = hero_ground;
         }
         g_hero_state.flag = 0;
-        stub_empty_5_pal();
+        stub_empty_4();
         scene = &g_scene_playback_state;
         if (scene->restore) {
             scene_ground = coll_probe_ground_height_below(scene->pos, 0, 0.5f);
             if (2.0f < scene_ground && math_fabs(scene->pos[2] - scene_ground) < 2.0f)
                 scene->pos[2] = scene_ground;
-            stub_empty_15(g_scene_playback_state.pos, g_scene_playback_state.rot, 0, 1);
+            stub_empty_14(g_scene_playback_state.pos, g_scene_playback_state.rot, 0, 1);
         }
     }
     if (g_dialogue_talk_state.moby)
