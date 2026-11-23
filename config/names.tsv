@@ -9519,7 +9519,7 @@ D_L00_001AF690	g_blitz_cooldown_ticks_b	descriptive	config/names_local.tsv
 D_L00_001AF684	g_blitz_delay_ticks_a	descriptive	config/names_local.tsv		
 D_L00_001AF688	g_blitz_delay_ticks_b	descriptive	config/names_local.tsv		
 D_L00_001AF670	g_blitz_gun_euler_angles	descriptive	config/names_local.tsv		
-D_L00_00294900	g_blitz_gun_sound_records	descriptive	config/names_local.tsv		
+D_L00_00294900	g_blitz_gun_rumble_waves	descriptive	config/names_local.tsv		g_blitz_gun_sound_records
 D_L00_001AF680	g_blitz_startup_ticks	descriptive	config/names_local.tsv		
 D_L00_001AF6B4	g_blitz_ticks	descriptive	config/names_local.tsv		
 D_L12_001B05A4	g_block_damping	descriptive	config/names_local.tsv		
@@ -9720,7 +9720,7 @@ D_L20_001AC810	g_bounce_projectile_model	descriptive	config/names_local.tsv
 D_001AA39C	g_bounce_split_chance	descriptive	config/names_local.tsv		
 D_L00_001B0C2C	g_bouncer_l00_debris_scale	descriptive	config/names_local.tsv		
 D_L00_001B0C38	g_bouncer_l00_debris_scale_2	descriptive	config/names_local.tsv		
-D_L00_0029F210	g_bouncer_sound_record	descriptive	config/names_local.tsv		
+D_L00_0029F210	g_bouncer_rumble_waves	descriptive	config/names_local.tsv		g_bouncer_sound_record
 D_L00_001B2BE4	g_bouncer_timer	descriptive	config/names_local.tsv		
 D_0013958D	g_bouncer_weapon_index	descriptive	config/names_local.tsv		
 D_L00_001B0918	g_bouncing_explosive_bounce_damping	descriptive	config/names_local.tsv		
@@ -10326,7 +10326,7 @@ D_L00_001AF5D8	g_charge_minimum	descriptive	config/names_local.tsv
 D_L00_001AF5DC	g_charge_next_step	descriptive	config/names_local.tsv		
 D_L00_001B06C0	g_charge_rate_down	descriptive	config/names_local.tsv		
 D_L00_001B06BC	g_charge_rate_up	descriptive	config/names_local.tsv		
-D_L00_002960A0	g_charge_sound_records	descriptive	config/names_local.tsv		
+D_L00_002960A0	g_lock_on_weapon_rumble_waves	descriptive	config/names_local.tsv		g_charge_sound_records
 D_L22_001AFA04	g_charge_voice_other	descriptive	config/names_local.tsv		
 D_L22_001AFA00	g_charge_voice_player	descriptive	config/names_local.tsv		
 D_L00_0024F7C0	g_charge_weapon_effect_table	descriptive	config/names_local.tsv		
@@ -10365,7 +10365,7 @@ D_L22_001AF9EC	g_charged_shot_vec_scale	descriptive	config/names_local.tsv
 D_L23_001A8AB8	g_charged_shot_zero_words	descriptive	config/names_local.tsv		
 D_00139593	g_charging_weapon_index	descriptive	config/names_local.tsv		
 D_L00_001B0F90	g_charging_weapon_initial_value	descriptive	config/names_local.tsv		
-D_L00_0029FBE0	g_charging_weapon_sound_records	descriptive	config/names_local.tsv		
+D_L00_0029FBE0	g_charging_weapon_rumble_waves	descriptive	config/names_local.tsv		g_charging_weapon_sound_records
 D_L05_00221D88	g_chase_target	descriptive	config/names_local.tsv		
 D_001A7A44	g_cheat_flags	descriptive	config/names_local.tsv		
 D_001AB938	g_cheat_id_table	descriptive	config/names_local.tsv		
@@ -11174,7 +11174,7 @@ D_L16_001B15C0	g_effect_field_b	descriptive	config/names_local.tsv
 D_L03_001AEC70	g_effect_flags	descriptive	config/names_local.tsv		
 D_L16_001B15B8	g_effect_float_param	descriptive	config/names_local.tsv		
 D_L06_001B1858	g_effect_group_counts	descriptive	config/names_local.tsv		
-D_L00_00296120	g_effect_handle_records	descriptive	config/names_local.tsv		
+D_L00_00296120	g_spread_weapon_rumble_waves	descriptive	config/names_local.tsv		g_effect_handle_records
 D_L00_001B0AF4	g_effect_id_max	descriptive	config/names_local.tsv		
 D_L00_001B0AF0	g_effect_id_min	descriptive	config/names_local.tsv		
 D_001AEF60	g_effect_init_flag	descriptive	config/names_local.tsv		
@@ -11950,9 +11950,9 @@ D_L05_001B251C	g_feltzin_target_mobys	descriptive	config/names_local.tsv
 D_L05_001B3550	g_feltzin_timer	descriptive	config/names_local.tsv		
 D_L01_002A45D0	g_ferry_height_offsets	descriptive	config/names_local.tsv		
 D_L01_002A48B0	g_ferry_height_offsets_alt	descriptive	config/names_local.tsv		
-D_L01_00297300	g_ferry_src_record_a	descriptive	config/names_local.tsv		
-D_L01_00297380	g_ferry_src_record_b	descriptive	config/names_local.tsv		
-D_L01_00297400	g_ferry_src_record_c	descriptive	config/names_local.tsv		
+D_L01_00297300	g_ferry_rumble_waves_a	descriptive	config/names_local.tsv		g_ferry_src_record_a
+D_L01_00297380	g_ferry_rumble_waves_b	descriptive	config/names_local.tsv		g_ferry_src_record_b
+D_L01_00297400	g_ferry_rumble_waves_c	descriptive	config/names_local.tsv		g_ferry_src_record_c
 D_0018A0B4	g_field_mob_contact	descriptive	config/names_local.tsv		
 D_L11_001B1D60	g_fighter_action_distance	descriptive	config/names_local.tsv		
 D_L11_001B1DA4	g_fighter_close_distance	descriptive	config/names_local.tsv		
@@ -12731,7 +12731,7 @@ D_L00_001B2BB0	g_gravity_bomb_fire_held	descriptive	config/names_local.tsv
 D_L00_001B080C	g_gravity_bomb_launch_time	descriptive	config/names_local.tsv		
 D_L00_001B082C	g_gravity_bomb_query_friction	descriptive	config/names_local.tsv		
 D_L00_001B0828	g_gravity_bomb_query_response	descriptive	config/names_local.tsv		
-D_L00_0029AE70	g_gravity_bomb_sound_records	descriptive	config/names_local.tsv		
+D_L00_0029AE70	g_gravity_bomb_rumble_waves	descriptive	config/names_local.tsv		g_gravity_bomb_sound_records
 D_L00_001B0808	g_gravity_bomb_speed	descriptive	config/names_local.tsv		
 D_00139592	g_gravity_bomb_weapon_index	descriptive	config/names_local.tsv		
 D_L00_001A9000	g_gravity_center_point	descriptive	config/names_local.tsv		
@@ -14555,8 +14555,8 @@ D_L00_001AEC90	g_lamp_piece_vectors	descriptive	config/names_local.tsv
 D_L00_001B2874	g_lancer_fire_held	descriptive	config/names_local.tsv		
 D_L00_001B2868	g_lancer_horizontal_arc	descriptive	config/names_local.tsv		
 D_L00_001B286C	g_lancer_range	descriptive	config/names_local.tsv		
-D_L00_00294980	g_lancer_sound_records_a	descriptive	config/names_local.tsv		
-D_L00_00294A00	g_lancer_sound_records_b	descriptive	config/names_local.tsv		
+D_L00_00294980	g_lancer_shot_rumble_waves	descriptive	config/names_local.tsv		g_lancer_sound_records_a
+D_L00_00294A00	g_lancer_held_rumble_waves	descriptive	config/names_local.tsv		g_lancer_sound_records_b
 D_L00_001AF6C4	g_lancer_state_int	descriptive	config/names_local.tsv		
 D_L00_001AF6C0	g_lancer_state_short	descriptive	config/names_local.tsv		
 D_L00_001B2870	g_lancer_vertical_arc	descriptive	config/names_local.tsv		
@@ -15405,7 +15405,7 @@ D_001430C0	g_mc_rpc_result	descriptive	config/names_local.tsv
 D_00137E6C	g_mc_sema	descriptive	config/names_local.tsv		
 D_00141BB0	g_mc_set_file_info_request	descriptive	config/names_local.tsv		
 D_L00_001B1270	g_megarocket_nozzle_offset	descriptive	config/names_local.tsv		
-D_0029FCC8	g_megarocket_sound_records	descriptive	config/names_local.tsv		
+D_0029FCC8	g_megarocket_rumble_waves	descriptive	config/names_local.tsv		g_megarocket_sound_records
 D_001AEC68	g_megaturret_shot_param	descriptive	config/names_local.tsv		
 D_L00_001AEFA8	g_megaturret_shot_value	descriptive	config/names_local.tsv		
 D_001AEC0C	g_megaturret_slot_counter	descriptive	config/names_local.tsv		
@@ -15687,7 +15687,7 @@ D_001AD908	g_meter_vtable_b	descriptive	config/names_local.tsv
 D_L00_001B05DC	g_mini_nuke_blast_moby	descriptive	config/names_local.tsv		
 D_L00_001B0644	g_mini_nuke_collision_friction	descriptive	config/names_local.tsv		
 D_L00_001B0640	g_mini_nuke_collision_response	descriptive	config/names_local.tsv		
-D_L00_00296020	g_mini_nuke_sound_records	descriptive	config/names_local.tsv		
+D_L00_00296020	g_mini_nuke_rumble_waves	descriptive	config/names_local.tsv		g_mini_nuke_sound_records
 D_L08_001B1B64	g_mining_hit_cooldown	descriptive	config/names_local.tsv		
 D_L08_001B1B4C	g_mining_hit_float_c	descriptive	config/names_local.tsv		
 D_L08_001B1B50	g_mining_hit_float_d	descriptive	config/names_local.tsv		
@@ -15763,7 +15763,7 @@ D_L08_001B1938	g_mining_vehicle_turn_push	descriptive	config/names_local.tsv
 D_L08_001B18F8	g_mining_vehicle_turn_rate	descriptive	config/names_local.tsv		
 D_L08_001B1900	g_mining_vehicle_vertical_damping	descriptive	config/names_local.tsv		
 D_L00_001B2864	g_minirocket_fire_held	descriptive	config/names_local.tsv		
-D_00294880	g_minirocket_sound_records	descriptive	config/names_local.tsv		
+D_00294880	g_minirocket_rumble_waves	descriptive	config/names_local.tsv		g_minirocket_sound_records
 D_L03_001AEFCC	g_miniturret_counter	descriptive	config/names_local.tsv		
 D_L03_001AEFB0	g_miniturret_move_speed	descriptive	config/names_local.tsv		
 D_L03_001ADAAC	g_miniturret_l03_owner_table	descriptive	config/names_local.tsv		
@@ -16283,7 +16283,7 @@ D_L00_001AFEC0	g_nuke_l00_launch_speed	descriptive	config/names_local.tsv
 D_L04_001B01A8	g_nuke_l04_launch_speed	descriptive	config/names_local.tsv		
 D_L00_001AFEC8	g_nuke_move_speed	descriptive	config/names_local.tsv		
 D_L04_001B2F38	g_nuke_pressed_flag	descriptive	config/names_local.tsv		
-D_L04_002BA6C0	g_nuke_src_records	descriptive	config/names_local.tsv		
+D_L04_002BA6C0	g_mini_nuke_l04_rumble_waves	descriptive	config/names_local.tsv		g_nuke_src_records
 D_L01_001AA550	g_number_separators	descriptive	config/names_local.tsv		
 D_L04_002AF630	g_object_anim_sparks_table	descriptive	config/names_local.tsv		
 D_001ADA78	g_object_base_table	descriptive	config/names_local.tsv		
@@ -18661,7 +18661,7 @@ D_L08_002603E0	g_slot_pane_matrices	descriptive	config/names_local.tsv
 D_L08_002604A0	g_slot_pane_points	descriptive	config/names_local.tsv		
 D_001A73E0	g_slot_play_counters	descriptive	config/names_local.tsv		
 D_L08_00260410	g_slot_positions	descriptive	config/names_local.tsv		
-D_L05_002B8770	g_slot_record_source	descriptive	config/names_local.tsv		
+D_L05_002B8770	g_ship_l05_rumble_waves	descriptive	config/names_local.tsv		g_slot_record_source
 D_L02_002A53B0	g_slot_reel_symbol_table	descriptive	config/names_local.tsv		
 D_L02_002A52F0	g_slot_strip_geometry	descriptive	config/names_local.tsv		
 D_PAL_001B09B8	g_slot_t_increment	descriptive	config/names_local.tsv		
@@ -20298,7 +20298,7 @@ D_L03_001B2750	g_target_counters	descriptive	config/names_local.tsv
 D_001A85CC	g_target_fade_speed	descriptive	config/names_local.tsv		
 D_001A861C	g_target_height	descriptive	config/names_local.tsv		
 D_L03_001B0464	g_target_height_speed	descriptive	config/names_local.tsv		
-D_L00_00294800	g_target_hud_records	descriptive	config/names_local.tsv		
+D_L00_00294800	g_scoped_weapon_rumble_waves	descriptive	config/names_local.tsv		g_target_hud_records
 D_L06_001B2970	g_target_index_list	descriptive	config/names_local.tsv		
 D_001EE960	g_target_list	descriptive	config/names_local.tsv		
 D_L00_001FACE0	g_target_l00_list	descriptive	config/names_local.tsv		
@@ -22075,7 +22075,7 @@ D_L00_001B09B0	g_vaporizer_ring_c_width	descriptive	config/names_local.tsv
 D_L00_001B097C	g_vaporizer_ring_side_u_offset	descriptive	config/names_local.tsv		
 D_L00_001B0980	g_vaporizer_ring_u_step	descriptive	config/names_local.tsv		
 D_L00_001B0984	g_vaporizer_ring_vec_scale	descriptive	config/names_local.tsv		
-D_L00_00296AA0	g_vaporizer_sound_records	descriptive	config/names_local.tsv		
+D_L00_00296AA0	g_vaporizer_rumble_waves	descriptive	config/names_local.tsv		g_vaporizer_sound_records
 D_L00_001B09F0	g_vaporizer_spark_alpha	descriptive	config/names_local.tsv		
 D_L00_001B09F8	g_vaporizer_spark_angle_max	descriptive	config/names_local.tsv		
 D_L00_001B09F4	g_vaporizer_spark_angle_min	descriptive	config/names_local.tsv		

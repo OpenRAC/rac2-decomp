@@ -15,7 +15,7 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
 };
 extern AimQueryConfig g_gravity_bomb_aim_config;
 extern AimTuning g_weapon_l00_table[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_gravity_bomb_sound_records[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_gravity_bomb_rumble_waves[];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
 extern unsigned char g_gravity_bomb_weapon_index[];
@@ -89,7 +89,7 @@ void gravity_bomb_launcher_update_pal(unsigned char *object) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_gravity_bomb_fire_held = 1;
                 start_equipped_item_animation_pal();
-                *(int *)(state + 0x2C) = actuator_play_waves(g_gravity_bomb_sound_records);
+                *(int *)(state + 0x2C) = actuator_play_waves(g_gravity_bomb_rumble_waves);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 gravity_bomb_spawn_projectile_pal((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);

@@ -4,7 +4,7 @@ typedef union { ShotQuad q; float f[4]; } ShotVector;
 extern int g_feltzin_mission_index, g_pad_pressed_flags[], g_ship_mode_words[];
 typedef struct { int upgrade; char pad[12]; int maximum, ammo; char tail[16]; } WeaponSlot;
 extern WeaponSlot g_spawn_entry_table[];
-extern char g_sound_state[],g_slot_record_source[];
+extern char g_sound_state[],g_ship_l05_rumble_waves[];
 extern float g_ship_aim_length __attribute__((sda)), g_ship_muzzle_speed __attribute__((sda));
 extern unsigned short g_ship_shot_var_half_a __attribute__((sda)),g_ship_shot_var_half_b __attribute__((sda)),g_ship_shot_var_half_c __attribute__((sda));
 extern int g_ship_shot_var_word_a __attribute__((sda)),g_ship_shot_var_word_b __attribute__((sda)),g_ship_shot_voice_id __attribute__((sda));
@@ -192,5 +192,5 @@ void UpdateShipWeapons(char *moby, char *driver)
     }
 
     if (!math_fast_float_d(vars + 0x218))
-        I(vars, 0x214) = actuator_play_waves(g_slot_record_source);
+        I(vars, 0x214) = actuator_play_waves(g_ship_l05_rumble_waves);
 }

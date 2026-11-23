@@ -17,7 +17,7 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
 };
 extern AimQueryConfig g_nuke_l00_aim_query_config;
 extern AimTuning g_weapon_l00_table[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_mini_nuke_sound_records[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_mini_nuke_rumble_waves[];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
 extern unsigned char g_gravity_bomb_weapon_index[];
@@ -92,7 +92,7 @@ void mini_l00_nuke_update(unsigned char *object) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_nuke_fire_held = 1;
                 start_equipped_item_animation();
-                *(int *)(state + 0x2C) = actuator_play_waves(g_mini_nuke_sound_records);
+                *(int *)(state + 0x2C) = actuator_play_waves(g_mini_nuke_rumble_waves);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 mini_nuke_projectile_spawn((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);

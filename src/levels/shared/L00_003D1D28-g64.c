@@ -46,7 +46,7 @@ extern u8 g_item_slot_to_record[];
 extern u8 g_hero_weapon_id_index NOT_SDA;
 extern float g_strip_axis[4] NOT_SDA;
 extern WeaponEntry g_weapon_l00_table[];
-extern u8 g_effect_handle_records[];
+extern u8 g_spread_weapon_rumble_waves[];
 extern u8 g_default_vector[] MACRO_ADDR;
 typedef struct { u8 pad[0x160]; float f160; int pad164; int i168; int i16C; float f170; int pad174; int i178; } Shake;
 extern Shake g_scalar_transition_state;
@@ -172,7 +172,7 @@ void UpdateSpreadWeapon(u8 *self)
                     st->t6 = 2;
                 }
                 start_equipped_item_animation();
-                st->handle = actuator_play_waves(g_effect_handle_records);
+                st->handle = actuator_play_waves(g_spread_weapon_rumble_waves);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
                 st->t4C = g_effect_state_param;
                 self[0x20] = 2;

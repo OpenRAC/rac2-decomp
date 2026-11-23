@@ -44,7 +44,7 @@ extern int coll_trace_projectile_to_impact_pal(float, void *, void *, void *, vo
 extern void part_spawn_muzzle_spark_burst_pal(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_rumble_waves;
 extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void actuator_end_looping_waves(int);
 extern void ref_L00_003FDE48_00(void *, void *);
@@ -103,7 +103,7 @@ void bouncer_update_pal(unsigned char *object) {
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
             start_equipped_item_animation_pal();
             *(int *)(state + 0x2C) = 13;
-            *(int *)(state + 0x28) = actuator_play_waves(&g_bouncer_sound_record);
+            *(int *)(state + 0x28) = actuator_play_waves(&g_bouncer_rumble_waves);
         }
         if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.unk_22B8 == 0) {
             handle = *(int *)(state + 0x28);

@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 struct Rac2Native_5f824a0e369ccf7b_src_record { u8 b0,b1,b2,b3; u16 s4,s6,s8,s10,s12; u8 e,f; };
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_blitz_gun_sound_records[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_blitz_gun_rumble_waves[];
 extern u8 g_item_slot_to_record[];
 extern float g_blitz_gun_euler_angles[4] __attribute__((sda));
 extern unsigned int g_blitz_startup_ticks __attribute__((sda));
@@ -153,7 +153,7 @@ void blitz_gun_update(char *moby)
                     *(int *)(state + 0x48) = 0;
                 }
                 start_equipped_item_animation();
-                *(int *)(state + 0x4C) = actuator_play_waves(g_blitz_gun_sound_records);
+                *(int *)(state + 0x4C) = actuator_play_waves(g_blitz_gun_rumble_waves);
                 *(u8 *)(moby + 0x20) = 2;
                 *(float *)(state + 0xC) = math_random_angle();
                 anim_start_blended(moby,2,0,0);

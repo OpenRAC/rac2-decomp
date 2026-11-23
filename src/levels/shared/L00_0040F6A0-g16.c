@@ -65,7 +65,7 @@ extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_table_2[];
-extern u8 g_megarocket_sound_records[];
+extern u8 g_megarocket_rumble_waves[];
 
 extern s32 hero_l00_set_action(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -299,7 +299,7 @@ void megarocket_cannon_update(Moby *moby)
             charge_shot_start_effect(moby, &nozzle, charged);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             start_equipped_item_animation();
-            vars->sound = actuator_play_waves(g_megarocket_sound_records);
+            vars->sound = actuator_play_waves(g_megarocket_rumble_waves);
             if (charged)
                 g_subtitle_history[0x3A8 / 2] = 0xFFFF;
             else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)

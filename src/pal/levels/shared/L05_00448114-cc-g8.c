@@ -29,7 +29,7 @@ extern char g_ship_saved_position[] __attribute__((sda));
 extern char g_ship_saved_matrix_row0[] __attribute__((sda));
 extern char g_ship_saved_matrix_row1[] __attribute__((sda));
 extern char g_ship_saved_matrix_row2[] __attribute__((sda));
-extern char g_slot_record_source[];
+extern char g_ship_l05_rumble_waves[];
 
 extern void hero_set_objects_flag_bit(void);
 extern void UpdateSteeringInput_pal(void *, void *, void *);
@@ -140,7 +140,7 @@ void UpdateTimedTransformState_pal(char *obj)
             if (g_current_map_index == 20) t = 0.32000002f;
             ship_update_record_transform(obj, t);
             if ((((int)(g_ship_crash_recovery_time - 20) * 5 + 2) / 6) < g_ship_transition_timer) {
-                actuator_play_waves(g_slot_record_source);
+                actuator_play_waves(g_ship_l05_rumble_waves);
             }
         }
         break;

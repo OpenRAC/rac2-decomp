@@ -486,7 +486,7 @@
 #define g_object_anim_sparks_table              D_L04_002AF630
 #define g_water_l04_grid_data                   D_L04_002AF6C0
 #define g_grouped_object_call_arg_d             D_L04_002BA660
-#define g_nuke_src_records                      D_L04_002BA6C0
+#define g_mini_nuke_l04_rumble_waves            D_L04_002BA6C0
 #define g_exhaust_effect_params_a               D_L04_002BDAC0
 #define g_exhaust_effect_params_b               D_L04_002BDB20
 #define g_race_challenge_table                  D_L04_002C63C0

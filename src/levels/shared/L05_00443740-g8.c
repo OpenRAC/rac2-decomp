@@ -6,7 +6,7 @@ typedef struct {
     int timer, flag;
 } DriverState;
 extern DriverState g_feltzin_challenge_state;
-extern char g_slot_record_source[];
+extern char g_ship_l05_rumble_waves[];
 extern float g_ship_moby_scale_factor __attribute__((sda));
 extern float g_ship_forward_offset __attribute__((sda));
 extern float g_ship_lift_offset_scale __attribute__((sda));
@@ -89,7 +89,7 @@ void UpdateDrivenMobyTransform(char *obj)
     FastVecAdd(moby + 0x10, moby + 0x10, lift_offset);
     if (g_feltzin_challenge_state.flag) {
         if (!math_fast_float_d(&g_feltzin_challenge_state.timer)) {
-            actuator_play_waves(g_slot_record_source);
+            actuator_play_waves(g_ship_l05_rumble_waves);
         } else {
             g_feltzin_challenge_state.flag = 0;
             g_feltzin_challenge_state.timer = 7;

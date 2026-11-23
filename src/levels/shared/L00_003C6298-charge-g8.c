@@ -64,7 +64,7 @@ extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_l00_table[];
 extern Light g_light_table[];
-extern u8 g_charge_sound_records[];
+extern u8 g_lock_on_weapon_rumble_waves[];
 extern u8 g_default_vector[] __attribute__((sda));
 
 extern int vec_fast_helper_b(void *);
@@ -213,7 +213,7 @@ void UpdateLockOnWeapon(Moby *moby)
             weapon_spawn_muzzle_burst(moby);
             anim_start_blended_with_flags(moby, 2, 0, 1, 0);
             moby->scale = 0.9f;
-            vars->sound = actuator_play_waves(g_charge_sound_records);
+            vars->sound = actuator_play_waves(g_lock_on_weapon_rumble_waves);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;

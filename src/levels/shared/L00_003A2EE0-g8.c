@@ -48,7 +48,7 @@ extern char g_camera_l00_position[];
 extern char *g_hit_l00_result[];
 extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_l00_table[];
-extern TargetRecord g_target_hud_records[];
+extern TargetRecord g_scoped_weapon_rumble_waves[];
 
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
@@ -263,7 +263,7 @@ void UpdateScopedWeapon(u8 *moby)
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
                 start_equipped_item_animation();
-                st->hud = actuator_play_waves(g_target_hud_records);
+                st->hud = actuator_play_waves(g_scoped_weapon_rumble_waves);
                 st->fire_timer = 2;
                 moby[0x20] = 2;
                 anim_start_blended(moby, 2, 0, 0);

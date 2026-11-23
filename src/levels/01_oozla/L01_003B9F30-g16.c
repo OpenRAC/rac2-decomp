@@ -40,9 +40,9 @@ extern char *g_path_l01_table[];
 extern char *g_moby_l01_table __attribute__((sda));
 extern float g_water_l01_height[] __attribute__((sda));
 extern float g_ferry_height_offsets_alt[], g_ferry_height_offsets[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_a;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_b;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_c;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_rumble_waves_a;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_rumble_waves_b;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_rumble_waves_c;
 extern float level_get_water_height(void);
 extern int func_001163B0(void);
 extern void anim_start_blended(unsigned char *, int, int, int);
@@ -159,7 +159,7 @@ void path_ferry_update(unsigned char *object)
         int i;
         hit = part_find_owned_effect_slot(object, 0x10000, 0);
         if (hit && (!P(hit, 0x20) || H(P(hit, 0x20), 0xAA) != 0xCE7 /* moby class 3303 */)) {
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) actuator_play_waves(&g_ferry_src_record_a);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) actuator_play_waves(&g_ferry_rumble_waves_a);
             if (object[0x43] != 2) anim_start_blended(object, 2, 5, 3);
             moby_set_state(object, 3, -1);
         } else {
@@ -186,7 +186,7 @@ void path_ferry_update(unsigned char *object)
                 F(object, 0x48) = math_random_float_range(0.8f, 1.2f);
             }
             if (g_hero_state.interaction == (char *)object && g_hero_state.active) {
-                actuator_play_waves(&g_ferry_src_record_a);
+                actuator_play_waves(&g_ferry_rumble_waves_a);
                 if (object[0x43] != 2) anim_start_blended(object, 2, 5, 3);
                 moby_set_state(object, 3, -1);
             }
@@ -196,7 +196,7 @@ void path_ferry_update(unsigned char *object)
     }
     case 3:
         if (object[0x60] & 2) {
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) I(context, 0x2F0) = actuator_play_waves(&g_ferry_src_record_b);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) I(context, 0x2F0) = actuator_play_waves(&g_ferry_rumble_waves_b);
             if (object[0x43] != 3) anim_start_blended(object, 3, 0, 6);
             F(context, 0x2CC) = F(context, 0x2D0) = 10.0f;
             moby_set_state(object, 4, -1);
@@ -253,7 +253,7 @@ void path_ferry_update(unsigned char *object)
         if ((float)(I(outbound, 0)-1) <= F(context, 0x2B0)) {
             actuator_end_looping_waves(I(context, 0x2F0));
             I(context, 0x2F0) = -1;
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) actuator_play_waves(&g_ferry_src_record_c);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) actuator_play_waves(&g_ferry_rumble_waves_c);
             if (object[0x43] != 6) anim_start_blended(object, 6, 0, 10);
             U(object, 0x96) = 0;
             object[0x20] = 5;

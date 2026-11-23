@@ -37,7 +37,7 @@ extern char *g_path_l05_entry_table;
 extern Moby *g_feltzin_target_mobys;
 extern int g_current_map_index MACRO_ADDR;
 extern Collision g_collision_l05_result;
-extern char g_slot_record_source[];
+extern char g_ship_l05_rumble_waves[];
 extern int g_feltzin_mission_index;
 extern float g_ship_hit_value __attribute__((sda));
 extern float g_ship_hit_event_amount __attribute__((sda));
@@ -172,7 +172,7 @@ void ResolveLinkedMobyMovementCollisions_pal(char *obj, void *target)
                 hero_apply_damage_pal(g_ship_hit_damage);
                 *(int *)(record + 0x58) = ((s32)(g_ship_record_word) * 5 + 2) / 6;
             }
-            actuator_play_waves(g_slot_record_source);
+            actuator_play_waves(g_ship_l05_rumble_waves);
             qcopy(moby->state + 0x90, g_collision_l05_result.hit);
             gfx_add_draw_callback_third(part_spawn_impact_trail, moby);
             continue;
@@ -192,7 +192,7 @@ impact:
         FastVecAdd(moby->position, moby->position, move);
         FastVecAdd(obj + 0x30, obj + 0x30, move);
         qcopy(pos, g_collision_l05_result.position);
-        actuator_play_waves(g_slot_record_source);
+        actuator_play_waves(g_ship_l05_rumble_waves);
         if (!(g_feltzin_mission_index & 3)) {
             float value = g_ship_hit_value;
 

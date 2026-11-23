@@ -19,7 +19,7 @@ extern u8 g_item_slot_to_record[];
 extern Statistics g_progress_statistics[];
 extern u32 g_frame_counter;
 extern u32 g_current_map_index;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_lancer_sound_records_a[], g_lancer_sound_records_b[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_lancer_shot_rumble_waves[], g_lancer_held_rumble_waves[];
 extern int g_game_l00_mode;
 extern float g_lancer_horizontal_arc;
 extern float g_lancer_range;
@@ -231,9 +231,9 @@ void lancer_update_pal(char *moby)
                 *(int *)(state + 0x28) = 8;
                 snd_play_from_class_bank(0, 0, moby, TYPE(moby));
                 if (TYPE(moby) == 0x5D2)
-                    actuator_play_waves(g_lancer_sound_records_a);
+                    actuator_play_waves(g_lancer_shot_rumble_waves);
                 else if (*(int *)(state + 0x3C) < 0)
-                    *(int *)(state + 0x3C) = actuator_play_waves(g_lancer_sound_records_b);
+                    *(int *)(state + 0x3C) = actuator_play_waves(g_lancer_held_rumble_waves);
                 if (TYPE(moby) == 0x5D2)
                     CreateTargetedMovingEffect_pal(muzzle, moby, target, previousRange);
                 else

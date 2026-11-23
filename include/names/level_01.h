@@ -612,9 +612,9 @@
 #define g_beam_corner_vertices                      D_L01_00290030
 #define g_beam_l01_uv_table                         D_L01_002900C0
 #define g_beam_color_table                          D_L01_00290108
-#define g_ferry_src_record_a                        D_L01_00297300
-#define g_ferry_src_record_b                        D_L01_00297380
-#define g_ferry_src_record_c                        D_L01_00297400
+#define g_ferry_rumble_waves_a                      D_L01_00297300
+#define g_ferry_rumble_waves_b                      D_L01_00297380
+#define g_ferry_rumble_waves_c                      D_L01_00297400
 #define g_water_height_grid                         D_L01_00297580
 #define g_water_color_grid                          D_L01_00297960
 #define g_water_packet_header                       D_L01_00297B50

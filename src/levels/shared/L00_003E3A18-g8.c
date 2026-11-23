@@ -48,7 +48,7 @@ extern unsigned char g_beam_weapon_index NOT_SDA;
 extern UpdateTuning g_weapon_l00_table[];
 typedef struct { float red, green, blue, unused; UpdateVector position; } ScopeLight;
 extern ScopeLight g_light_table[];
-extern char g_vaporizer_sound_records[];
+extern char g_vaporizer_rumble_waves[];
 extern void anim_start_blended_with_flags(char *, int, int, int, int);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void gfx_free_point_light(int);
@@ -247,7 +247,7 @@ void vaporizer_update(u8 *object)
         if (g_hero_state.blocked == 0 && (g_pad_state[0x1A4/4] & g_hero_state.input) && canFire) {
             if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
-                data->sound = actuator_play_waves(g_vaporizer_sound_records);
+                data->sound = actuator_play_waves(g_vaporizer_rumble_waves);
                 data->firingDelay = 2;
                 object[0x20] = 2;
                 anim_start_blended(object, 2, 0, 0);

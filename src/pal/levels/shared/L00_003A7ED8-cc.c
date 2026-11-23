@@ -58,7 +58,7 @@ extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_table_2[];
-extern u8 g_minirocket_sound_records[];
+extern u8 g_minirocket_rumble_waves[];
 
 extern void EmitLayeredSparks_pal(void *);
 extern int vec_fast_helper_b(void *);
@@ -248,7 +248,7 @@ void minirocket_tube_update_pal(Moby *moby)
             else
                 start_equipped_item_animation_pal();
             anim_start_blended_pal(moby, 2, 0, 0);
-            vars->sound = actuator_play_waves(g_minirocket_sound_records);
+            vars->sound = actuator_play_waves(g_minirocket_rumble_waves);
             {
                 WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
                 vars->cooldown = 1.0f / weapon->rate;
