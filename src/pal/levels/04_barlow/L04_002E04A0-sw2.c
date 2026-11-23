@@ -169,6 +169,8 @@ s32 hero_l04_set_move_state_pal(s32 action, s32 animate) {
         HALF(0x2504) = 0;
         level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x18E0));
     }
+    /* A change of action stops the vibration, but not while 0x1FA counts down: the 50 ticks
+     * after the wrench slam's rumble starts as it strikes the ground. */
     if (SHORT(0x1FA) == 0) actuator_stop_all();
     hero_create_item_slot_objects_pal(WORD(0x22A0), WORD(0x2294));
     WORD(0x1188) = 0;
