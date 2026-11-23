@@ -29,8 +29,8 @@ extern float moby_get_anim_value(void *);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended_pal(void *, int, int, int);
 extern int FloatToInt(float);
-extern int queue_copy_record_by_index(int);
-extern void slot_reset_active(int);
+extern int actuator_play_pattern(int);
+extern void actuator_end_looping_waves(int);
 extern int math_fast_float_d(void *);
 extern int PlayMobySound(int, int, void *);
 extern int math_random_int_below(int);
@@ -66,27 +66,27 @@ void hero_grabber_update_pal(char *moby)
         if (g_hero_state.obj == moby && g_hero_state.active) {
             moby_set_state(moby, 2, -1);
             *(int *)(state + 0x60) = FloatToInt((*(float *)(state + 0x50) * 300.0f + 2.0f) * 0.16666667f);
-            *(int *)(state + 0x78) = queue_copy_record_by_index(7);
+            *(int *)(state + 0x78) = actuator_play_pattern(7);
             if (*(unsigned char *)(moby + 0x43) != 1) anim_start_blended_pal(moby, 1, 0, 8);
         }
         break;
     case 2:
         if (g_hero_state.obj == moby && g_hero_state.active) {
-            *(int *)(state + 0x78) = queue_copy_record_by_index(4);
+            *(int *)(state + 0x78) = actuator_play_pattern(4);
         } else if (*(int *)(state + 0x78) != -1) {
-            slot_reset_active(*(int *)(state + 0x78));
+            actuator_end_looping_waves(*(int *)(state + 0x78));
             *(int *)(state + 0x78) = -1;
         }
         if (math_fast_float_d(state + 0x70) && math_fast_float_d(state + 0x60)) {
             if (*(int *)(state + 0x78) != -1) {
-                slot_reset_active(*(int *)(state + 0x78));
+                actuator_end_looping_waves(*(int *)(state + 0x78));
                 *(int *)(state + 0x78) = -1;
             }
             moby_set_state(moby, 3, -1);
             PlayMobySound(0, 0, moby);
             if (*(unsigned char *)(moby + 0x43) != 2) anim_start_blended_pal(moby, 2, 0, 5);
             if (g_hero_state.obj == moby && g_hero_state.active)
-                *(int *)(state + 0x78) = queue_copy_record_by_index(5);
+                *(int *)(state + 0x78) = actuator_play_pattern(5);
             *(float *)(moby + 0x48) = g_grabber_field_value;
         }
         break;
@@ -95,12 +95,12 @@ void hero_grabber_update_pal(char *moby)
             *(unsigned short *)(moby + 0x34) |= 0x1000;
             *(int *)(state + 0x64) = 500;
             if (g_hero_state.obj == moby && g_hero_state.f31C < 0.5f) {
-                *(int *)(state + 0x78) = queue_copy_record_by_index(5);
+                *(int *)(state + 0x78) = actuator_play_pattern(5);
                 *(int *)(state + 0x68) = 1;
                 *(int *)(moby + 0x9C) = -1;
             } else {
                 if (*(int *)(state + 0x78) != -1) {
-                    slot_reset_active(*(int *)(state + 0x78));
+                    actuator_end_looping_waves(*(int *)(state + 0x78));
                     *(int *)(state + 0x78) = -1;
                 }
                 *(int *)(moby + 0x9C) = 0x80000000;
@@ -109,7 +109,7 @@ void hero_grabber_update_pal(char *moby)
         }
         break;
     case 4:
-        if (*(int *)(state + 0x68) && !math_random_int_below(11)) *(int *)(state + 0x78) = queue_copy_record_by_index(5);
+        if (*(int *)(state + 0x68) && !math_random_int_below(11)) *(int *)(state + 0x78) = actuator_play_pattern(5);
         if (*(float *)(state + 0x74) < 46.0f && frame > 46.0f) {
             if (*(int *)(state + 0x68)) {
                 if (g_hero_state.f24CC < 2) hero_record_play_counters_pal();
@@ -127,7 +127,7 @@ void hero_grabber_update_pal(char *moby)
         }
         if (*(unsigned char *)(moby + 0x60) & 2) {
             if (*(int *)(state + 0x78) != -1) {
-                slot_reset_active(*(int *)(state + 0x78));
+                actuator_end_looping_waves(*(int *)(state + 0x78));
                 *(int *)(state + 0x78) = -1;
             }
             moby_set_state(moby, 1, -1);

@@ -46,7 +46,7 @@ extern void make_hit_descriptor(float, L23Hit *, u8 *, s32, L23Vec *);
 
 extern void QueueMobyImpact(u8 *, L23Hit *);
 
-extern int queue_copy_record_by_index(s32);
+extern int actuator_play_pattern(s32);
 
 extern void part_start_random_scale_effect(void *, s32, s32);
 
@@ -74,7 +74,7 @@ void shot_update_hit_check(u8 *moby, void *origin) {
         hit.h1A = *(u16 *)(moby + 0xAA);
         if (g_last_ray_hit.f18 == g_hero_moby) {
             QueueMobyImpact(g_last_ray_hit.f18, &hit);
-            queue_copy_record_by_index(0x2B);
+            actuator_play_pattern(0x2B);
         }
         part_start_random_scale_effect(moby + 0x10, 0xA, 1);
     } else {

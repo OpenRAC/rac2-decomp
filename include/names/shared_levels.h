@@ -1920,7 +1920,7 @@
 #define g_hero_effect_vectors_b                   D_L00_0025DE00
 #define g_hero_effect_vectors_c                   D_L00_0025DE70
 #define g_hero_effect_blend_table                 D_L00_0025DEE0
-#define g_queue_source_records                    D_L00_0025E120
+#define g_actuator_patterns                       D_L00_0025E120
 #define g_weight_tap_table                        D_L00_0025EDE0
 #define g_glow_object_limit_pairs                 D_L00_00262260
 #define g_weapon_l00_table                        D_L00_00262570
@@ -2265,11 +2265,11 @@
 #define level_return_zero                         func_L00_002D6878
 #define level_is_special_mode_active              func_L00_002D6880
 #define level_get_global_word                     func_L00_002D68E8
-#define queue_copy_record_by_index                func_L00_002D6900
-#define slot_clear_active_bytes                   func_L00_002D6940
-#define slot_is_entry_nonzero                     func_L00_002D6978
-#define slot_copy_records_to_free                 func_L00_002D6998
-#define slot_reset_active                         func_L00_002D6B70
+#define actuator_play_pattern                     func_L00_002D6900
+#define actuator_stop_all                         func_L00_002D6940
+#define actuator_is_channel_active                func_L00_002D6978
+#define actuator_play_waves                       func_L00_002D6998
+#define actuator_end_looping_waves                func_L00_002D6B70
 #define LevelActuatorCalcPower                    func_L00_002D6BA8
 #define math_add_wrapping_counter                 func_L00_002D6FD8
 #define cam_clear_override_slots                  func_L00_002D7068

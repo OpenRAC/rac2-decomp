@@ -57,8 +57,8 @@ extern int hero_l00_set_action(int,int);
 extern int get_ammo(int),weapon_spend_ammo(int,int);
 extern void hud_add_moby_marker(void *,unsigned int,void *,int,int,int,float,float,float);
 extern void start_equipped_item_animation(void);
-extern void slot_reset_active(int);
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void actuator_end_looping_waves(int);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern float math_random_angle(void),IntToFloat(int),math_random_float_range(float,float),FastAddRotations(float,float);
 extern void beam_draw_ring_and_core(void *);
 /* The binder: func_L00_002E6EF8 in 23 programs, its twin func_L08_002F2D10 in levels 08, 09,
@@ -158,7 +158,7 @@ void blitz_gun_update_pal(char *moby)
                     ((BlastTimers *)state)->charged = 0;
                 }
                 start_equipped_item_animation();
-                *(int *)(state + 0x4C) = slot_copy_records_to_free(g_blitz_gun_sound_records);
+                *(int *)(state + 0x4C) = actuator_play_waves(g_blitz_gun_sound_records);
                 *(u8 *)(moby + 0x20) = 2;
                 *(float *)(state + 0xC) = math_random_angle();
                 anim_start_blended(moby,2,0,0);
@@ -176,7 +176,7 @@ void blitz_gun_update_pal(char *moby)
             }
             if (!((g_pad_state.b320 & g_hero_state.b050) && get_ammo(-1) && g_hero_state.c0d8) &&
                 *(int *)(state + 0x4C) >= 0) {
-                slot_reset_active(*(int *)(state + 0x4C));
+                actuator_end_looping_waves(*(int *)(state + 0x4C));
                 *(int *)(state + 0x4C) = -1;
             }
         }

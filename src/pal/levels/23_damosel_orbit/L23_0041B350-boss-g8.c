@@ -114,7 +114,7 @@ extern void moby_store_position_private(u8 *, void *);
 extern int player_slot_has_object(unsigned int);
 extern int charged_shot_get_for_owner(int);
 extern void charged_shot_release(int, int);
-extern int queue_copy_record_by_index(unsigned int);
+extern int actuator_play_pattern(unsigned int);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern void boss_turn_gun_toward_target_pal(char *);
 extern void mothership_project_point_onto_surface(char *, float);
@@ -649,5 +649,5 @@ state_default:
     }
     math_fast_float_d((char *)&g_boss_camera_timer[0]);
     if (g_boss_camera_timer[0])
-        queue_copy_record_by_index(0x2b);
+        actuator_play_pattern(0x2b);
 }

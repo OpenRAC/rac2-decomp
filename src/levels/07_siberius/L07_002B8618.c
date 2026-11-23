@@ -161,7 +161,7 @@ extern f32 cam_get_view_space_vector_length(s32);
 extern f32 cam_get_view_space_height(s32);
 extern void cam_set_view_space_height(s32, s32, f32);
 extern void cam_set_view_space_vector_length(s32, s32, f32);
-extern s32 queue_copy_record_by_index(s32);
+extern s32 actuator_play_pattern(s32);
 extern s32 func_L00_002EE4D8(s32, s32, f32);
 extern s32 math_lerp_int(s32, s32, f32);
 extern void level_init_pending_slot(s32, s32);
@@ -1033,7 +1033,7 @@ void hero_l07_update_state_machine(void) {
             coll_process_hit(0.4f, (s32)((TI128*)v0), 0x10, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], (s32) ((TI128*)v10));
         }
         if (math_is_below_plane_within_depth(25.7f) != 0) {
-            queue_copy_record_by_index(0x19);
+            actuator_play_pattern(0x19);
             ((Hero *)g_hero_state)->h[0x1FA/2] = 0x32;
             if (g_hero_override_flag != 0) {
                 ((Hero *)g_hero_l07_state_block)->f[0x180/4] = 0.1f;

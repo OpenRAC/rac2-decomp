@@ -81,7 +81,7 @@ extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern void SetCamera5Pose(void *, void *, int, int, int);
 extern void cancel_hero_item_animation(void);
-extern int queue_copy_record_by_index(int);
+extern int actuator_play_pattern(int);
 extern void release_moby_animation_slot(void *, void *);
 extern void moby_set_flag_bit(void *, int);
 extern int snd_start_in_slot(int, int, int);
@@ -986,7 +986,7 @@ block_184:
                                 }
 
                                 if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < g_space_ship_trigger_distance) {
-                                    queue_copy_record_by_index(0x2B);
+                                    actuator_play_pattern(0x2B);
                                     g_space_ship_boost_timer = g_space_ship_state_default;
                                 }
                             }

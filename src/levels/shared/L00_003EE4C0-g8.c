@@ -35,11 +35,11 @@ extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void 
 extern void cancel_hero_item_animation(void);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation(void);
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern int PlayMobySound(int, int, char *);
 extern char *gravity_bomb_spawn_projectile(int, char *, char *);
 extern int get_ammo(int);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern int vec_fast_helper_b(void *);
 extern void weapon_draw_aim_effect(void *);
 extern void ref_L00_003EE4C0_00(void (*)(void *), void *);
@@ -90,7 +90,7 @@ void gravity_bomb_launcher_update(unsigned char *object) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_gravity_bomb_fire_held = 1;
                 start_equipped_item_animation();
-                *(int *)(state + 0x2C) = slot_copy_records_to_free(g_gravity_bomb_sound_records);
+                *(int *)(state + 0x2C) = actuator_play_waves(g_gravity_bomb_sound_records);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 gravity_bomb_spawn_projectile((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
@@ -104,7 +104,7 @@ void gravity_bomb_launcher_update(unsigned char *object) {
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(state + 0x2C) >= 0) {
-                    slot_reset_active(*(int *)(state + 0x2C));
+                    actuator_end_looping_waves(*(int *)(state + 0x2C));
                     *(int *)(state + 0x2C) = -1;
                 }
             }

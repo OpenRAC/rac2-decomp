@@ -3974,11 +3974,11 @@ func_L00_002D6848	level_is_special_global_value	descriptive	config/names_local.t
 func_L00_002D6878	level_return_zero	descriptive	config/names_local.tsv		
 func_L00_002D6880	level_is_special_mode_active	descriptive	config/names_local.tsv		
 func_L00_002D68E8	level_get_global_word	descriptive	config/names_local.tsv		
-func_L00_002D6900	queue_copy_record_by_index	descriptive	config/names_local.tsv		
-func_L00_002D6940	slot_clear_active_bytes	descriptive	config/names_local.tsv		
-func_L00_002D6978	slot_is_entry_nonzero	descriptive	config/names_local.tsv		
-func_L00_002D6998	slot_copy_records_to_free	descriptive	config/names_local.tsv		
-func_L00_002D6B70	slot_reset_active	descriptive	config/names_local.tsv		
+func_L00_002D6900	actuator_play_pattern	descriptive	config/names_local.tsv		queue_copy_record_by_index
+func_L00_002D6940	actuator_stop_all	descriptive	config/names_local.tsv		slot_clear_active_bytes
+func_L00_002D6978	actuator_is_channel_active	descriptive	config/names_local.tsv		slot_is_entry_nonzero
+func_L00_002D6998	actuator_play_waves	descriptive	config/names_local.tsv		slot_copy_records_to_free
+func_L00_002D6B70	actuator_end_looping_waves	descriptive	config/names_local.tsv		slot_reset_active
 func_L00_002D6FD8	math_add_wrapping_counter	descriptive	config/names_local.tsv		
 func_L00_002D7068	cam_clear_override_slots	descriptive	config/names_local.tsv		
 func_L00_002D70A0	cam_alloc_override_slot	descriptive	config/names_local.tsv		
@@ -12304,7 +12304,7 @@ D_001B24DC	g_frame_time_base	descriptive	config/names_local.tsv
 D_001BD370	g_frame_time_divisor	descriptive	config/names_local.tsv		
 D_001B168C	g_frame_time_scale	descriptive	config/names_local.tsv		
 D_001B24E0	g_frame_time_scales	descriptive	config/names_local.tsv		
-D_L04_001B94C0	g_free_slot_records	descriptive	config/names_local.tsv		
+D_L04_001B94C0	g_wave_l04_channels	descriptive	config/names_local.tsv		g_free_slot_records
 D_001A8B84	g_frontend_done_flag	descriptive	config/names_local.tsv		
 D_001A742C	g_fs_aa_buffer_table	descriptive	config/names_local.tsv		
 D_L03_002A11E8	g_fx_color_table	descriptive	config/names_local.tsv		
@@ -17195,7 +17195,7 @@ D_L01_001AEEE8	g_quad_vertex_index_c	descriptive	config/names_local.tsv
 D_L01_001AEEEC	g_quad_vertex_index_d	descriptive	config/names_local.tsv		
 D_L11_001B18F8	g_quad_wave_amplitude	descriptive	config/names_local.tsv		
 D_001A9EA0	g_quat_next_axis_table	descriptive	config/names_local.tsv		
-D_L00_0025E120	g_queue_source_records	descriptive	config/names_local.tsv		
+D_L00_0025E120	g_actuator_patterns	descriptive	config/names_local.tsv		g_queue_source_records
 D_L04_001B09F8	g_race_banner_keys_end	descriptive	config/names_local.tsv		
 D_L04_001B09E0	g_race_banner_keys_start	descriptive	config/names_local.tsv		
 D_L04_001B09B0	g_race_banner_keys_x	descriptive	config/names_local.tsv		
@@ -18648,7 +18648,7 @@ D_L00_001B19E8	g_slot_count	descriptive	config/names_local.tsv
 D_L23_001B3900	g_slot_effect_alpha_table	descriptive	config/names_local.tsv		
 D_L02_001B0A18	g_slot_effect_rate_range	descriptive	config/names_local.tsv		
 D_L23_001B38E8	g_slot_effect_scale_table	descriptive	config/names_local.tsv		
-D_L24_001B8500	g_slot_entry_table	descriptive	config/names_local.tsv		
+D_L24_001B8500	g_wave_l24_channels	descriptive	config/names_local.tsv		g_slot_entry_table
 D_L04_0021DA00	g_slot_flag_view_a	descriptive	config/names_local.tsv		
 D_L04_0021E670	g_slot_flag_view_b	descriptive	config/names_local.tsv		
 D_0018C0E8	g_slot_index_first	descriptive	config/names_local.tsv		

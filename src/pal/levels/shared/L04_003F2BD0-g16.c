@@ -38,8 +38,8 @@ extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
 extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern void slot_reset_active(void);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void actuator_end_looping_waves(void);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void moby_draw_attached_effect(void *);
 

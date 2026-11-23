@@ -87,13 +87,13 @@ extern int moby_is_in_special_class_range(void *);
 extern int PlayMobySound(int, int, void *);
 extern void weapon_spawn_muzzle_burst_pal(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern char *pair_choose_owner_for_key(void *, void *, int, int *, int);
 extern void KeyOwnerTableInsert(void *, void *, int);
 extern Moby *aimed_projectile_spawn_pal(void *, void *, void *, void *, float, float, float, float);
 extern int weapon_spend_ammo(int, int);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern void cancel_hero_item_animation_pal(void);
 extern float IntToFloat(int);
 extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
@@ -215,7 +215,7 @@ void update_lock_on_weapon_l03_pal(Moby *moby)
             weapon_spawn_muzzle_burst_pal(moby);
             anim_start_blended_with_flags(moby, 2, 0, 1, 0);
             moby->scale = 0.9f;
-            vars->sound = slot_copy_records_to_free(g_charge_sound_records);
+            vars->sound = actuator_play_waves(g_charge_sound_records);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;
@@ -250,7 +250,7 @@ void update_lock_on_weapon_l03_pal(Moby *moby)
         }
         if (!(g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
             if (vars->sound >= 0) {
-                slot_reset_active(vars->sound);
+                actuator_end_looping_waves(vars->sound);
                 vars->sound = -1;
                 cancel_hero_item_animation_pal();
             }

@@ -74,8 +74,8 @@ extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, flo
 extern void cancel_hero_item_animation_pal(void);
 extern void start_equipped_item_animation_pal(void);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern int slot_copy_records_to_free(void *);
-extern void slot_reset_active(int);
+extern int actuator_play_waves(void *);
+extern void actuator_end_looping_waves(int);
 extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern int PlayMobySound(int, int, void *);
@@ -170,7 +170,7 @@ void UpdateSpreadWeapon_pal(u8 *self)
                     turret_state->t40 = 0;
                 }
                 start_equipped_item_animation_pal();
-                turret_state->handle = slot_copy_records_to_free(g_effect_handle_records);
+                turret_state->handle = actuator_play_waves(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
                 turret_state->t4C = ((s32)g_effect_state_param * 5 + 2) / 6;
                 self[0x20] = 2;
@@ -190,7 +190,7 @@ void UpdateSpreadWeapon_pal(u8 *self)
             }
             if (!(((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
                 if (turret_state->handle >= 0) {
-                    slot_reset_active(turret_state->handle);
+                    actuator_end_looping_waves(turret_state->handle);
                     turret_state->handle = -1;
                 }
             }

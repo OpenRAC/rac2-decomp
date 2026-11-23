@@ -71,8 +71,8 @@ extern int hero_classify_input_direction(void);
 extern void hero_select_anim_frame(s32, s32);
 extern f32 cam_get_view_space_vector_length(char *);
 extern void cam_set_view_space_height(V4_F6a70b950 *, V4_F6a70b950 *, float);
-extern int queue_copy_record_by_index(unsigned int);
-extern void slot_clear_active_bytes(void);
+extern int actuator_play_pattern(unsigned int);
+extern void actuator_stop_all(void);
 extern void level_init_pending_slot(void *, char *);
 extern void level_append_record_to_table(List_F66766f2b *, int, int, float);
 extern void level_release_slot_list(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *);
@@ -189,7 +189,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
         HALF(0x2504) = 0;
         level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x18E0));
     }
-    if (SHORT(0x1FA) == 0) slot_clear_active_bytes();
+    if (SHORT(0x1FA) == 0) actuator_stop_all();
     hero_create_item_slot_objects_pal(WORD(0x22A0), WORD(0x2294));
     WORD(0x1188) = 0;
     switch (action) {
@@ -743,7 +743,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
             REAL(0x4C8) = 18.0f; SHORT(0x4AC) = 4; REAL(0x4B8) = 0.8f;
             REAL(0x4CC) = 30.0f; REAL(0x4D0) = 11.0f; REAL(0x4A8) = 1.5f;
             REAL(0x50C) = 1.55f; REAL(0x508) = 1.5f; HALF(0x518) = 1;
-            queue_copy_record_by_index(20);
+            actuator_play_pattern(20);
             REAL(0x50C) = 0.9f; REAL(0x4A8) = 0.4f; REAL(0x508) = 0.4f;
             if (REAL(0x184) < 0.40000004f) {
                 level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
@@ -772,7 +772,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
             REAL(0x4C8) = 12.0f; REAL(0x4CC) = 20.0f; REAL(0x4D0) = 1e+01f; HALF(0x518) = 10;
             if (BYTE(0x24DA)) { REAL(0x498) = 0.09800001f; REAL(0x50C) = 3.35f; REAL(0x508) = 3.3f; }
             else { REAL(0x498) = 0.034f; REAL(0x50C) = 1.85f; REAL(0x508) = 1.8f; }
-            BYTE(0x49F) = 1; REAL(0x4A8) = REAL(0x508); queue_copy_record_by_index(27);
+            BYTE(0x49F) = 1; REAL(0x4A8) = REAL(0x508); actuator_play_pattern(27);
             HALF(0x52A) = 67; REAL(0x520) = 0.011600001f;
             COPY_VECTOR(0x4F0, 0x4E0); HALF(0x24D8) = 1; BYTE(0x22B7) = 1; BYTE(0x52C) = 1;
 
@@ -781,7 +781,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
             REAL(0x4A8) = 4.0f; REAL(0x4C8) = 26.0f; SHORT(0x4AC) = 7;
             REAL(0x4B8) = 0.6f; REAL(0x4CC) = 38.0f; REAL(0x4D0) = 18.0f;
             REAL(0x50C) = 4.07f; REAL(0x508) = 4.0f; HALF(0x518) = 12;
-            queue_copy_record_by_index(20); REAL(0x510) = 4.5f; HALF(0x51A) = 100;
+            actuator_play_pattern(20); REAL(0x510) = 4.5f; HALF(0x51A) = 100;
             REAL(0x4A4) = 0.038000003f; HALF(0x526) = 31;
             if (REAL(0x184) < 0.40000004f) {
                 level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
@@ -924,7 +924,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
             goto finish;
         case 0x1F:
             if (WORD(0x1220)) {
-                queue_copy_record_by_index(19);
+                actuator_play_pattern(19);
                 if (animate) {
                     set_hero_animation_pal(0x60, 4, -1.0f);
                     anim_start_blended_pal(PTR(0x1220), 3, 4, -1);
@@ -1015,7 +1015,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
         frames = 7.0f; animation_43 = 0x29; { set_hero_animation_pal(animation_43, 5, frames); goto finish; }
     case 0x16:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
-        hero_scale_saved_vectors(0.5f); queue_copy_record_by_index(18); HALF(0x20E) = 37;
+        hero_scale_saved_vectors(0.5f); actuator_play_pattern(18); HALF(0x20E) = 37;
         COPY_VECTOR(0xF0, 0x120); vec_clamp_length((f32 *)VEC(0xF0), 0.14000002f);
         hit_44 = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
         if (hit_44) AdjustPlayerHealth_pal(FloatToInt(*(f32 *)(hit_44 + 0x2C)));
@@ -1027,7 +1027,7 @@ s32 hero_l22_set_action_pal(s32 action, s32 animate) {
         goto finish;
     case 0x8C:
         WORD(0x229C) = 7; BITS(0x24A0) = 0; hero_scale_saved_vectors(0.5f);
-        BYTE(0x22BC) = 1; queue_copy_record_by_index(18);
+        BYTE(0x22BC) = 1; actuator_play_pattern(18);
         hit_45 = part_find_owned_effect_slot(PTR(0x2290), 8, 0);
         if (hit_45) AdjustPlayerHealth_pal(FloatToInt(*(f32 *)(hit_45 + 0x2C)));
         else AdjustPlayerHealth_pal(1);

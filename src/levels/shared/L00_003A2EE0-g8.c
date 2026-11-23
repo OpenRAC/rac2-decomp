@@ -74,8 +74,8 @@ extern void start_equipped_item_animation(void);
 extern s32 hero_l00_set_action(int, int);
 extern int weapon_spend_ammo(int, int);
 extern int get_ammo(int);
-extern int slot_copy_records_to_free(TargetRecord *);
-extern void slot_reset_active(int);
+extern int actuator_play_waves(TargetRecord *);
+extern void actuator_end_looping_waves(int);
 extern int AcquireEntitySlot(void *, int, int *);
 extern char *mem_round_up_to_16(char *);
 extern char *level_get_slot_body(int, int);
@@ -263,7 +263,7 @@ void UpdateScopedWeapon(u8 *moby)
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
                 start_equipped_item_animation();
-                st->hud = slot_copy_records_to_free(g_target_hud_records);
+                st->hud = actuator_play_waves(g_target_hud_records);
                 st->fire_timer = 2;
                 moby[0x20] = 2;
                 anim_start_blended(moby, 2, 0, 0);
@@ -273,7 +273,7 @@ void UpdateScopedWeapon(u8 *moby)
         }
         if (!(GAME->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || get_ammo(-1) == 0 || HERO->b[0x22B8] == 0) {
             if (st->hud >= 0) {
-                slot_reset_active(st->hud);
+                actuator_end_looping_waves(st->hud);
                 st->hud = -1;
             }
         }

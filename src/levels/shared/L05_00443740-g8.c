@@ -31,7 +31,7 @@ extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_fast_float_d(void *);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void ResolveLinkedMobyMovementCollisions(void *, void *);
 extern void ship_update_aim_point(void *, void *);
 extern void moby_sync_equipment_parts(void *);
@@ -89,7 +89,7 @@ void UpdateDrivenMobyTransform(char *obj)
     FastVecAdd(moby + 0x10, moby + 0x10, lift_offset);
     if (g_feltzin_challenge_state.flag) {
         if (!math_fast_float_d(&g_feltzin_challenge_state.timer)) {
-            slot_copy_records_to_free(g_slot_record_source);
+            actuator_play_waves(g_slot_record_source);
         } else {
             g_feltzin_challenge_state.flag = 0;
             g_feltzin_challenge_state.timer = 7;

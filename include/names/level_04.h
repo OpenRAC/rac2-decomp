@@ -399,7 +399,7 @@
 #define g_barlow_path_total_e                   D_L04_001B3480
 #define g_barlow_path_total_f                   D_L04_001B3484
 #define g_barlow_path_total_g                   D_L04_001B3488
-#define g_free_slot_records                     D_L04_001B94C0
+#define g_wave_l04_channels                     D_L04_001B94C0
 #define g_hero_l04_state                        D_L04_001B9540
 #define g_tether_zero_vec                       D_L04_001B9680
 #define g_hero_l04_state_extra                  D_L04_001B9698

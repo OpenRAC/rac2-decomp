@@ -39,7 +39,7 @@ extern void UpdateDrivenMobyTransform_pal(void *);
 extern void euler_rotation_basis(void *, void *);
 extern void hero_record_play_counters_pal(void);
 extern void ship_update_record_transform(void *, float);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void ship_respawn_at_best_saved_slot_pal(void *);
 extern float hero_get_clamped_stat(void);
 extern int hero_get_state_value_c(void);
@@ -140,7 +140,7 @@ void UpdateTimedTransformState_pal(char *obj)
             if (g_current_map_index == 20) t = 0.32000002f;
             ship_update_record_transform(obj, t);
             if ((((int)(g_ship_crash_recovery_time - 20) * 5 + 2) / 6) < g_ship_transition_timer) {
-                slot_copy_records_to_free(g_slot_record_source);
+                actuator_play_waves(g_slot_record_source);
             }
         }
         break;

@@ -31,48 +31,39 @@ typedef unsigned int u32;
 
 extern u32 g_game_mode;
 
-extern u8 g_slot_entry_table[];
+extern u8 g_wave_l24_channels[];
 
-/* Measured partial layouts; original type and game roles are unknown. */
-struct Rac2Native_5f824a0e369ccf7b_src_record {
-    unsigned char b0;
-    unsigned char b1;
-    unsigned char b2;
-    unsigned char b3;
-    unsigned short s4;
-    unsigned short s6;
-    unsigned short s8;
-    unsigned short s10;
-    unsigned short s12;
-    unsigned char e;
-    unsigned char f;
+/* The controller's vibration (the pad actuators) is made of eight wave channels, which
+ * LevelActuatorCalcPower (L00_002D67A8-envelope.c) mixes every frame. g_wave_l00_channels,
+ * g_wave_l04_channels and g_wave_l24_channels are that one array, named by the address the code
+ * forms in level 00, 04 and 24. The functions below start and stop waves in it. */
+
+/* One wave of a vibration pattern, as the level program stores it: WaveChannel's fields, except
+ * that PEAK is the highest level, where WaveChannel keeps AMPLITUDE (PEAK - BIAS). A KIND of 0xFF
+ * ends the list. */
+struct WaveRecord {
+    unsigned char kind;
+    unsigned char permanent;
+    unsigned char output;
+    unsigned char multiply;
+    unsigned short delay;
+    unsigned short duration;
+    unsigned short frame;
+    unsigned short rise;
+    unsigned short fall;
+    unsigned char peak;
+    unsigned char bias;
 };
 
-struct Rac2Native_5f824a0e369ccf7b_dst_record {
-    unsigned char b0;
-    unsigned char b1;
-    unsigned char b2;
-    unsigned char b3;
-    unsigned short s4;
-    unsigned short s6;
-    unsigned short s8;
-    short s10;
-    short s12;
-    unsigned char e;
-    unsigned char f;
-};
-
-extern struct Rac2Native_5f824a0e369ccf7b_dst_record g_free_slot_records[8] __attribute__((nosda));
-
+/* A wave channel, as in L00_002D67A8-envelope.c. */
 typedef struct {
-    u8 field0;
-    u8 active;
-    u8 middle[4];
-    unsigned short count;
-    u8 trailing[8];
-} ConditionalResetSlot;
+    unsigned char kind, permanent, output, multiply;
+    short delay, duration, frame, rise, fall;
+    unsigned char amplitude, bias;
+} WaveChannel;
 
-extern ConditionalResetSlot g_wave_l00_channels[8];
+extern WaveChannel g_wave_l04_channels[8] __attribute__((nosda));
+extern WaveChannel g_wave_l00_channels[8];
 
 /* Filter primary or fallback object's class identifier by mode and signed selection */
 /* Checks if the tracked object is a certain kind of object, picked by the selection number. */
@@ -114,44 +105,52 @@ u32 level_get_global_word(void) {
 }
 
 
-extern struct Rac2Native_5f824a0e369ccf7b_src_record *g_queue_source_records[];
+/* The level's vibration patterns: 48 lists of waves (0 to 47), data in the level program. */
+extern struct WaveRecord *g_actuator_patterns[];
 
-int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src);
+int actuator_play_waves(struct WaveRecord *src);
 
-/* Copies the record the INDEX selects, or reports -1 when INDEX is past the 0x62-entry table. */
-int queue_copy_record_by_index(unsigned int index)
+/* Plays vibration pattern INDEX, a fixed rumble the game picks by number (18 when the hero is
+ * hurt, for example). Returns what actuator_play_waves returns, or -1 when INDEX is 0x62 or more.
+ * The table has only 48 patterns, so 48 to 0x61 would read past its end; no caller asks for one. */
+int actuator_play_pattern(unsigned int index)
 {
     if (index < 0x62)
-        return slot_copy_records_to_free(g_queue_source_records[index]);
+        return actuator_play_waves(g_actuator_patterns[index]);
     return -1;
 }
 
-/* Clears the first byte of the eight 16-byte slots, walking from the last one down. */
-void slot_clear_active_bytes(void)
+/* Stops every wave at once by clearing each channel's kind. The hero's set-action functions call
+ * it on every change of action unless the hero's halfword at 0x1FA is set, so a new action
+ * cuts off the rumble of the last one. */
+void actuator_stop_all(void)
 {
     s32 i;
     for (i = 7; i >= 0; --i)
-        g_wave_l00_channels[i].field0 = 0;
+        g_wave_l00_channels[i].kind = 0;
 }
 
-/* tests the byte at the indexed 16-byte table entry */
-s32 slot_is_entry_nonzero(s32 index) {
- return g_slot_entry_table[index*16]!=0;
+/* Tells whether wave channel INDEX is playing (its kind byte is not 0). */
+s32 actuator_is_channel_active(s32 index) {
+ return g_wave_l24_channels[index*16]!=0;
 }
 
-/* Check space among eight destination records, copy bounded input records into inactive slots, adjust copied byte and halfword fields, and return a slot index or -1. */
-int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src)
+/* Starts a list of up to eight waves, each in a free channel. Plays nothing and returns -1 when
+ * too few channels are free; otherwise returns the channel of the last wave, which callers keep
+ * as a handle. A wave with no period (rise and fall both 0) gets a rise of 1, since the mixer
+ * divides by it. */
+int actuator_play_waves(struct WaveRecord *src)
 {
     int n = 0;
     int i;
     int j;
 
-    while (n < 8 && src[n].b0 != 255)
+    while (n < 8 && src[n].kind != 255)
         n++;
 
     j = 0;
     for (i = 0; i < 8 && j < n; i++) {
-        if (g_free_slot_records[i].b0 == 0)
+        if (g_wave_l04_channels[i].kind == 0)
             j++;
     }
 
@@ -160,35 +159,37 @@ int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src
 
     for (j = 0; j < n; j++) {
         i = 0;
-        while (i < 8 && g_free_slot_records[i].b0 != 0)
+        while (i < 8 && g_wave_l04_channels[i].kind != 0)
             i++;
         if (i < 8) {
-            g_free_slot_records[i].b0 = src[j].b0;
-            g_free_slot_records[i].b1 = src[j].b1;
-            g_free_slot_records[i].b2 = src[j].b2;
-            g_free_slot_records[i].b3 = src[j].b3;
-            g_free_slot_records[i].s4 = src[j].s4;
-            g_free_slot_records[i].s6 = src[j].s6;
-            g_free_slot_records[i].s8 = src[j].s8;
-            g_free_slot_records[i].s10 = src[j].s10;
-            g_free_slot_records[i].s12 = src[j].s12;
-            g_free_slot_records[i].e = src[j].e - src[j].f;
-            g_free_slot_records[i].f = src[j].f;
-            if (g_free_slot_records[i].s10 + g_free_slot_records[i].s12 == 0)
-                g_free_slot_records[i].s10++;
+            g_wave_l04_channels[i].kind = src[j].kind;
+            g_wave_l04_channels[i].permanent = src[j].permanent;
+            g_wave_l04_channels[i].output = src[j].output;
+            g_wave_l04_channels[i].multiply = src[j].multiply;
+            g_wave_l04_channels[i].delay = src[j].delay;
+            g_wave_l04_channels[i].duration = src[j].duration;
+            g_wave_l04_channels[i].frame = src[j].frame;
+            g_wave_l04_channels[i].rise = src[j].rise;
+            g_wave_l04_channels[i].fall = src[j].fall;
+            g_wave_l04_channels[i].amplitude = src[j].peak - src[j].bias;
+            g_wave_l04_channels[i].bias = src[j].bias;
+            if (g_wave_l04_channels[i].rise + g_wave_l04_channels[i].fall == 0)
+                g_wave_l04_channels[i].rise++;
         }
     }
     return i;
 }
 
-/* For eight16-byte records, clear active byte1 and halfword6 only when active is nonzero */
-void slot_reset_active(void) {
-    ConditionalResetSlot *slot = g_wave_l00_channels;
+/* Ends every looping (permanent) wave: with no time left, the mixer stops it on its next frame.
+ * Waves with a set duration play on. Callers pass the handle actuator_play_waves gave them, but
+ * the function takes no argument and ends all looping waves. */
+void actuator_end_looping_waves(void) {
+    WaveChannel *slot = g_wave_l00_channels;
     s32 remaining = 7;
     do {
-        if (slot->active) {
-            slot->active = 0;
-            slot->count = 0;
+        if (slot->permanent) {
+            slot->permanent = 0;
+            slot->duration = 0;
         }
         --remaining;
         ++slot;

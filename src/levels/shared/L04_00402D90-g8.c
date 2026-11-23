@@ -169,7 +169,7 @@ extern void add_vectors(void *,void *,void *);
 extern unsigned char *SpawnHomingShot(void *,void *,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern unsigned char *bike_find_aim_target(void *,void *,void *,void *,void *,void *,float,float);
-extern int queue_copy_record_by_index(int);
+extern int actuator_play_pattern(int);
 extern void * homing_rocket_spawn(void *,void *,void *,float,float,float,float,float);
 extern void * shield_dome_spawn(void *,void *);
 /* Lets the racer pick up item boxes and fire its chosen weapon: shots, homing rockets or a dome blast. */
@@ -233,7 +233,7 @@ void racer_update_item_use(unsigned char *racer)
     FastVecSub(delta,origin,target+16);
     if(func_L00_002EE290(delta)<25) {pitch=aimPitch;yaw=aimYaw;}
    } else {aimPitch=pitch;aimYaw=yaw;extra=0.2f;}
-   queue_copy_record_by_index(47);add_vectors(temp,origin,dir);
+   actuator_play_pattern(47);add_vectors(temp,origin,dir);
    homing_rocket_spawn(racer,origin,target,aimPitch,aimYaw,extra,pitch,yaw);PlayMobySound(8,0,racer);
    if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }return; }

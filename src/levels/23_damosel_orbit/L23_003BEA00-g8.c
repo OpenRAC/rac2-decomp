@@ -113,7 +113,7 @@ extern float moby_get_anim_value(char *),math_random_float_range(float,float);
 extern int math_is_value_within_step(char *,float);
 extern void *ribbon_trail_create(u8 *,u8 *,u8 *,u8,u8,float,float,float,float,short,short,int,int,int,int,int);
 extern void moby_transform_joint_to_world(char *,int,char *);
-extern int queue_copy_record_by_index(unsigned int);
+extern int actuator_play_pattern(unsigned int);
 
 /* Per-frame update of the boss-like enemy: checks the hero distance and facing, then runs its state machine (idle, chase, attack, charge, hurt) and finishes with the shared timers. */
 void enemy_update_state_machine(u8 *object)
@@ -308,7 +308,7 @@ void enemy_update_state_machine(u8 *object)
             FastVecAdd(point,point,((DispatchState *)state)->f2A0+0xC0);
             FastVecScale(point,point,15.0f); point[3]=5627.9248f;
             part_queue_impact_effect((int)g_hero_moby,(int)object,0x10007,(int)(object+0x10),(int)point,g_mothership_impact_param);
-            queue_copy_record_by_index(43);
+            actuator_play_pattern(43);
             SpawnExplosion(g_boss_hit_point,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
             ((DispatchState *)state)->f3BE=1;
         }
@@ -319,7 +319,7 @@ void enemy_update_state_machine(u8 *object)
             if (((DispatchState *)state)->f3B4!=-1) { snd_stop_voice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
         } else if ((int)U(object,0x96)>g_enemy_flee_health_threshold) { moby_clear_selected((char *)object); moby_set_state(object,5,0); } else {
             if ((int)U(object,0x96)>=g_enemy_flee_health_threshold-5 && ((DispatchState *)state)->f3BE) {
-                snd_start_in_slot(29,0,0); ((DispatchState *)state)->f3BE=0; queue_copy_record_by_index(43);
+                snd_start_in_slot(29,0,0); ((DispatchState *)state)->f3BE=0; actuator_play_pattern(43);
             }
         }
         break;

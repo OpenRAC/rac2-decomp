@@ -22,7 +22,7 @@ extern int PlayMobySound(int,int,void *);
 extern void slot_subtract_value_clamped(int,int);
 extern char *moby_spawn_shot_effect_pal(void *,void *,float,void *,int,int,int,int,int);
 extern char *feltzin_shot_create_pal(void *,void *,int,void *,int),*moby_spawn_directed_effect_pal(void *,void *,int,void *,int),*projectile_spawn_with_target_pal(void *,void *,int,void *,int,int),*projectile_l05_spawn_pal(void *,void *,int,void *,int);
-extern int snd_play_from_class_bank(int,int,void *,int),slot_copy_records_to_free(void *);
+extern int snd_play_from_class_bank(int,int,void *,int),actuator_play_waves(void *);
 extern void snd_stop_voice(int);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
@@ -195,5 +195,5 @@ void UpdateShipWeapons_pal(char *moby, char *ship)
     }
 
     if (!math_fast_float_d(vars + 0x218))
-        I(vars, 0x214) = slot_copy_records_to_free(g_slot_record_source);
+        I(vars, 0x214) = actuator_play_waves(g_slot_record_source);
 }

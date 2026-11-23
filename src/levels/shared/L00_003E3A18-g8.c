@@ -71,10 +71,10 @@ extern s32 hero_l00_set_action(int, int);
 extern int math_fast_float_d(int *);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation(void);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void anim_start_blended(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern int FastDecTimer(short *);
 extern void AimAndSpawnBeamWithMuzzleFlashes(char *);
 extern int vec_fast_helper_b(float *);
@@ -247,14 +247,14 @@ void vaporizer_update(u8 *object)
         if (g_hero_state.blocked == 0 && (g_pad_state[0x1A4/4] & g_hero_state.input) && canFire) {
             if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
-                data->sound = slot_copy_records_to_free(g_vaporizer_sound_records);
+                data->sound = actuator_play_waves(g_vaporizer_sound_records);
                 data->firingDelay = 2;
                 object[0x20] = 2;
                 anim_start_blended(object, 2, 0, 0);
             } else PlayMobySound(1, 0, object);
             if ((g_pad_state[0x1A0/4] & g_hero_state.input) && get_ammo(-1) && g_hero_state.active) break;
             if (data->sound >= 0) {
-                slot_reset_active(data->sound);
+                actuator_end_looping_waves(data->sound);
                 data->sound = -1;
             }
         }

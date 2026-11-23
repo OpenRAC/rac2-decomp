@@ -72,8 +72,8 @@ extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, flo
 extern void cancel_hero_item_animation(void);
 extern void start_equipped_item_animation(void);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern int slot_copy_records_to_free(void *);
-extern void slot_reset_active(int);
+extern int actuator_play_waves(void *);
+extern void actuator_end_looping_waves(int);
 extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern int PlayMobySound(int, int, void *);
@@ -172,7 +172,7 @@ void UpdateSpreadWeapon(u8 *self)
                     st->t6 = 2;
                 }
                 start_equipped_item_animation();
-                st->handle = slot_copy_records_to_free(g_effect_handle_records);
+                st->handle = actuator_play_waves(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
                 st->t4C = g_effect_state_param;
                 self[0x20] = 2;
@@ -192,7 +192,7 @@ void UpdateSpreadWeapon(u8 *self)
             }
             if (!(((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
                 if (st->handle >= 0) {
-                    slot_reset_active(st->handle);
+                    actuator_end_looping_waves(st->handle);
                     st->handle = -1;
                 }
             }
