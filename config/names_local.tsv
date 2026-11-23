@@ -2934,7 +2934,7 @@ func_L00_002D6940	actuator_stop_all	zeroes the kind byte of all 8 wave channels;
 func_L00_002D6978	actuator_is_channel_active	tests a wave channel's kind byte (was slot_is_entry_nonzero)	
 func_L00_002D6998	actuator_play_waves	copies a 0xFF-ended wave list into free wave channels, returns a channel or -1 (was slot_copy_records_to_free)	
 func_L00_002D6B70	actuator_end_looping_waves	clears permanent and duration of looping wave channels so the mixer ends them (was slot_reset_active)	
-func_L00_002D6FD8	math_add_wrapping_counter	wraps at 256 (was AddToWrappingCounter)	
+func_L00_002D6FD8	actuator_update	runs LevelActuatorCalcPower and writes the pad's motor bytes (+0x188, +0x189 of g_pad_state) when vibration is on (was math_add_wrapping_counter)	
 func_L00_002D7068	cam_clear_override_slots	clears 32 slots, selection -1 (was ClearCameraOverrideSlots)	
 func_L00_002D70A0	cam_alloc_override_slot	finds free slot and inits (was AllocCameraOverrideSlot)	
 func_L00_002D7140	cam_end_override	clears active and eases blend (was EndCameraOverride)	

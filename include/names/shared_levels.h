@@ -2271,7 +2271,7 @@
 #define actuator_play_waves                       func_L00_002D6998
 #define actuator_end_looping_waves                func_L00_002D6B70
 #define LevelActuatorCalcPower                    func_L00_002D6BA8
-#define math_add_wrapping_counter                 func_L00_002D6FD8
+#define actuator_update                           func_L00_002D6FD8
 #define cam_clear_override_slots                  func_L00_002D7068
 #define cam_alloc_override_slot                   func_L00_002D70A0
 #define cam_end_override                          func_L00_002D7140

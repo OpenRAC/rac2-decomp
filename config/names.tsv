@@ -3979,7 +3979,7 @@ func_L00_002D6940	actuator_stop_all	descriptive	config/names_local.tsv		slot_cle
 func_L00_002D6978	actuator_is_channel_active	descriptive	config/names_local.tsv		slot_is_entry_nonzero
 func_L00_002D6998	actuator_play_waves	descriptive	config/names_local.tsv		slot_copy_records_to_free
 func_L00_002D6B70	actuator_end_looping_waves	descriptive	config/names_local.tsv		slot_reset_active
-func_L00_002D6FD8	math_add_wrapping_counter	descriptive	config/names_local.tsv		
+func_L00_002D6FD8	actuator_update	descriptive	config/names_local.tsv		math_add_wrapping_counter
 func_L00_002D7068	cam_clear_override_slots	descriptive	config/names_local.tsv		
 func_L00_002D70A0	cam_alloc_override_slot	descriptive	config/names_local.tsv		
 func_L00_002D7140	cam_end_override	descriptive	config/names_local.tsv		
