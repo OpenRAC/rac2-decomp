@@ -4,7 +4,7 @@
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
 extern void hero_clear_queued_anim(void);
-extern s32 hero_l18_set_action_us2(s32, s32);
+extern s32 hero_l18_set_move_state_us2(s32, s32);
 extern u8 g_hero_state[];
 extern u8 g_hero_state[];
 extern u8 g_anim_entry_table_a[], g_anim_entry_table_b[];
@@ -78,7 +78,7 @@ void hero_detach_from_object_us2(s32 keep)
         goto done;
     }
 reset:
-    hero_l18_set_action_us2(0, 1);
+    hero_l18_set_move_state_us2(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

@@ -21,7 +21,7 @@ extern s32 g_current_map_index[] __attribute__((sda));
 extern s32 g_hero_aim_speed_start[] __attribute__((sda));
 extern char g_pickup_entry_table[];
 extern void hero_clear_queued_anim(void);
-extern s32 hero_l22_set_action(s32, s32);
+extern s32 hero_l22_set_move_state(s32, s32);
 extern void trail_reset_slots(void);
 
 /* Install this level's player parameters and start the shared subsystems. */
@@ -40,7 +40,7 @@ void level_init_player_params(void)
     g_hero_aim_speed_start[0] = 0;
     state->state = 0;
     hero_clear_queued_anim();
-    hero_l22_set_action(0, 1);
+    hero_l22_set_move_state(0, 1);
     trail_reset_slots();
     state->entry_table = g_pickup_entry_table;
 }

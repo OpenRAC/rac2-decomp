@@ -15,7 +15,7 @@ extern char g_pickup_entry_table[];
 
 extern void hero_clear_queued_anim(void);
 
-extern int hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_move_state(int mode, int flag);
 
 extern void trail_reset_slots(void);
 
@@ -258,7 +258,7 @@ void hero_restart_in_mode(int mode, int entryId, void *mobyArg) {
             break;
         }
     }
-    hero_l22_set_action(entryId, 2);
+    hero_l22_set_move_state(entryId, 2);
 }
 
 
@@ -328,7 +328,7 @@ void hero_l22_update_speed_targets(void) {
 
 extern unsigned char g_screen_mode_flag;
 
-extern int hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_move_state(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */
@@ -340,13 +340,13 @@ void text_play_mode_message(int slow) {
         mode = 2;
     switch (type) {
     case 0:
-        hero_l22_set_action(0, mode);
+        hero_l22_set_move_state(0, mode);
         break;
     case 1:
-        hero_l22_set_action(0x3F, mode);
+        hero_l22_set_move_state(0x3F, mode);
         break;
     case 2:
-        hero_l22_set_action(0x56, mode);
+        hero_l22_set_move_state(0x56, mode);
         break;
     }
 }

@@ -23,7 +23,7 @@ void FastVecCross(void *,void *,void *);
 float math_fast_sin_or_cos_b(float);
 float math_fast_sin_or_cos_a(float);
 void UpdateViewContext(void);
-s32 hero_l00_set_action(int,int);
+s32 hero_l00_set_move_state(int,int);
 int Spline_AdvanceByDistance(void *,void *,int *,float *,float,int);
 int FastDecTimer(void *);
 float math_cosine_blend(float,float,float);
@@ -107,7 +107,7 @@ void cam_path_update_cinematic(char *moby) {
             *(short *)(moby + 0x7E) = 4;
             g_cam_path_cinematic_flag = 0;
             if (*(int *)(desc + 0x4C) == 0) {
-                hero_l00_set_action(0, 1);
+                hero_l00_set_move_state(0, 1);
             }
         }
         if (*(int *)(desc + 0x40) == 0) {

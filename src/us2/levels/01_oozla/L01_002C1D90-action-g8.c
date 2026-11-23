@@ -98,7 +98,7 @@ extern ActionTableEntry g_action_table[];
 extern unsigned int PadPressedWithin(unsigned int, int, int *);
 extern int moby_is_class_71(unsigned char *);
 extern void hero_setup_attached_object_transform(void);
-extern int hero_set_move_state_us2(int, int);
+extern int SetHeroMoveState_us2(int, int);
 extern int get_ammo(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int PlayMobySound(int, int, char *);
@@ -155,9 +155,9 @@ int hero_process_item_action_input_us2(void)
                         hero_setup_attached_object_transform();
                         goto clear_pending;
                     }
-                    hero_set_move_state_us2(0x15, 1);
+                    SetHeroMoveState_us2(0x15, 1);
                 } else {
-                    hero_set_move_state_us2(0x13, 1);
+                    SetHeroMoveState_us2(0x13, 1);
                 }
             }
         } else {
@@ -174,9 +174,9 @@ int hero_process_item_action_input_us2(void)
                         (g_hero_state.high_attack && g_hero_state.height > 0.57f) ||
                         (g_hero_state.action == 8 && g_hero_state.height > 0.57f)) {
                         if (!g_hero_state.attack_block && !g_hero_state.pending_attack)
-                            hero_set_move_state_us2(0x14, 1);
+                            SetHeroMoveState_us2(0x14, 1);
                     } else {
-                        hero_set_move_state_us2(0x13, 1);
+                        SetHeroMoveState_us2(0x13, 1);
                     }
                     goto clear_pending;
                 }
@@ -188,7 +188,7 @@ int hero_process_item_action_input_us2(void)
                     if (g_hero_state.animation_lock) goto clear_pending;
                     if ((float)*(int *)(timing + 0x10) <= g_hero_state.animation_frame &&
                         (g_pad_state.buttons.word.buffered & 8) && PadPressedWithin(mask, 15, 0)) {
-                        hero_set_move_state_us2(0x15, 1);
+                        SetHeroMoveState_us2(0x15, 1);
                         goto complete;
                     }
                 }
@@ -201,9 +201,9 @@ check_animation_lock:
                             window = window > 0 ? window : 1;
                             if (PadPressedWithin(mask, window < 16 ? window : 15, 0)) {
                                 if (g_pad_state.buttons.word.buffered & 8)
-                                    hero_set_move_state_us2(0x15, 1);
+                                    SetHeroMoveState_us2(0x15, 1);
                                 else
-                                    hero_set_move_state_us2(0x13, 1);
+                                    SetHeroMoveState_us2(0x13, 1);
                                 goto clear_pending;
                             }
                         }
@@ -222,7 +222,7 @@ clear_pending:
             (g_hero_state.queued_action && g_hero_state.queued_action != 22 && g_hero_state.queued_action != 65)) break;
         if (!(g_pad_state.buttons.word.buffered & 0x20) || g_hero_state.action_age < 23) break;
         if (get_ammo(request)) {
-            hero_set_move_state_us2(0x83, 1);
+            SetHeroMoveState_us2(0x83, 1);
             goto complete;
         }
         if (g_pad_state.buttons.word.pressed & 0x20)
@@ -271,7 +271,7 @@ clear_pending:
         if (get_ammo(-1)) {
             if (g_hero_state.motion == 12 || g_hero_state.motion == 0 || g_hero_state.action == 3 ||
                 (g_hero_state.motion == 1 && g_hero_state.blend < 0.7f)) {
-                hero_set_move_state_us2(0x22, 1);
+                SetHeroMoveState_us2(0x22, 1);
                 goto complete;
             }
             start_equipped_item_animation();
@@ -291,7 +291,7 @@ clear_pending:
             wrench_window = 10;
             if (wrench_age < 10) wrench_window = wrench_age;
             if (PadPressedWithin(mask, wrench_window, &scratch.wrench_buffered) && g_hero_state.action_object) {
-                hero_set_move_state_us2(31, 1);
+                SetHeroMoveState_us2(31, 1);
                 if (g_hero_state.action_object) PlayMobySound(0, 0, g_hero_state.action_object);
             }
         }
@@ -308,7 +308,7 @@ complete:
             if (g_hero_action_timer &&
                 (g_hero_state.motion < 2 || g_hero_state.motion == 12 || ((g_hero_state.motion == 2 || g_hero_state.motion == 4) && g_hero_state.platformMode)) &&
                 (g_pad_state.buttons.both & 0x800000008UL) == 0x800000008UL)
-                hero_set_move_state_us2(0x7B, 1);
+                SetHeroMoveState_us2(0x7B, 1);
             if (g_pad_state.buttons.word.pressed & 8) g_hero_action_timer = 30;
         }
     }

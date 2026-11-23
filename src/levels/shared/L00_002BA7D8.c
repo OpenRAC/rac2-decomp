@@ -176,7 +176,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 SelectHeroStateAnimation(s32);
 extern void hero_exit_vehicle_mode(s32);
 extern void hero_slide_along_wall(s32);
-extern s32 hero_l20_set_state(s32, s32);
+extern s32 hero_l20_set_move_state(s32, s32);
 extern s32 ref_L00_002BA7D8_00 MACRO_ADDR;
 extern void hero_get_offset_vector(f32 *);
 /* Runs the hero's state machine once per frame. It picks the code for the current state (walk, jump,

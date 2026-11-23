@@ -50,7 +50,7 @@ extern void infiltrator_ball_spawn_for_moby(char *),moby_update_attached_child(c
 extern int ForceClaimNotice(int,int,int);
 extern int load_is_class_cached(int);
 extern void LoadClassIntoFreeCacheSlot(int),hero_start_loader_state(int);
-extern int hero_l03_enter_state(int,int);
+extern int hero_l03_set_move_state(int,int);
 extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
 extern void hero_start_target_state(void *,int,float);
@@ -152,7 +152,7 @@ void infiltrator_lock_update(char *obj) {
     case 3:
         if (flag_set_first_pending(obj)) {
             PlayMobySound(0,0,obj);
-            hero_l03_enter_state(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            hero_l03_set_move_state(0x6F,0);set_hero_animation(0x54,0,20.0f);
             FastVecSub(vec,g_camera_pose_buffer,g_hero_state.position);
             matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
             SetCamera5Pose(g_camera_pose_buffer,g_camera_pose_buffer,3,120,0);

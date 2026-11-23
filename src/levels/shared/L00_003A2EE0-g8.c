@@ -71,7 +71,7 @@ extern int moby_is_in_special_class_range(void *);
 extern void snd_stop_voice(s32);
 extern int PlayMobySound(int, int, void *);
 extern void start_equipped_item_animation(void);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern int weapon_spend_ammo(int, int);
 extern int get_ammo(int);
 extern int actuator_play_waves(TargetRecord *);
@@ -197,7 +197,7 @@ void UpdateScopedWeapon(u8 *moby)
     case 1: {
         float zoom_blend;
         if (HERO->i[0x2294 / 4] == 1)
-            hero_l00_set_action(0x1D, 1);
+            hero_l00_set_move_state(0x1D, 1);
         fire = 1;
         if (HERO->i[0x1500 / 4] != 0) {
             fire = 0;

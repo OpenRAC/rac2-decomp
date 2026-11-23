@@ -94,7 +94,7 @@ extern int D_L20_001A8F00_abs __asm__("D_L20_001A8F00");
 extern float g_hero_timer_trigger_a, g_hero_timer_trigger_b;
 extern unsigned char g_hero_event_flags[] __attribute__((sda));
 extern void hero_ease_lean_to_upright_pal(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide_pal(void), hero_record_play_counters_pal(void);
-extern s32 hero_l20_set_state_pal(int, int);
+extern s32 hero_l20_set_move_state_pal(int, int);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
 extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
@@ -175,7 +175,7 @@ void hero_l20_update_timers_pal(void) {
     if (g_hero_state.field_24CC && !D_L20_001A8F00_abs && g_hero_state.mode == 4 && g_hero_state.field_2294 != 0x6F && (g_pad_state.pressed&0x10)) {
         g_hero_state.field_1E0 = 0;
         g_hero_state.field_24CC = 0;
-        hero_l20_set_state_pal(0x91, 1);
+        hero_l20_set_move_state_pal(0x91, 1);
     }
     if (!D_L20_001A8F00_abs) {
         if (g_hero_timer_trigger_a>0) g_hero_state.field_22A++;

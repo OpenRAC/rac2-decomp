@@ -699,7 +699,7 @@
 #define g_str_sandfly_debug                  D_L08_002B5600
 #define hero_refresh_action_triggers         func_L08_002BE8E8
 #define hero_l08_update_state_machine        func_L08_002CB6E8
-#define hero_l08_enter_state                 func_L08_002D2ED8
+#define hero_l08_set_move_state              func_L08_002D2ED8
 #define hero_l08_update_state_transitions    func_L08_002D90C8
 #define gfx_queue_draw_callback              func_L08_002F2D10
 #define DrawCenteredScaledText               func_L08_002F5CB8

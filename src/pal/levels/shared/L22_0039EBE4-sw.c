@@ -13,7 +13,7 @@ typedef struct {
 extern char g_hero_state[];
 extern u32 g_pad_pressed_flags;
 extern unsigned int shop_get_entry_for_state(int);
-extern unsigned int hero_l22_set_action_pal(int, int);
+extern unsigned int hero_l22_set_move_state_pal(int, int);
 extern void set_hero_animation_pal(int, int, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
@@ -40,7 +40,7 @@ void swingshot_l22_node_update_pal(u8 *moby)
     f32 probe_pos[4];
 
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        hero_l22_set_action_pal(0x1D, 1);
+        hero_l22_set_move_state_pal(0x1D, 1);
     data = *(FollowVars **)(moby + 0x68);
     if (data == 0)
         return;
@@ -131,9 +131,9 @@ have:
         probe_pos[2] += 0.5f;
         if (CollLine(probe_pos, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
-                hero_l22_set_action_pal(6, 1);
+                hero_l22_set_move_state_pal(6, 1);
             } else {
-                hero_l22_set_action_pal(0, 0);
+                hero_l22_set_move_state_pal(0, 0);
                 set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
             }
             moby[0x20] = 6;
@@ -157,9 +157,9 @@ have:
         link_vec[2] += 0.5f;
         if (CollLine(link_vec, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->h[0x34E / 2] != 0) {
-                hero_l22_set_action_pal(6, 1);
+                hero_l22_set_move_state_pal(6, 1);
             } else {
-                hero_l22_set_action_pal(0, 1);
+                hero_l22_set_move_state_pal(0, 1);
             }
             moby[0x20] = 6;
         } else {
@@ -173,20 +173,20 @@ have:
                 if (data->target != 0 && fast_vec_dist(data->target + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) > 3.5f) {
                     if ((g_pad_pressed_flags & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
                         ((Hero *)g_hero_state)->i[0xAC8 / 4] = 1;
-                        hero_l22_set_action_pal(0, 0);
+                        hero_l22_set_move_state_pal(0, 0);
                         set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
                         moby[0x20] = 6;
                     } else {
                         PlayMobySound(2, 0, (char *)moby);
                         if (((Hero *)g_hero_state)->i[0xAB8 / 4] != 0) {
-                            hero_l22_set_action_pal(0x25, 1);
+                            hero_l22_set_move_state_pal(0x25, 1);
                         } else {
-                            hero_l22_set_action_pal(0x24, 1);
+                            hero_l22_set_move_state_pal(0x24, 1);
                         }
                         moby[0x20] = 5;
                     }
                 } else {
-                    hero_l22_set_action_pal(0, 1);
+                    hero_l22_set_move_state_pal(0, 1);
                     moby[0x20] = 6;
                 }
             }
@@ -303,9 +303,9 @@ have:
         link_vec[2] += 0.5f;
         if (CollLine(link_vec, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
-                hero_l22_set_action_pal(6, 1);
+                hero_l22_set_move_state_pal(6, 1);
             } else {
-                hero_l22_set_action_pal(0, 0);
+                hero_l22_set_move_state_pal(0, 0);
                 set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
             }
             moby[0x20] = 0x13;

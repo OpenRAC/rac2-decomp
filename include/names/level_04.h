@@ -513,7 +513,7 @@
 #define ApplyHeroVelocityAndResolveDisplacement func_L04_002DBE70
 #define hero_steer_airborne_by_state            func_L04_002DCE78
 #define hero_l04_update_state_machine           func_L04_002E04A8
-#define hero_l04_enter_state                    func_L04_002E7C08
+#define hero_l04_set_move_state                 func_L04_002E7C08
 #define hero_l04_decide_state_transition        func_L04_002EDBC8
 #define level_clear_leftover_flag               func_L04_002FB920
 #define level_build_spawn_record                func_L04_0030C4C0

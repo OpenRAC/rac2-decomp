@@ -518,7 +518,7 @@ extern void lift_request_start(void *);
 extern void moby_mark_spawned(void *);
 extern void lift_set_moving_state(void *);
 extern void moby_set_state(void *, int, int);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
@@ -668,7 +668,7 @@ void lift_scene_update(unsigned char *moby) {
         if (flag_set_first_pending(moby)) {
             state->waitTimer = state->fadeLength;
             state->fadeTimer = state->fadeLength * 2;
-            hero_l00_set_action(0x6F, 1);
+            hero_l00_set_move_state(0x6F, 1);
         }
         if (math_fast_float_d(&state->waitTimer))
             moby_set_state(moby, state->nextState, -1);

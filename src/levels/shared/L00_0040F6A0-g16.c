@@ -67,7 +67,7 @@ extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_table_2[];
 extern u8 g_megarocket_rumble_waves[];
 
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -130,7 +130,7 @@ void megarocket_cannon_update(Moby *moby)
         vars->chargeSound = -1;
     }
     if (HERO->i[0x2294 / 4] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     matrix_mul_vec3(&nozzle, &g_megarocket_nozzle_offset, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)

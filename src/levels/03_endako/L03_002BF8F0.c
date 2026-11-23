@@ -184,7 +184,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 hero_get_gadget_value(s32);
 extern void hero_exit_vehicle_mode(s32);
 extern void DeflectHeroOffSteepSurface(s32);
-extern s32 hero_l20_set_state(s32, s32);
+extern s32 hero_l20_set_move_state(s32, s32);
 void hero_l03_update_state_machine(void) {
     f32 speed62;
     s32 lim67;

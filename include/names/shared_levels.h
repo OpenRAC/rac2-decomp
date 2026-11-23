@@ -2182,7 +2182,7 @@
 #define hero_find_swingshot_node_in_front         func_L00_002C3BB0
 #define hero_find_active_swingshot_node           func_L00_002C3E18
 #define hero_find_blue_swingshot_target           func_L00_002C40C0
-#define hero_l00_set_action                       func_L00_002C42E0
+#define hero_l00_set_move_state                   func_L00_002C42E0
 #define hero_start_loader_state                   func_L00_002C8BA8
 #define hero_try_start_transition                 func_L00_002C8C00
 #define hero_try_start_ledge_move                 func_L00_002C8CB0

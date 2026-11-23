@@ -82,7 +82,7 @@ extern void cancel_hero_item_animation(void);
 
 extern void release_moby_animation_slot(int, void *);
 
-extern s32 hero_l22_set_action(int, int);
+extern s32 hero_l22_set_move_state(int, int);
 
 extern void gfx_update_color_fade(void *, void *);
 
@@ -149,7 +149,7 @@ void UpdateShieldHitsAndStrength(unsigned char *moby) {
                     cancel_hero_item_animation();
                     release_moby_animation_slot(g_hero_state.f2290, g_hero_state.f1870);
                     g_hero_state.f187C = 0;
-                    hero_l22_set_action(0, 1);
+                    hero_l22_set_move_state(0, 1);
                     return;
                 }
             }

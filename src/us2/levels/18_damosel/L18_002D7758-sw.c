@@ -166,7 +166,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 hero_get_screen_id(s32);
 extern void hero_detach_from_object_us2(s32);
 extern void ClipHeroVelocityAtWall(s32);
-extern s32 hero_l18_set_action_us2(s32, s32);
+extern s32 hero_l18_set_move_state_us2(s32, s32);
 extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
@@ -2777,7 +2777,7 @@ block_807:
             }
             hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             if (shooter_update_ranged_attack((s32) hero_moby_2) != 0) {
-                hero_l18_set_action_us2(0x8D, 1);
+                hero_l18_set_move_state_us2(0x8D, 1);
             }
         }
         break;

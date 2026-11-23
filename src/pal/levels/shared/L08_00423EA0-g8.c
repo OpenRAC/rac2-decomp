@@ -239,7 +239,7 @@ extern float func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
 extern s32 level_set_game_state_pair_pal(s32, void *, s32);
 extern void script_queue_keyed_request(s32, s32);
-extern s32 hero_l08_enter_state_pal(s32, s32);
+extern s32 hero_l08_set_move_state_pal(s32, s32);
 extern void set_hero_animation_pal(s32, s32, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -396,7 +396,7 @@ void mining_vehicle_update_pal(VehicleMoby *moby)
                 fresh = 1;
                 level_set_game_state_pair_pal(0, ref_L08_0041EBF8_00, 1);
                 script_queue_keyed_request(vars->f194, vars->f19c);
-                hero_l08_enter_state_pal(49, 0);
+                hero_l08_set_move_state_pal(49, 0);
                 set_hero_animation_pal(g_mining_vehicle_hero_animation, 0, 15.0f);
                 qcopy(D_00189E20_14.rotation, moby->rot);
                 qcopy(D_00189E20_14.position, moby->pos);

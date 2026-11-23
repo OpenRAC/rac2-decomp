@@ -127,7 +127,7 @@ extern void gfx_queue_draw_callback(void *, void *);
 extern void protopet_start_enter_anim(char *, int);
 extern void part_spawn_upward_pal(char *);
 extern void part_spawn_spray_pal(char *);
-extern s32 hero_l19_set_state_pal(int, int);
+extern s32 hero_l19_set_move_state_pal(int, int);
 
 void train_l19_update_pal(char *moby)
 {
@@ -260,7 +260,7 @@ void train_l19_update_pal(char *moby)
                         FastVecScale(vecs[1], moby + 0xC0, -g_train_scale_neg);
                         vecs[1][2] = g_train_scale_neg * 4.0f;
                         vecs[1][3] = 5627.9248f;
-                        hero_l19_set_state_pal(0, 1);
+                        hero_l19_set_move_state_pal(0, 1);
                         force = (f32)g_player_stats[0] * 30.0f;
                         part_queue_impact_effect(target, moby, 0x10001, g_hero_state + 0x80, vecs[1], force > 100.0f ? force : 100.0f);
                         vars->iE0 = (g_train_state_value * 5 + 2) / 6;

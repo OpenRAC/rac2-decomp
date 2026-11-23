@@ -67,7 +67,7 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern s32 hero_l00_change_action_us2(int, int);
+extern s32 hero_l00_set_move_state_us2(int, int);
 extern void part_setup_object_effect_entry(void *, void *, void *);
 extern void anim_start_blended(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
@@ -176,7 +176,7 @@ void UpdateTimedGroundActor_us2(char *actor)
                 break;
             qcopy(actor + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);
-            hero_l00_change_action_us2(28, 1);
+            hero_l00_set_move_state_us2(28, 1);
             part_setup_object_effect_entry(actor + 0x10, actor + 0xF0, actor);
             STATE(actor) = 2;
             anim_start_blended(actor, 1, 0, 10);
@@ -278,7 +278,7 @@ void UpdateTimedGroundActor_us2(char *actor)
         break;
     case 8:
         if (g_game_mode == 28)
-            hero_l00_change_action_us2(0, 1);
+            hero_l00_set_move_state_us2(0, 1);
         if (*(short *)(g_camera_state_ptr + 0x86) == 27)
             ref_US2_L00_004010A0_00();
         table_clear_entry_flag(update_handle);

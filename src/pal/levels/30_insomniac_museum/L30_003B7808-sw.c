@@ -45,7 +45,7 @@ extern int g_vehicle_current_anim __attribute__((sda));
 extern char * part_find_owned_effect_slot(void *,int,int);
 extern float func_002A0558(void *,void *);
 extern int TryClaimNotice(int,int,int);
-extern s32 hero_l00_set_action_pal(int,int);
+extern s32 hero_l00_set_move_state_pal(int,int);
 extern void set_hero_animation_pal(int,int,float);
 extern float FastVecLength(void *);
 extern float FastAddRotations(float,float);
@@ -147,7 +147,7 @@ void UpdateHoverVehicleMoby_pal(HoverMoby *obj) {
             if(g_pad_held_flags&16) in.active=request;
         }
         if(in.active) {
-            hero_l00_set_action_pal(0x31,0);
+            hero_l00_set_move_state_pal(0x31,0);
             set_hero_animation_pal(g_vehicle_idle_anim,0,15.0f);
             qcopy_nc(&g_hero_state.rotation,&obj->rotation);
             qcopy_nc(&g_hero_state.position,&obj->position);
@@ -258,14 +258,14 @@ physics:
     case 4:
         obj->flags=obj->mclass->flags;
         I(g_hero_state.moby,0x9c)=0;
-        hero_l00_set_action_pal(0,1);
+        hero_l00_set_move_state_pal(0,1);
         g_hero_state.vehicle=0;
         obj->state=1;
         break;
     case 5:
         obj->flags=obj->mclass->flags;
         I(g_hero_state.moby,0x9c)=0;
-        hero_l00_set_action_pal(0,1);
+        hero_l00_set_move_state_pal(0,1);
         moby_transform_joint_to_world(obj,0,&frame.dir);
         SpawnExplosionEffects_pal(obj,st,&frame.dir,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         moby_mark_spawned(obj);

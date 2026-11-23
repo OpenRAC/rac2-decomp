@@ -125,7 +125,7 @@ typedef struct {
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 extern L02_003FF9A0_Rec g_material_l02_table[];
-extern s32 hero_l00_set_action_pal(s32, s32);
+extern s32 hero_l00_set_move_state_pal(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_save_index(s32);
 extern s32 flag_is_byte_set(void);
@@ -151,7 +151,7 @@ void menu_select_next_usable_pal(char *moby) {
     L02_003FF9A0_Rec *r;
 
     if (g_game_mode != 0x6F)
-        hero_l00_set_action_pal(0x6F, 1);
+        hero_l00_set_move_state_pal(0x6F, 1);
     if (PadPressedWithin(0x40, 0x32, 0) != 0) {
         moby_set_state(moby, 7, -1);
         for (i = *(s16 *)(state + 0x118) + 1; i < 0xE; i++) {

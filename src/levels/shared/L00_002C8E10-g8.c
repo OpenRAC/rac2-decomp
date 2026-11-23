@@ -7,7 +7,7 @@ extern float math_fabs(float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern short GetCollHitMaterial(void);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern int hero_play_sound(int, int);
 
 /* Decide whether the resident should transition after falling or leaving support. */
@@ -66,9 +66,9 @@ int hero_check_fall_transition(void)
                     start[2] = *(float *)g_hero_ground_height - 0.01f;
                     if (!CollLine(start, end, 2, *(void **)(resident + 0x2290), 0)) {
                         if (*(int *)(resident + 0x229C) == 0x14 || *(int *)(resident + 0x24CC) == 0)
-                            hero_l00_set_action(0x67, 1);
+                            hero_l00_set_move_state(0x67, 1);
                         else
-                            hero_l00_set_action(0x33, 1);
+                            hero_l00_set_move_state(0x33, 1);
                         return 1;
                     }
                 }
@@ -78,9 +78,9 @@ int hero_check_fall_transition(void)
     if (falling) {
         char *fallState = g_hero_state;
         if (*(int *)(fallState + 0x229C) == 0x14 || *(int *)(fallState + 0x24CC) == 0)
-            hero_l00_set_action(0x67, 1);
+            hero_l00_set_move_state(0x67, 1);
         else
-            hero_l00_set_action(0x36, 1);
+            hero_l00_set_move_state(0x36, 1);
         hero_play_sound(3, 0);
     }
     return falling;

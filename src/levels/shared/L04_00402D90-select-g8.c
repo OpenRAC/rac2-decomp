@@ -19,7 +19,7 @@ extern void snd_send_cmd22(int), snd_send_cmd23(int);
 extern int snd_Pump(void);
 extern void music_Pause(int), music_Unpause(void);
 extern void racer_reset_state(char *, int);
-extern int hero_l04_enter_state(int,int);
+extern int hero_l04_set_move_state(int,int);
 extern void racer_release_sound_handles(char *, char *), racer_release_link_state(char *,char *);
 extern int snd_play_from_global_bank(int,int,void *);
 extern int race_get_course_win_count(int);
@@ -40,7 +40,7 @@ void UpdateRaceSelectionMenu(char *controller, char *vars)
         g_selected_race_index = g_current_race_index;
         g_race_select_initialized = 1;
     }
-    if (S32_AT(g_hero_state,0x2294) != 0x31) hero_l04_enter_state(0x31,1);
+    if (S32_AT(g_hero_state,0x2294) != 0x31) hero_l04_set_move_state(0x31,1);
     U16_AT(controller,0x34) |= 0x41;
     if (S32_AT(vars,0x1dc) != -1) {
         obj = g_moby_l04_pool + (S32_AT(vars,0x1dc) << 8);

@@ -68,7 +68,7 @@ extern void * cam_alloc_override_slot(s32 size);
 extern void cam_end_override(char *);
 extern void load_scene_chunk(int, int);
 extern f32 weapon_compute_shot_launch_speed(f32 *a, f32 *b, f32 *out, f32 d, f32 e);
-extern s32 hero_set_move_state_us2(s32 action, s32 animate);
+extern s32 SetHeroMoveState_us2(s32 action, s32 animate);
 extern int moby_start_effect_from_entry(void *, float);
 extern void script_queue_keyed_request(int, int);
 extern float level_get_water_height(void);
@@ -603,7 +603,7 @@ block_149:
             }
             if (((UView *)(ptr_val_s4))->b[0x2F4] != 0) {
                 if (float_val_23 > 33.0f) {
-                    hero_set_move_state_us2(0x16, 1);
+                    SetHeroMoveState_us2(0x16, 1);
                     ((Hero *)g_hero_state)->i[0x2294 / 4] = 0x6F;
                     ((Hero *)g_hero_state)->i[0x24A0 / 4] = 0;
                     ((Hero *)g_hero_state)->i[0x229C / 4] = 9;
@@ -627,7 +627,7 @@ block_149:
                 ((UView *)(moby))->i[0x27] = (s32) (((UView *)(moby))->i[0x27] & ~0x30);
                 *(s32 *)(moby + 0x98) = (s32) *(s32 *)(((u8 *)((UView *)(moby))->p[0x9]) + 0x10);
                 if (g_game_mode == 0x6F) {
-                    hero_set_move_state_us2(0x16, 1);
+                    SetHeroMoveState_us2(0x16, 1);
                 }
             }
             if (((UView *)(moby))->b[0x60] & 2) {
@@ -636,7 +636,7 @@ block_149:
                 moby_set_animation_and_speed(moby, 0xC, 0, 0x14);
                 moby_set_state(moby, 0, 5);
                 if (g_game_mode == 0x6F) {
-                    hero_set_move_state_us2(0x16, 1);
+                    SetHeroMoveState_us2(0x16, 1);
                 }
             }
         } else {
@@ -676,7 +676,7 @@ block_149:
         ptr_val_v0_5 = SpawnGoldBolt(ptr_val_s1, 1, -1, -1);
         ((u8 *)((UView *)(ptr_val_s4))->p[0xC0]) = ptr_val_v0_5;
         if (ptr_val_v0_5 != NULL) {
-            hero_set_move_state_us2(0x6F, 1);
+            SetHeroMoveState_us2(0x6F, 1);
             ptr_val_s0_2 = ptr_val_s4 + 0x2A0;
             ptr_val_v0_6 = ((u8 *)((UView *)(ptr_val_s4))->p[0xC0]);
             *(f32 *)(ptr_val_v0_6 + 0x18) = (f32) (*(f32 *)(ptr_val_v0_6 + 0x18) - 0.5f);

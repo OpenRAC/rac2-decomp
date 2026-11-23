@@ -139,7 +139,7 @@ extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, fl
 extern void FadeToBlack(int);
 extern void moby_copy_joint_transform_to_object(u8 *, char *, int, int);
 extern void hero_reset_position_and_direction(char *, char *, int, int);
-extern int hero_set_action_us2(int, int);
+extern int hero_l22_set_move_state_us2(int, int);
 extern char *effect_create_attached(char *, char *);
 extern void build_axis_rotation_quaternion(char *, int, float);
 typedef struct { int value; } StateInt;
@@ -567,7 +567,7 @@ state20:
         cancel_hero_item_animation();
         release_moby_animation_slot((LvlSlotCtx *)PLAYER, &HERO->slotList);
         HERO->slotCount = 0;
-        hero_set_action_us2(0, 1);
+        hero_l22_set_move_state_us2(0, 1);
         g_charged_l23_blast_timer = 0;
         return;
     }

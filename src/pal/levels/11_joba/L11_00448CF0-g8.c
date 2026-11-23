@@ -4,7 +4,7 @@
 extern int mode_get_stack_top(void);
 extern int flag_is_byte_set(void);
 extern int arena_get_challenge_flag_index(unsigned int);
-extern int hero_l11_enter_state_pal(int, int);
+extern int hero_l11_set_move_state_pal(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int FastDecTimer(short *);
 extern void moby_set_state(u8 *, int, int);
@@ -45,7 +45,7 @@ void UpdateJobaClassSelectionMenu_pal(u8 *object)
     int i, found;
     InputView *input;
     if (mode_get_stack_top()==5) return;
-    if (g_game_mode[0]!=0x6f) hero_l11_enter_state_pal(0x6f,1);
+    if (g_game_mode[0]!=0x6f) hero_l11_set_move_state_pal(0x6f,1);
     if (H(0x1ea)==0) {
         if ((((InputView *)g_pad_state)->field1c4&0x2000) && H(0x1e8)<12) {
             for (i=H(0x1e8)+1;i<13;i++) {

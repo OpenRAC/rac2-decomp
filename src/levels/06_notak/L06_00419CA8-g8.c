@@ -56,7 +56,7 @@ extern float mat_fast_helper_a(float,float);
 extern float math_fabs(float);
 extern int PadPressedWithin(int,int,int);
 extern float fast_vec_dist(void *,void *);
-extern int hero_l00_set_action(int,int);
+extern int hero_l00_set_move_state(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void cam_set_state_rotation(void *);
 extern void object_copy_vector_to_selected(void *);
@@ -124,7 +124,7 @@ used:
                 if(fast_vec_dist(obj+0x10,nearby+0x10)<3.25f) {clear=0;break;}
             }
             if(clear) {
-                hero_l00_set_action(0x37,1);
+                hero_l00_set_move_state(0x37,1);
                 SetCamera5Pose(g_hero_l06_position.position,g_hero_l06_position.rotation,3,0xB4,0);
                 cam_set_state_rotation(g_region_table+(I(ctx,0x20)<<7)+0x70);
                 object_copy_vector_to_selected(g_region_table+(I(ctx,0x20)<<7)+0x30);
@@ -152,7 +152,7 @@ used:
         temp.q=0; temp.f[2]=g_hero_l06_position.rotation[2]; axis.q=temp.q;
         angle=mat_fast_helper_a(g_hero_state.position[0]-F(obj,0x10),g_hero_state.position[1]-F(obj,0x14));
         if((PadPressedWithin(0x80,7,0) && g_hero_state.modeTimer>=61) || F(ctx,0)==1.0f) {
-            hero_l00_set_action(0,1);
+            hero_l00_set_move_state(0,1);
             if(I(ctx,0x38)) {U(obj,0x20)=1;}
             else
             if(F(ctx,0)==1.0f) {

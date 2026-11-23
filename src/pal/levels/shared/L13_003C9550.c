@@ -10,7 +10,7 @@ extern int IsPointInCuboid(void *, int);
 extern int flag_set_first_pending(char *);
 extern void cam_lock_entry(int);
 extern int ForceClaimNotice(int, int, int);
-extern int hero_set_action_state_pal(int, int);
+extern int hero_l13_set_move_state_pal(int, int);
 extern float FastAddRotations(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
@@ -49,7 +49,7 @@ void warp_ring_trigger_update_pal(char *moby)
             if (*(int *)(other + 0x2294) == 0x82) {
                 cuboid = *(int *)(vars + 8);
                 if (cuboid >= 0 && IsPointInCuboid(other + 0x80, cuboid) != 0)
-                    hero_set_action_state_pal(6, 1);
+                    hero_l13_set_move_state_pal(6, 1);
             }
         }
         break;

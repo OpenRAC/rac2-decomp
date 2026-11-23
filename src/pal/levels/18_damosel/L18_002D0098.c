@@ -63,7 +63,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 hero_l18_set_action_pal(s32, s32);
+extern s32 hero_l18_set_move_state_pal(s32, s32);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth_pal(s32);
 extern int hero_play_sound(s32, s32);
@@ -154,7 +154,7 @@ s32 hero_handle_hit_object_contact_pal(s32 apply_push) {
     case 0:
         hit_moby = g_hero_state.f249C;
         if (hit_moby != 0 && (*(s16 *)(hit_moby + 0xAA) == 0x4EB || *(s16 *)(hit_moby + 0xAA) == 0x558)) {
-            hero_l18_set_action_pal(0x7D, 1);
+            hero_l18_set_move_state_pal(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
@@ -165,7 +165,7 @@ s32 hero_handle_hit_object_contact_pal(s32 apply_push) {
                 AdjustPlayerHealth_pal(FloatToInt(*(float *)(effect_slot + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                hero_l18_set_action_pal(0x16, 1);
+                hero_l18_set_move_state_pal(0x16, 1);
             }
             g_hero_state.f1DC = 0x40;
             if (g_hero_state.f21C == 0) {
@@ -175,13 +175,13 @@ s32 hero_handle_hit_object_contact_pal(s32 apply_push) {
             return 0;
         }
         if (g_hero_state.f229C == 0x12) {
-            hero_l18_set_action_pal(0x72, 1);
+            hero_l18_set_move_state_pal(0x72, 1);
         } else if (g_hero_state.f229C == 0x11) {
-            hero_l18_set_action_pal(0x73, 1);
+            hero_l18_set_move_state_pal(0x73, 1);
         } else if (entry->f24 & 8) {
-            hero_l18_set_action_pal(0x8C, 1);
+            hero_l18_set_move_state_pal(0x8C, 1);
         } else {
-            hero_l18_set_action_pal(0x16, 1);
+            hero_l18_set_move_state_pal(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
             qzero(&push_vec);
@@ -193,7 +193,7 @@ s32 hero_handle_hit_object_contact_pal(s32 apply_push) {
         }
         break;
     case 4:
-        hero_l18_set_action_pal(0x90, 1);
+        hero_l18_set_move_state_pal(0x90, 1);
         hero_flatten_push_vector(&push_vec, is_special, 0.10000001f, 0.060000002f);
         break;
     }

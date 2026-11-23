@@ -68,7 +68,7 @@ extern u8 g_lock_on_weapon_rumble_waves[];
 extern u8 g_default_vector[] __attribute__((sda));
 
 extern int vec_fast_helper_b(void *);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern int math_fast_float_d(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -127,7 +127,7 @@ void UpdateLockOnWeapon(Moby *moby)
     }
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     ready = 1;
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         if (math_fast_float_d(&((Hero *)g_hero_state)->i[0x2534 / 4]) == 0)

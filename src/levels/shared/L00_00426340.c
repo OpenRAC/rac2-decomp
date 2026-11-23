@@ -8,7 +8,7 @@ typedef struct { u8 pad[0x194]; InitQuad *transform; } PathCamera;
 extern PathCamera g_scalar_transition_state;
 extern float mat_fast_helper_a(float x, float y);
 extern void vec_clear_128(InitQuad *v);
-extern int hero_l00_set_action(int event, int value);
+extern int hero_l00_set_move_state(int event, int value);
 /* Partial records follow only the fields used by the two path walks.
  * Retail reserves eight weight/index slots and assumes at most eight accepted
  * entries; it does not add a bounds check to the path scan. */
@@ -730,7 +730,7 @@ void InitPathMotion(u8 *object)
     qcopy(object + 0x10, transform + 1);
     qcopy(object + 0x20, transform + 2);
     if (data->eventGate == 0)
-        hero_l00_set_action(0x6f, 1);
+        hero_l00_set_move_state(0x6f, 1);
     data->initialized = 1;
 }
 

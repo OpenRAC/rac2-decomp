@@ -53,7 +53,7 @@ extern char *g_area_hit_targets[];
 extern int FastDecTimer(void *),math_fast_float_d(void *),vec_fast_helper_b(void *);
 extern int PlayMobySound(int,int,char *);
 extern void anim_start_blended_with_flags(void *,int,int,int,int),anim_start_blended(void *,int,int,int);
-extern int hero_l00_set_action(int,int);
+extern int hero_l00_set_move_state(int,int);
 extern int get_ammo(int),weapon_spend_ammo(int,int);
 extern void hud_add_moby_marker(void *,unsigned int,void *,int,int,int,float,float,float);
 extern void start_equipped_item_animation(void);
@@ -117,7 +117,7 @@ void blitz_gun_update_pal(char *moby)
             anim_start_blended_with_flags(moby,1,0,2,0);
     }
     if (g_hero_state.c0b4 == 1)
-        hero_l00_set_action(29,1);
+        hero_l00_set_move_state(29,1);
     vec_fast_helper_b(state);
     {
     char *holder = state;

@@ -13,7 +13,7 @@ extern float math_random_float_range(float a, float b);
 extern float square_root(float a);
 extern void FastVecScale(void *dst, void *src, float s);
 extern void entity_start_launch_to_target(char *e, void *v, float a, float b, float c);
-extern s32 hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_move_state(int a0, int a1);
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool MACRO_ADDR;
 extern int g_group_link_limit __attribute__((sda));
@@ -83,7 +83,7 @@ void UpdateLaunchVolume(char *self) {
             fall_height = (top_height - projected[2]) * 2.0f; duration += square_root(fall_height / 0.0055555557f);
             FastVecSub(launch_velocity, projected, hero_now + 0x80); FastVecScale(launch_velocity, launch_velocity, 1.0f / duration);
             launch_velocity[2] = square_root(rise_height * 0.0055555557f);
-            hero_l00_set_action(0x44, 1);
+            hero_l00_set_move_state(0x44, 1);
             qcopy(hero_now + 0xF0, launch_velocity);
         }
     }

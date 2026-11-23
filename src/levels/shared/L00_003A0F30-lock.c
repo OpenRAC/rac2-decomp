@@ -61,7 +61,7 @@ extern u8 g_minirocket_rumble_waves[];
 
 extern void EmitLayeredSparks(void *);
 extern int vec_fast_helper_b(void *);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern int get_ammo(int);
@@ -113,7 +113,7 @@ void minirocket_tube_update(Moby *moby)
     EmitLayeredSparks(moby);
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
         anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     if (((Hero *)g_hero_state)->i[0x1450 / 4] != 0)

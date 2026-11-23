@@ -124,7 +124,7 @@ extern void LoadClassIntoFreeCacheSlot(int);
 extern int ForceClaimNotice(int, int, int);
 extern void object_copy_vector_to_selected(const void *), cam_set_state_rotation(const void *);
 extern void SetCamera5Pose(const void *, const void *, int, int, int);
-extern int hero_l00_set_action_pal(int, int);
+extern int hero_l00_set_move_state_pal(int, int);
 extern void set_hero_animation_pal(int, int, float);
 extern void script_queue_keyed_request(int, int);
 extern void advance_path_follower_pal(char *, int);
@@ -265,7 +265,7 @@ void challenge_controller_update_pal(u8 *object)
         g_hero_state.controlMode = 3;
         status = hero_get_target_state_kind();
         if (status == 2 && g_hero_state.object[0x42] == g_hero_state.object[0x43]) {
-            hero_l00_set_action_pal(0x6F, 0);
+            hero_l00_set_move_state_pal(0x6F, 0);
             set_hero_animation_pal(0x54, 0, 6.0f);
             position.f[0] = math_fast_sin_or_cos_a(*(float *)(object + 0xF8)) * 3.0f;
             position.f[1] = math_fast_sin_or_cos_b(*(float *)(object + 0xF8)) * 3.0f;
@@ -376,7 +376,7 @@ void challenge_controller_update_pal(u8 *object)
         char *actors;
         u16 *list;
         ForceClaimNotice(1, 0, 1);
-        hero_l00_set_action_pal(0x6F, 1);
+        hero_l00_set_move_state_pal(0x6F, 1);
         record = g_matrix_l02_record_table + state->record * 0x80;
         if (fast_vec_dist(&g_camera_l02_position.from, record + 0x30) <= 1.0f) {
             if (g_arena_state_words == 7) {
@@ -398,7 +398,7 @@ void challenge_controller_update_pal(u8 *object)
                     break;
                 cam_set_mode_state(3);
                 g_hero_state.cameraRequest = state->savedCamera;
-                hero_l00_set_action_pal(0, 1);
+                hero_l00_set_move_state_pal(0, 1);
                 g_hero_state.cameraRequest = state->savedCamera;
                 if (state->restoreMode != -1)
                     cam_reset_entry(state->restoreMode);
@@ -423,7 +423,7 @@ void challenge_controller_update_pal(u8 *object)
                 g_hero_state.cameraRequest = state->savedCamera;
                 cam_set_mode_state(3);
                 g_hero_state.cameraRequest = state->savedCamera;
-                hero_l00_set_action_pal(0, 1);
+                hero_l00_set_move_state_pal(0, 1);
                 object[0x30] = 0x40;
                 if (state->decoration) {
                     moby_mark_spawned(state->decoration);
@@ -497,7 +497,7 @@ void challenge_controller_update_pal(u8 *object)
                 break;
             cam_set_mode_state(3);
             g_hero_state.cameraRequest = state->savedCamera;
-            hero_l00_set_action_pal(0, 1);
+            hero_l00_set_move_state_pal(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
@@ -544,7 +544,7 @@ void challenge_controller_update_pal(u8 *object)
             }
             cam_set_mode_state(3);
             g_hero_state.cameraRequest = state->savedCamera;
-            hero_l00_set_action_pal(0, 1);
+            hero_l00_set_move_state_pal(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
@@ -576,7 +576,7 @@ void challenge_controller_update_pal(u8 *object)
             }
             cam_set_mode_state(3);
             g_hero_state.cameraRequest = state->savedCamera;
-            hero_l00_set_action_pal(0, 1);
+            hero_l00_set_move_state_pal(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
@@ -601,7 +601,7 @@ void challenge_controller_update_pal(u8 *object)
             } else if (g_pad_state.buttons.word.high & 0x10) {
                 cam_set_mode_state(3);
                 g_hero_state.cameraRequest = state->savedCamera;
-                hero_l00_set_action_pal(0, 1);
+                hero_l00_set_move_state_pal(0, 1);
                 object[0x30] = 0x40;
                 if (state->decoration) {
                     moby_mark_spawned(state->decoration);
@@ -648,7 +648,7 @@ void challenge_controller_update_pal(u8 *object)
                 break;
             cam_set_mode_state(3);
             g_hero_state.cameraRequest = state->savedCamera;
-            hero_l00_set_action_pal(0, 1);
+            hero_l00_set_move_state_pal(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);

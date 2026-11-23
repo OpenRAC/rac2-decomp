@@ -67,7 +67,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 hero_l22_set_action(s32, s32);
+extern s32 hero_l22_set_move_state(s32, s32);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth(s32);
 extern int hero_play_sound(s32, s32);
@@ -152,7 +152,7 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
     case 0:
         other_moby = g_hero_state.f249C;
         if (other_moby != 0 && (*(s16 *)(other_moby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(other_moby + 0xAA) == 0x558 /* moby class 1368 */)) {
-            hero_l22_set_action(0x7D, 1);
+            hero_l22_set_move_state(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
@@ -163,7 +163,7 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
                 AdjustPlayerHealth(FloatToInt(*(float *)(weapon_moby + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                hero_l22_set_action(0x16, 1);
+                hero_l22_set_move_state(0x16, 1);
             }
             g_hero_state.f1DC = 0x4D;
             if (g_hero_state.f21C == 0) {
@@ -173,13 +173,13 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
             return 0;
         }
         if (g_hero_state.f229C == 0x12) {
-            hero_l22_set_action(0x72, 1);
+            hero_l22_set_move_state(0x72, 1);
         } else if (g_hero_state.f229C == 0x11) {
-            hero_l22_set_action(0x73, 1);
+            hero_l22_set_move_state(0x73, 1);
         } else if (entry->f24 & 8) {
-            hero_l22_set_action(0x8C, 1);
+            hero_l22_set_move_state(0x8C, 1);
         } else {
-            hero_l22_set_action(0x16, 1);
+            hero_l22_set_move_state(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
             qzero(&push);
@@ -191,15 +191,15 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
         }
         break;
     case 1:
-        hero_l22_set_action(0x42, 1);
+        hero_l22_set_move_state(0x42, 1);
         hero_flatten_push_vector(&push, flag, 0.083333336f, 0.050000004f);
         break;
     case 2:
         if ((entry->f24 & 4) || g_hero_state.f1874 <= 0) {
             if (entry->f20 != 0 && *(s16 *)(entry->f20 + 0xAA) == 0x11DF /* moby class 4575 */) {
-                hero_l22_set_action(0x5A, 1);
+                hero_l22_set_move_state(0x5A, 1);
             } else {
-                hero_l22_set_action(0x59, 1);
+                hero_l22_set_move_state(0x59, 1);
             }
             player_slot_clear_object(g_hero_state.f2290);
             FastVecScale(&push, &push, 0.095f);

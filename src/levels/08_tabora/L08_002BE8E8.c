@@ -13,7 +13,7 @@ extern u8 g_hero_input_enabled __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
 extern void mem_fast_helper_b(void *, s32);
 extern float math_fabs(float);
-extern s32 hero_l08_enter_state(s32, s32);
+extern s32 hero_l08_set_move_state(s32, s32);
 
 /* Preserve the selected action while refreshing its transient trigger flags. */
 void hero_refresh_action_triggers(void)
@@ -91,7 +91,7 @@ void hero_refresh_action_triggers(void)
         math_fabs(*(float *)(g_hero_state + 0x330) - (*(float *)(g_hero_state + 0x88) + 0.25f)) < 1.0f &&
         *(float *)(g_hero_state + 0x330) - *(float *)(g_hero_state + 0x88) > 0.0f &&
         (*(float *)(g_hero_state + 0x118) < 0.0f || *(s32 *)(g_hero_state + 0x2294) == 0x7B)) {
-        hero_l08_enter_state(0x7C, 1);
+        hero_l08_set_move_state(0x7C, 1);
     } else if (g_hero_state[0x1496] && *(s32 *)(g_hero_state + 0x2294) != 0x65 &&
         *(s32 *)(g_hero_state + 0x2294) != 0x78 &&
         math_fabs(*(float *)(g_hero_state + 0x334) - (*(float *)(g_hero_state + 0x88) + 0.25f)) < 1.0f &&
@@ -99,17 +99,17 @@ void hero_refresh_action_triggers(void)
         (*(s32 *)(g_hero_state + 0x2294) != 0x66 || g_hero_state[0x49E]) &&
         (*(float *)(g_hero_state + 0x118) < 0.0f || *(s32 *)(g_hero_state + 0x2294) == 0x7B)) {
         if (!*(s32 *)(g_hero_state + 0x24CC))
-            hero_l08_enter_state(0x78, 1);
+            hero_l08_set_move_state(0x78, 1);
         else
-            hero_l08_enter_state(0x65, 1);
+            hero_l08_set_move_state(0x65, 1);
     } else if (g_hero_state[0x149B] && *(s32 *)(g_hero_state + 0x2294) != 0x78 &&
         *(s32 *)(g_hero_state + 0x2294) != 0x74 &&
         math_fabs(*(float *)(g_hero_state + 0x334) - (*(float *)(g_hero_state + 0x88) + 0.25f)) < 1.0f &&
         *(float *)(g_hero_state + 0x334) - *(float *)(g_hero_state + 0x88) > 0.0f &&
         (*(float *)(g_hero_state + 0x118) < 0.0f || *(s32 *)(g_hero_state + 0x2294) == 0x7B)) {
         if (g_current_map_index == 13)
-            hero_l08_enter_state(0x74, 1);
+            hero_l08_set_move_state(0x74, 1);
         else
-            hero_l08_enter_state(0x78, 1);
+            hero_l08_set_move_state(0x78, 1);
     }
 }

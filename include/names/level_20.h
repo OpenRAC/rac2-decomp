@@ -344,7 +344,7 @@
 #define hero_slide_along_wall              func_L20_002C7588
 #define hero_l20_update_state_machine      func_L20_002CD928
 #define hero_l20_update_timers             func_L20_002D6488
-#define hero_l20_set_state                 func_L20_002D7730
+#define hero_l20_set_move_state            func_L20_002D7730
 #define hero_load_state_by_game_mode       func_L20_002DC390
 #define hero_l20_decide_state_transition   func_L20_002DEBE0
 #define level_script_update                func_L20_00310E38

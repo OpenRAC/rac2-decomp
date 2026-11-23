@@ -17,7 +17,7 @@ extern float g_hk22_speed_scale __attribute__((sda));
 extern float g_weapon_effect_scale[];
 extern void ReleaseDeadOrExpiredSlots(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);
 extern int vec_fast_helper_b(void *);
@@ -52,7 +52,7 @@ void hk22_update(unsigned char *object) {
     *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * g_hk22_speed_scale;
     g_weapon_effect_scale[0] = 0.1f;
     if (H->i[2213] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     if (H->i[2213] == 0x1D) {
         if (*(float *)state > 0.0f && get_ammo(-1))
             color = 0x600000FF;

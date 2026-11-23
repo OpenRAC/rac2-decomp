@@ -368,7 +368,7 @@ extern void cancel_hero_item_animation(void);
 
 extern void attachment_reset_all(void);
 
-extern s32 hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_move_state(int a0, int a1);
 
 extern void anim_start_object_at_frame(int a0, int a1);
 
@@ -426,7 +426,7 @@ void hero_reset_position_and_direction(void *position, void *direction, int soun
     attachment_reset_all();
 
     if (sound != -1)
-        hero_l00_set_action(sound, 2);
+        hero_l00_set_move_state(sound, 2);
 
     anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 

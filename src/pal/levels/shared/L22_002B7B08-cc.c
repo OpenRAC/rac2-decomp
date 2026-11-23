@@ -3,7 +3,7 @@
 
 extern char g_hero_state[];
 
-extern int hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_move_state(int mode, int flag);
 
 /* Loads the level's tuning constants and starts the two subsystems. */
 /* func_L22_002A8B98 is defined in L22_002A8B98-init.c. */
@@ -133,7 +133,7 @@ void hero_l22_update_speed_targets_pal(void) {
     }
 }
 
-extern int hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_move_state(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */

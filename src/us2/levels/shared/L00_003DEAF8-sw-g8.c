@@ -34,7 +34,7 @@ extern void part_steer_effect_direction(char *, char *, int);
 extern void vec_transform_or_copy(char *, char *), shop_trigger_current_state_effect(char *, char *);
 extern void vec_add_object_direction_scaled(char *, char *, float);
 extern void vec_clear_128(char *);
-extern s32 hero_l00_change_action_us2(int, int);
+extern s32 hero_l00_set_move_state_us2(int, int);
 extern void part_setup_object_effect_entry(char *, char *, char *);
 extern void anim_start_blended(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
@@ -131,7 +131,7 @@ void spider_bot_update_us2(char *spider_bot)
             qcopy(spider_bot + 0x10, hit_info + 0x20);
             vec_clear_128(vars);
             ForceClaimNotice(6, 0, 1);
-            hero_l00_change_action_us2(28, 1);
+            hero_l00_set_move_state_us2(28, 1);
             part_setup_object_effect_entry(spider_bot + 0x10, spider_bot + 0xF0, spider_bot);
             spider_bot[0x20] = 2;
             anim_start_blended(spider_bot, 1, 0, 10);
@@ -246,7 +246,7 @@ void spider_bot_update_us2(char *spider_bot)
         break;
     }
     case 8: {
-        if (g_game_mode[0] == 28) hero_l00_change_action_us2(0, 1);
+        if (g_game_mode[0] == 28) hero_l00_set_move_state_us2(0, 1);
         if (*(short *)(g_camera_state_ptr[0] + 0x86) == 27) ref_US2_L00_003DEAF8_00();
         g_hud_timer_a_state = 0;
         level_store_value_pair_us2(0, 0);

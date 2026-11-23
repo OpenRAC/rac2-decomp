@@ -16,7 +16,7 @@ extern void moby_init_vars_once(char *);
 extern void moby_fire_shot(char *, void *);
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int FastDecTimer(s16 *);
 extern int math_fast_float_d(int *);
@@ -60,7 +60,7 @@ void hoverbomb_gun_update(unsigned char *object) {
     int phase;
 
     moby_init_vars_once(object);
-    if (H->i[2213] == 1) hero_l00_set_action(29, 1);
+    if (H->i[2213] == 1) hero_l00_set_move_state(29, 1);
     if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 10, 0);

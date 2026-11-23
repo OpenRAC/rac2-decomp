@@ -39,7 +39,7 @@ extern int moby_is_spot_free_of_blockers(char *);
 extern void vec_transform_by_object_or_given(char *,char *,char *,char *);
 extern void FastVecSub(void *,void *,void *);
 extern float FastVecDot(void *,void *);
-extern s32 hero_l16_enter_state(int,int);
+extern s32 hero_l16_set_move_state(int,int);
 extern void cam_start_blend_to_target(char *);
 extern float math_fabs(float);
 extern void cam_set_mode_state(int);
@@ -95,7 +95,7 @@ void follow_player_update(u8 *object)
                     direction[2]=zero;
                     vec_scale_to_length(direction,direction,1.0f);
                     vec_scale_to_length(forward,forward,1.0f);
-                    if (FastVecDot(direction,forward)<0.2f) { hero_l16_enter_state(0x37,1); cam_start_blend_to_target((char *)object); }
+                    if (FastVecDot(direction,forward)<0.2f) { hero_l16_set_move_state(0x37,1); cam_start_blend_to_target((char *)object); }
                     moby_set_state(object,2,-1);
                 }
             }
@@ -115,7 +115,7 @@ decay:
         if (F(state,0x34)>=1.0f) goto leaveActive;
         if (g_hero_state.field2294==0x37) goto active;
 leaveActive:
-        if (g_hero_state.field2294==0x37) hero_l16_enter_state(0,1);
+        if (g_hero_state.field2294==0x37) hero_l16_set_move_state(0,1);
         cam_set_mode_state(1);
         I(state,0x3C)=20;
         I(state,0x58)++;

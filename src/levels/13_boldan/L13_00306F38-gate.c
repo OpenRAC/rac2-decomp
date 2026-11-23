@@ -2,7 +2,7 @@
 extern void moby_mark_spawned(void *);
 extern int hero_is_current_selected_id(void *);
 extern int IsPointInCuboid(void *,int);
-extern int hero_change_action(int,int);
+extern int hero_l13_set_move_state(int,int);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern float vec_distance_xy(void *,void *);
 extern struct { char pad[0x348]; short state; } g_hero_state;
@@ -23,7 +23,7 @@ void gate_l13_update(char *moby) {
         if (hero_is_current_selected_id(moby)) {
             if (g_hero_state.state==1 && IsPointInCuboid((char *)&g_hero_state+0x80,*(int *)(vars+8))) {
                 *(u16 *)(moby+0x96)=0;
-                hero_change_action(0x6F,1);
+                hero_l13_set_move_state(0x6F,1);
                 *(u8 *)(moby+0x20)=2;
             }
             if (*(int *)(vars+8)!=-1 || !*(char **)(vars+0xC)) break;
@@ -42,7 +42,7 @@ opened:
             math_apply_axis_rotation_to_quat(moby+0xE0,moby+0xE0,moby+0xD0,0.017453294f);
             (*(u16 *)(moby+0x96))++;
         } else {
-            hero_change_action(0,1);
+            hero_l13_set_move_state(0,1);
             *(u8 *)(moby+0x20)=7;
         }
         break;

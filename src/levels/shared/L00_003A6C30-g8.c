@@ -58,7 +58,7 @@ extern float math_fabs(float);
 extern float IntToFloat(int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void EmitParticleTrailLayers(char *);
 extern void part_spawn_line_at_moby(char *);
 extern void start_equipped_item_animation(void);
@@ -201,7 +201,7 @@ void lancer_update(char *moby)
     case 1: {
         int ready;
         if (HERO->i[0x2294 / 4] == 1)
-            hero_l00_set_action(29, 1);
+            hero_l00_set_move_state(29, 1);
         ready = 1;
         if (HERO->i[0x2294 / 4] == 29)
         {

@@ -36,7 +36,7 @@ extern f32 math_fast_sin_or_cos_b(f32);
 extern void FastVecAdd(void *, void *, void *);
 extern void mem_fast_helper_b(void *, s32);
 extern void cam_set_mode_state(s32);
-extern s32 hero_l11_enter_state(s32, s32);
+extern s32 hero_l11_set_move_state(s32, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void SetCamera5Pose(void *, void *, s32, s32, s32);
 extern f32 fast_vec_dist(void *, void *);
@@ -110,7 +110,7 @@ void turret_update_pal(TurretMoby *moby) {
             mem_fast_helper_b(&g_hero_state.velocity, 0xA0);
             if (g_pad_state.pressed & 0x10) {
                 cam_set_mode_state(0);
-                hero_l11_enter_state(0, 1);
+                hero_l11_set_move_state(0, 1);
                 moby->command = 2;
                 moby->state = 4;
                 moby->speed = 1.0f;
@@ -135,7 +135,7 @@ void turret_update_pal(TurretMoby *moby) {
                    g_hero_state.state != 0x39 && g_hero_state.ground == moby &&
                    fast_vec_dist(&seat, g_hero_state.moby + 0x10) < 1.2f && vars->mount_delay == 0 && D_L11_001A8FB4_block[0] == 0) {
             moby->command = 1;
-            hero_l11_enter_state(0x31, 1);
+            hero_l11_set_move_state(0x31, 1);
         }
     }
     switch (moby->state) {

@@ -5,7 +5,7 @@
 extern int mode_get_stack_top(void);
 extern int flag_is_byte_set(void);
 extern int arena_get_challenge_save_index(unsigned int);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int FastDecTimer(short *);
 extern void moby_set_state(u8 *, int, int);
@@ -46,7 +46,7 @@ void arena_update_challenge_menu(u8 *object)
     int i, found;
     InputView *input;
     if (mode_get_stack_top()==5) return;
-    if (g_game_mode[0]!=0x6f) hero_l00_set_action(0x6f,1);
+    if (g_game_mode[0]!=0x6f) hero_l00_set_move_state(0x6f,1);
     if (H(0x11a)==0) {
         if ((((InputView *)g_pad_state)->field1c4&0x2000) && H(0x118)<13) {
             for (i=H(0x118)+1;i<14;i++) {

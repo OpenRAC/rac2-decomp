@@ -5,7 +5,7 @@ typedef struct {
     char *row;
 } TableEntry;
 
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void hero_set_objects_flag_bit(void);
 extern int g_ship_encounter_flag;
 extern int g_current_map_index MACRO_ADDR;
@@ -24,7 +24,7 @@ int ship_try_start_encounter(char *object)
     if (g_ship_encounter_flag != 0 ||
         (*(unsigned char *)(*(char **)(row + 0x5C) + (g_current_map_index << 4) + (int)g_moby_group_flags) & 0x80) != 0)
         return 0;
-    hero_l00_set_action(0x31, 1);
+    hero_l00_set_move_state(0x31, 1);
     base = g_hero_state;
     *(int *)(*(char **)(base + 0x2290) + 0x98) = 0;
     hero_set_objects_flag_bit();

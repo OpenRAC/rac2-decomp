@@ -28,7 +28,7 @@ extern void hero_process_action_command(void);
 extern int hero_find_ledge_grab_pal(char *, char *, char *);
 extern void UpdateHeroMotionResponseParameters_pal(void);
 extern s32 FastDecTimer(s32);
-extern s32 hero_l20_set_state_pal(s32, s32);
+extern s32 hero_l20_set_move_state_pal(s32, s32);
 extern s32 subtitle_request_voice_line_pal(s32, s32);
 extern void hero_l20_decide_state_transition(void);
 extern void RebuildRegionObjectMembership(void);
@@ -71,7 +71,7 @@ void hero_l20_update_frame_pal(void)
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
                         *(int *)(base + 0x24CC) = 0;
-                        hero_l20_set_state_pal(0x91, 1);
+                        hero_l20_set_move_state_pal(0x91, 1);
                     }
                     if (g_current_map_index == 0x14) {
                         if (g_hero_frame_flag == 0) {

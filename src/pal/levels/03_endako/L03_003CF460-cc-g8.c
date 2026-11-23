@@ -15,7 +15,7 @@ extern void hero_start_target_state(void *, int, float);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 extern int flag_is_third_pending_set(void *);
 extern int hero_get_target_state_kind(void);
-extern s32 hero_l03_enter_state(int, int);
+extern s32 hero_l03_set_move_state(int, int);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void hero_start_loader_state(int);
@@ -124,7 +124,7 @@ void tube_start_update_pal(char *actor)
         g_hero_state.interaction_lock=1;
         if (hero_get_target_state_kind()==2) {
             moby_set_state(actor,3,-1);
-            hero_l03_enter_state(0x6F,1);
+            hero_l03_set_move_state(0x6F,1);
         } else {
             timer = H(actor,0x96);
             old_timer = timer++;

@@ -196,7 +196,7 @@ extern int mothership_call_helper_return_true(void);
 extern int L23_DrawEncounterHud(void);
 extern void cancel_hero_item_animation(void);
 extern void release_moby_animation_slot(void *, void *);
-extern int hero_set_action_us2(int, int);
+extern int hero_l22_set_move_state_us2(int, int);
 extern char *GetLocalizedString(int);
 extern int level_l00_call_module_handler_with_arg_9_us2(int, int);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -421,7 +421,7 @@ void mothership_update_us2(L23Moby *moby) {
             cancel_hero_item_animation();
             release_moby_animation_slot(game->f2290, game->f1870);
             game->f187C = 0;
-            hero_set_action_us2(0, 1);
+            hero_l22_set_move_state_us2(0, 1);
         }
     }
     cam_compute_view_direction(&moby->pos, state->m410, 0);

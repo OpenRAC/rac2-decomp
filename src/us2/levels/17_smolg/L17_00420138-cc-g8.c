@@ -193,7 +193,7 @@ extern int ForceClaimNotice(s32, s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
 extern void moby_set_flag_bit(void *, s32);
 extern void cam_lock_entry(s32);
-extern s32 hero_l13_change_action_us2(s32, s32);
+extern s32 hero_l13_set_move_state_us2(s32, s32);
 
 /* func_US2_L17_00420138's state record. */
 typedef struct {
@@ -267,7 +267,7 @@ void target_pad_update_us2(u8 *obj)
     }
     if (vars->cuboid >= 0 && IsPointInCuboid(g_hero_state.pos, vars->cuboid)
         && g_hero_state.mode == 0x82)
-        hero_l13_change_action_us2(6, 1);
+        hero_l13_set_move_state_us2(6, 1);
 }
 
 /* func_L17_00420E08's state record. */

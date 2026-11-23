@@ -28,7 +28,7 @@ extern int g_game_l00_mode;
 extern int g_bouncer_timer;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 hero_l00_change_action_us2(int a0, int a1);
+extern s32 hero_l00_set_move_state_us2(int a0, int a1);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
@@ -85,7 +85,7 @@ void bouncer_update_us2(unsigned char *bouncer) {
         vars->handle = -1;
         g_bouncer_timer = 20;
     }
-    if (g_hero_state.level == 1) hero_l00_change_action_us2(29, 1);
+    if (g_hero_state.level == 1) hero_l00_set_move_state_us2(29, 1);
     if (bouncer[0x42] == bouncer[0x43] && (bouncer[0x60] & 2)) anim_start_blended_with_flags(bouncer, 1, 0, 2, 0);
     moby_compute_offset_point(bouncer, (char *)origin);
     target = 0;

@@ -103,7 +103,7 @@ extern void gfx_start_color_fade(void *, void *);
 extern void gfx_update_color_fade(void *, void *);
 extern f32 func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
-extern s32 hero_l08_enter_state(s32, s32);
+extern s32 hero_l08_set_move_state(s32, s32);
 extern void set_hero_animation(int, int, f32);
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
@@ -357,7 +357,7 @@ void RideableMobyUpdate(RideMoby *moby)
             }
         }
         if (fire != 0) {
-            hero_l08_enter_state(0x31, 0);
+            hero_l08_set_move_state(0x31, 0);
             set_hero_animation(g_hover_anim_next, 0, 15.0f);
             *(TI128 *)(g_hero_state + 0x90) = moby->rot.q;
             *(TI128 *)(g_hero_state + 0x80) = moby->pos.q;
@@ -612,7 +612,7 @@ void RideableMobyUpdate(RideMoby *moby)
     case 4:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        hero_l08_enter_state(0, 1);
+        hero_l08_set_move_state(0, 1);
         ((Hero *)g_hero_state)->h[0x1834 / 2] = -1;
         ((Hero *)g_hero_state)->f[0x108 / 4] = 0.16666667f;
         ((Hero *)g_hero_state)->ptr[0x1830 / 4] = 0;
@@ -628,7 +628,7 @@ void RideableMobyUpdate(RideMoby *moby)
     case 5:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        hero_l08_enter_state(0, 1);
+        hero_l08_set_move_state(0, 1);
         moby_transform_joint_to_world(moby, 0, dir);
         SpawnExplosionEffects(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         moby->pos.q = vars->x30;

@@ -117,7 +117,7 @@ extern void hero_reset_speeds_and_vectors(void);
 extern void hero_record_play_counters(void);
 extern void set_hero_animation(int, int, float);
 extern void script_queue_keyed_request(int, int);
-extern int hero_l08_enter_state(int, int);
+extern int hero_l08_set_move_state(int, int);
 extern void cam_update_aim_values(void *, void *);
 extern void hero_move_with_mount_to_transform(void *, void *);
 extern void hero_save_transform_snap_object(void *, void *);
@@ -230,7 +230,7 @@ void UpdateHeroNpc(u8 *obj)
             if (can_grab && g_hero_state.target == g_moby_array[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
-                hero_l08_enter_state(0x31, 0);
+                hero_l08_set_move_state(0x31, 0);
                 set_hero_animation(0x87, 0, 3.0f);
                 ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                 q = g_moby_array[DI(0x6C)].bytes;
@@ -278,7 +278,7 @@ void UpdateHeroNpc(u8 *obj)
                         snd_play_from_class_bank(0, 0, obj, 0x988);
                     }
                     DI(0x50) = g_vehicle_timer_start;
-                    hero_l08_enter_state(0x31, 0);
+                    hero_l08_set_move_state(0x31, 0);
                     set_hero_animation(0x81, 0, 15.0f);
                     ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                     if (g_vehicle_active_flag != 0)
@@ -580,7 +580,7 @@ void UpdateHeroNpc(u8 *obj)
             g_vehicle_collision_x = g_vehicle_saved_x;
             g_vehicle_collision_y = g_vehicle_saved_y;
             DI(0x50) = 0;
-            hero_l08_enter_state(0, 1);
+            hero_l08_set_move_state(0, 1);
             hero_reset_speeds_and_vectors();
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);

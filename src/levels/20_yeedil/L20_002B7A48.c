@@ -53,7 +53,7 @@ extern void attachment_reset_all(void);
 extern int level_run_slot_callback(s32);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(s32);
-extern s32 hero_l20_set_state(s32, s32);
+extern s32 hero_l20_set_move_state(s32, s32);
 extern void set_hero_animation(f32, s32, s32);
 extern s32 g_pad_pressed_flags[];
 extern void UpdateYeedilHeroCollisionCapsule(void);
@@ -159,7 +159,7 @@ void SetYeedilHeroVehicleMode(s32 new_mode, s32 animation, char *attach_object)
         *(u16 *)(D + 0x24D4) = *(u16 *)(D + 0x24CC);
         *(s32 *)(D + 0x24CC) = 3;
     }
-    hero_l20_set_state(p1, 2);
+    hero_l20_set_move_state(p1, 2);
     if (p0 == 4)
         set_hero_animation(5.0f, 0xF, 0);
 }

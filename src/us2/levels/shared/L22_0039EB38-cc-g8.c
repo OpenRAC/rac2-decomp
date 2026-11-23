@@ -90,7 +90,7 @@ extern int moby_check_target_point_from_offset(void *, void *);
 extern int moby_aim_at_target_offset(void *, void *);
 extern void moby_store_position_private(void *, void *);
 extern int moby_call_helper_with_blocks(void *);
-extern int hero_set_action_us2(int, int);
+extern int hero_l22_set_move_state_us2(int, int);
 extern void math_steer_along_direction(void *, void *, void *, void *, float, float, float);
 extern void moby_update_timed(void *);
 extern void arena_push_point_out(void *, float);
@@ -435,7 +435,7 @@ void space_ship_update_us2(s8 *moby) {
                 cancel_hero_item_animation();
                 release_moby_animation_slot(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
                 M2C_FIELD(game, s32 *, 0x187C) = 0;
-                hero_set_action_us2(0, 1);
+                hero_l22_set_move_state_us2(0, 1);
                 M2C_FIELD(vars, s32 *, 0x344) = 0;
             }
             value_43 = M2C_FIELD(vars, u16 *, 0x41E);

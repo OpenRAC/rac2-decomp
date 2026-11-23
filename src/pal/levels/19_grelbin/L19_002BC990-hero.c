@@ -156,7 +156,7 @@ extern s32 shooter_update_ranged_attack_pal(s32);
 extern s32 hero_get_anim_id(s32);
 extern void hero_detach_from_object_pal(s32);
 extern void ClipHeroVelocityAtWall_pal(s32);
-extern s32 hero_l19_set_state_pal(s32, s32);
+extern s32 hero_l19_set_move_state_pal(s32, s32);
 extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_l00_raise_state_to_8();
 extern void moby_raise_state_to_eight_copy();
@@ -2424,7 +2424,7 @@ block_224:
             }
             hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             if (shooter_update_ranged_attack_pal((s32) ptr_val_21) != 0) {
-                hero_l19_set_state_pal(0x8D, 1);
+                hero_l19_set_move_state_pal(0x8D, 1);
             }
         }
         break;

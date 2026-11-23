@@ -42,7 +42,7 @@ extern unsigned char g_hero_input_enabled __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern int g_hero_special_flag __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
-extern int hero_l03_enter_state(int, int);
+extern int hero_l03_set_move_state(int, int);
 
 /* Reads the hero's button action this frame and switches the hero to the matching state (jump, glide, swing and so on). */
 void hero_handle_action_input(void)
@@ -73,14 +73,14 @@ void hero_handle_action_input(void)
     if (action == 12) PLAYER->tertiary = 1;
     if (PLAYER->primary) {
         if (active && PLAYER->state == 1 && PLAYER->mode != 0x7a) {
-            hero_l03_enter_state(0x7a, 1);
+            hero_l03_set_move_state(0x7a, 1);
         } else if (PLAYER->primary && active) {
             if (PLAYER->mode == 0x38 && !PLAYER->enabled) return;
-            if (PLAYER->busy) hero_l03_enter_state(0x38, 1);
-            else if (g_current_map_index == 2 && g_hero_special_flag) hero_l03_enter_state(0x7d, 1);
+            if (PLAYER->busy) hero_l03_set_move_state(0x38, 1);
+            else if (g_current_map_index == 2 && g_hero_special_flag) hero_l03_set_move_state(0x7d, 1);
             else if (*(int *)(*(char **)(PLAYER->object + 0x24) + 0x1f0))
-                hero_l03_enter_state(0x79, 1);
-            else hero_l03_enter_state(0x39, 1);
+                hero_l03_set_move_state(0x79, 1);
+            else hero_l03_set_move_state(0x39, 1);
         }
     }
 }

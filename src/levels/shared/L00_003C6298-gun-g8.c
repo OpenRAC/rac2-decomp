@@ -58,7 +58,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void start_equipped_item_animation(void);
 extern void cancel_hero_item_animation(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);
@@ -128,7 +128,7 @@ void sheepinator_update(char *owner)
         }
         if (!context->timer) context->timer = 15;
         moby_transform_joint_to_world(owner, 0, context);
-        if (g_hero_state.state == 1) hero_l00_set_action(29, 1);
+        if (g_hero_state.state == 1) hero_l00_set_move_state(29, 1);
         direction.q = 0;
         if (g_hero_state.state == 29 &&
             (FIELD(g_hero_state.object, unsigned short, 0x34) & 1)) {

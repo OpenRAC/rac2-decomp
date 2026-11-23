@@ -40,7 +40,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
 extern int StartAttachedEffect(char *, int, char *);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(char *, char *, void *, float);
@@ -117,7 +117,7 @@ void lava_l00_gun_update(char *object)
         math_spring_float_to_goal((float *)(state+0x50),(float *)(state+0x54),0,0.06f,0.01f,0.125f);
         *(int *)(state+0x60)=0;
     }
-    if (g_hero_state.i[0x2294/4]==1) hero_l00_set_action(29,1);
+    if (g_hero_state.i[0x2294/4]==1) hero_l00_set_move_state(29,1);
     moby_transform_joint_to_world(object,0,state);
     vec_clear_128(vector); vector[1]=-1;
     matrix_mul_vec3(vector,vector,object+0xc0);

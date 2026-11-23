@@ -180,7 +180,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 hero_get_weapon_anim_id(s32);
 extern void hero_exit_vehicle_mode(s32);
 extern void ClipHeroVelocityAgainstWall(s32);
-extern s32 hero_l20_set_state(s32, s32);
+extern s32 hero_l20_set_move_state(s32, s32);
 /* Runs the player's per-frame behaviour for the current action (walking, jumping, swinging, swimming and so on). */
 void hero_update_state_handler(void) {
     f32 speed62;

@@ -67,7 +67,7 @@ extern int *level_get_slot_header(int, int);
 extern char *mem_round_up_to_16(char *);
 extern void mem_fast_helper_b(void *, int);
 extern void ref_L00_003E3A18_00(int);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern int math_fast_float_d(int *);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation(void);
@@ -213,7 +213,7 @@ void vaporizer_update(u8 *object)
         if (data->resource >= 0) ref_L00_003E3A18_00(data->resource);
         break;
     case 1:
-        if (g_hero_state.mode == 1) hero_l00_set_action(29, 1);
+        if (g_hero_state.mode == 1) hero_l00_set_move_state(29, 1);
         if (g_hero_state.scope) {
             if (data->scoped == 0) g_render_state_word = 0;
             data->scoped = 1;

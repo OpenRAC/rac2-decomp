@@ -47,7 +47,7 @@ extern HeroGroundFlags g_hero_state;
 extern unsigned char g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
-extern s32 hero_l04_enter_state(int, int);
+extern s32 hero_l04_set_move_state(int, int);
 
 /* Checks what kind of ground the hero stands on (ice, water, slippery) and sets the matching flags. */
 void UpdateHeroGroundMaterialFlags(void)
@@ -96,6 +96,6 @@ void UpdateHeroGroundMaterialFlags(void)
         math_fabs(g_hero_state.waterSurfaceZ - (g_hero_state.positionZ + 0.25f)) < 1.0f &&
         g_hero_state.waterSurfaceZ - g_hero_state.positionZ > 0.0f &&
         (g_hero_state.displacementZ < 0.0f || g_hero_state.moveState == 123))
-        hero_l04_enter_state(124, 1);
+        hero_l04_set_move_state(124, 1);
 }
 

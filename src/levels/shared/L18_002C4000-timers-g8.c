@@ -91,7 +91,7 @@ extern float g_hero_l18_reach_timer_b, g_hero_l18_reach_timer_a;
 /* The equipment flag at 0x1A7AFF: a small-data object at a nonzero offset, length 2 for reorg. */
 extern unsigned char g_hero_event_flags[] __attribute__((sda));
 extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
-extern s32 hero_l18_set_action(int, int);
+extern s32 hero_l18_set_move_state(int, int);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
 extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
@@ -173,7 +173,7 @@ void hero_update_timers_reach(void) {
     if (g_hero_state.field_24CC && !D_L18_001A8F00_abs && g_hero_state.mode == 4 && g_hero_state.field_2294 != 0x6F && (g_pad_state.pressed&0x10)) {
         g_hero_state.field_1E0 = 0;
         g_hero_state.field_24CC = 0;
-        hero_l18_set_action(0x91, 1);
+        hero_l18_set_move_state(0x91, 1);
     }
     if (!D_L18_001A8F00_abs) {
         if (g_hero_l18_reach_timer_b>0) g_hero_state.field_22A++;

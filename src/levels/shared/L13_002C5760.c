@@ -176,7 +176,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 SelectHeroStateAnimation(s32);
 extern void hero_exit_vehicle_mode(s32);
 extern void hero_slide_along_wall(s32);
-extern s32 hero_l20_set_state(s32, s32);
+extern s32 hero_l20_set_move_state(s32, s32);
 /* Per-frame update of the hero (Ratchet): reads the controller and runs the hero's state machine
    (walking, jumping, swimming, weapons and so on) for this level. */
 void hero_l13_update_state_machine(void) {

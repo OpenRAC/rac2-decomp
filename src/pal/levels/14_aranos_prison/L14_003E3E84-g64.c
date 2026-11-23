@@ -67,7 +67,7 @@ extern int g_effect_state_param __attribute__((sda));
 extern s32 FastDecTimer(s16 *);
 extern int math_fast_float_d(void *);
 extern int vec_fast_helper_b(void *);
-extern s32 hero_l00_set_action_pal(int, int);
+extern s32 hero_l00_set_move_state_pal(int, int);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
@@ -133,7 +133,7 @@ void spread_weapon_update_pal(u8 *self)
             self[0x20] = 1;
     }
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        hero_l00_set_action_pal(0x1D, 1);
+        hero_l00_set_move_state_pal(0x1D, 1);
     vec_fast_helper_b(st);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         u32 color;

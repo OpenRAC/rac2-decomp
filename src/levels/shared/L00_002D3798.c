@@ -481,7 +481,7 @@ int get_ammo(int slot_index)
     return g_weapon_ammo_counts[slot];
 }
 
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 
 /* Stores a target, a mode and a time on the hero, and starts hero state 98 unless the hero is already in states 98 to 100. */
 void hero_start_target_state(V4_F6a70b950 *vec, int mode, float time)
@@ -496,7 +496,7 @@ void hero_start_target_state(V4_F6a70b950 *vec, int mode, float time)
     *(int *)(hero_base + 0x18B0) = mode;
     *(float *)(hero_base + 0x18AC) = time;
     if ((unsigned)(hero_state - 98) >= 3)
-        hero_l00_set_action(98, 2);
+        hero_l00_set_move_state(98, 2);
 }
 
 extern int g_game_mode;

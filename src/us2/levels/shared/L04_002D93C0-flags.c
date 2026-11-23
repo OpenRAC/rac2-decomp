@@ -11,7 +11,7 @@ extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
-extern s32 hero_l04_enter_state_us2(int,int);
+extern s32 hero_l04_set_move_state_us2(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern void AdjustPlayerHealth_us2(int);
 extern int hero_play_sound(int,int);
@@ -147,7 +147,7 @@ int hero_check_surface_contact_us2(int update) {
     if (!GROUND_HERO.b[0x22B4]) {
         char *surface_moby = GROUND_HERO.p[0x249C / 4];
         if (surface_moby && (AH(surface_moby, 0xAA) == 0x4EB || AH(surface_moby, 0xAA) == 0x558)) {
-            hero_l04_enter_state_us2(0x7D, 1);
+            hero_l04_set_move_state_us2(0x7D, 1);
             return 1;
         }
         if ((GROUND_HERO.i[0x2294 / 4] == 1 ||
@@ -155,16 +155,16 @@ int hero_check_surface_contact_us2(int update) {
             !(AI(entry, 0x24) & 8)) {
             char *surface_moby = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
             if (surface_moby) AdjustPlayerHealth_us2(FloatToInt(AF(surface_moby, 0x2C)));
-            if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_enter_state_us2(0x16, 1);
+            if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_set_move_state_us2(0x16, 1);
             GROUND_HERO.h[0x1DC / 2] = 0x4D;
             if (!GROUND_HERO.h[0x21C / 2]) GROUND_HERO.h[0x21C / 2] = 0x12;
             hero_play_sound(20, 0);
             return 0;
         }
-        if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_enter_state_us2(0x72, 1);
-        else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_enter_state_us2(0x73, 1);
-        else if (AI(entry, 0x24) & 8) hero_l04_enter_state_us2(0x8C, 1);
-        else hero_l04_enter_state_us2(0x16, 1);
+        if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_set_move_state_us2(0x72, 1);
+        else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_set_move_state_us2(0x73, 1);
+        else if (AI(entry, 0x24) & 8) hero_l04_set_move_state_us2(0x8C, 1);
+        else hero_l04_set_move_state_us2(0x16, 1);
         if (GROUND_HERO.i[0x2294 / 4] == 0x8C) {
             qzero(&delta);
         } else {

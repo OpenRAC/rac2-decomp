@@ -182,7 +182,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 hero_get_anim_id(s32);
 extern void hero_detach_from_object(s32);
 extern void ClipHeroVelocityAtWall(s32);
-extern s32 hero_l19_set_state(s32, s32);
+extern s32 hero_l19_set_move_state(s32, s32);
 /* Runs the hero's state machine once per frame in Grelbin: walking, jumping, gliding, swinging and the rest. */
 void hero_l19_update_state_machine(void) {
     f32 frame_floateed62;
@@ -2425,7 +2425,7 @@ block_224:
             }
             hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             if (shooter_update_ranged_attack((s32) ptr15) != 0) {
-                hero_l19_set_state(0x8D, 1);
+                hero_l19_set_move_state(0x8D, 1);
             }
         }
         break;
