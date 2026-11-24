@@ -18,7 +18,7 @@ extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
-extern s32 hero_l20_set_state_us2(s32, s32);
+extern s32 hero_l20_set_move_state_us2(s32, s32);
 
 /* Apart from the leading state-1 block this is the same code as func_L18_002CFF48
    (src/levels/shared/L18_002CFD68-qcopy.c), and it needs the same grouped-copy profile.
@@ -94,7 +94,7 @@ void hero_exit_vehicle_mode_us2(s32 keep)
         goto done;
     }
 reset:
-    hero_l20_set_state_us2(0, 1);
+    hero_l20_set_move_state_us2(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

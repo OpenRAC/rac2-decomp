@@ -62,7 +62,7 @@ extern int g_arena_state __attribute__((sda));
 extern u8 g_hero_input_enabled __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
 extern u8 g_contact_hit_flag __attribute__((sda));
-extern int hero_l11_enter_state_us2(int, int);
+extern int hero_l11_set_move_state_us2(int, int);
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
@@ -114,18 +114,18 @@ int hero_handle_contact_hit_us2(long apply)
     case 0:
         contact = g_hero_state.contact;
         if (contact && (*(short *)(contact+0xaa) == 0x4eb || *(short *)(contact+0xaa) == 0x558)) {
-            hero_l11_enter_state_us2(0x7d, 1); return 1;
+            hero_l11_set_move_state_us2(0x7d, 1); return 1;
         }
         if ((g_hero_state.state == 1 || g_hero_state.state == 0x1d || g_hero_state.interrupted) && !(entry->flags & 8)) {
             u8 *hit = part_find_owned_effect_slot(g_hero_state.object, 1, 0);
             if (hit) AdjustPlayerHealth_us2(FloatToInt(*(float *)(hit+0x2c)));
-            if (!g_hero_state.health) hero_l11_enter_state_us2(0x16, 1);
+            if (!g_hero_state.health) hero_l11_set_move_state_us2(0x16, 1);
             g_hero_state.timer = 0x4d;
             if (!g_hero_state.sound_timer) g_hero_state.sound_timer = 0x12;
             hero_play_sound(0x14, 0); return 0;
         }
-        if (entry->flags & 8) hero_l11_enter_state_us2(0x8c, 1);
-        else hero_l11_enter_state_us2(0x16, 1);
+        if (entry->flags & 8) hero_l11_set_move_state_us2(0x8c, 1);
+        else hero_l11_set_move_state_us2(0x16, 1);
         if (g_hero_state.state == 0x8c) qzero(&direction);
         else {
             hero_flatten_push_vector((int)&direction, special, g_hero_state.jump_pressed ? 0.0f : 0.055000003f, 0.028333336f);
@@ -133,7 +133,7 @@ int hero_handle_contact_hit_us2(long apply)
         }
         break;
     case 1:
-        hero_l11_enter_state_us2(0x42, 1);
+        hero_l11_set_move_state_us2(0x42, 1);
         hero_flatten_push_vector((int)&direction, special, 0.083333336f, 0.050000004f);
         break;
     }

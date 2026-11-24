@@ -111,7 +111,7 @@ extern void menu_update_pause(void), gfx_call_engine_routine_zero(void), UpdateM
 extern void UpdatePurchaseMenuAndPreview(void), shop_draw_purchase_menu_scene(void), transition_draw_background(void);
 extern int UpdatePlaybackScene(void);
 extern int level_call_helper_d(void), level_call_helper_e(void);
-extern void math_trap_always(void), level_decrement_counter_clamped(void), math_add_wrapping_counter(void);
+extern void math_trap_always(void), level_decrement_counter_clamped(void), actuator_update(void);
 extern void mc_update_state(void), map_update_state_machine(void), SetupGifPaging(int);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern int GetIconFrame(int, int);
@@ -266,7 +266,7 @@ void RunLevelLoop(void)
         }
         g_pad_hold_frame_count[0]++;
         level_decrement_counter_clamped();
-        if (!g_game_l00_mode[0]) math_add_wrapping_counter();
+        if (!g_game_l00_mode[0]) actuator_update();
         mc_update_state();
         map_update_state_machine();
         if ((unsigned)(g_memcard_state.pressed - 15) < 2 || g_memcard_state.alternate == 15 || g_memcard_input_latch[0]) {
@@ -344,7 +344,7 @@ void RunLevelLoop(void)
                         pad_poll_ports();
                         cutscene_update_frame();
                     }
-                    math_add_wrapping_counter();
+                    actuator_update();
                     sceGsSyncV(0);
                     g_ring_animation_counter[0]++;
                 } else if (g_debug_state == 3) {
@@ -360,7 +360,7 @@ void RunLevelLoop(void)
                     pad_poll_ports();
                     cutscene_update_frame();
                 }
-                math_add_wrapping_counter();
+                actuator_update();
                 counter_count_calls_bump();
                 sceGsSyncV(0);
                 g_ring_animation_counter[0]++;

@@ -399,7 +399,7 @@
 #define g_barlow_path_total_e                   D_L04_001B3480
 #define g_barlow_path_total_f                   D_L04_001B3484
 #define g_barlow_path_total_g                   D_L04_001B3488
-#define g_free_slot_records                     D_L04_001B94C0
+#define g_wave_l04_channels                     D_L04_001B94C0
 #define g_hero_l04_state                        D_L04_001B9540
 #define g_tether_zero_vec                       D_L04_001B9680
 #define g_hero_l04_state_extra                  D_L04_001B9698
@@ -486,7 +486,7 @@
 #define g_object_anim_sparks_table              D_L04_002AF630
 #define g_water_l04_grid_data                   D_L04_002AF6C0
 #define g_grouped_object_call_arg_d             D_L04_002BA660
-#define g_nuke_src_records                      D_L04_002BA6C0
+#define g_mini_nuke_l04_rumble_waves            D_L04_002BA6C0
 #define g_exhaust_effect_params_a               D_L04_002BDAC0
 #define g_exhaust_effect_params_b               D_L04_002BDB20
 #define g_race_challenge_table                  D_L04_002C63C0
@@ -513,7 +513,7 @@
 #define ApplyHeroVelocityAndResolveDisplacement func_L04_002DBE70
 #define hero_steer_airborne_by_state            func_L04_002DCE78
 #define hero_l04_update_state_machine           func_L04_002E04A8
-#define hero_l04_enter_state                    func_L04_002E7C08
+#define hero_l04_set_move_state                 func_L04_002E7C08
 #define hero_l04_decide_state_transition        func_L04_002EDBC8
 #define level_clear_leftover_flag               func_L04_002FB920
 #define level_build_spawn_record                func_L04_0030C4C0

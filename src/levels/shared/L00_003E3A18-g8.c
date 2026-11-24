@@ -48,7 +48,7 @@ extern unsigned char g_beam_weapon_index NOT_SDA;
 extern UpdateTuning g_weapon_l00_table[];
 typedef struct { float red, green, blue, unused; UpdateVector position; } ScopeLight;
 extern ScopeLight g_light_table[];
-extern char g_vaporizer_sound_records[];
+extern char g_vaporizer_rumble_waves[];
 extern void anim_start_blended_with_flags(char *, int, int, int, int);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void gfx_free_point_light(int);
@@ -67,14 +67,14 @@ extern int *level_get_slot_header(int, int);
 extern char *mem_round_up_to_16(char *);
 extern void mem_fast_helper_b(void *, int);
 extern void ref_L00_003E3A18_00(int);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern int math_fast_float_d(int *);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation(void);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void anim_start_blended(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern int FastDecTimer(short *);
 extern void AimAndSpawnBeamWithMuzzleFlashes(char *);
 extern int vec_fast_helper_b(float *);
@@ -213,7 +213,7 @@ void vaporizer_update(u8 *object)
         if (data->resource >= 0) ref_L00_003E3A18_00(data->resource);
         break;
     case 1:
-        if (g_hero_state.mode == 1) hero_l00_set_action(29, 1);
+        if (g_hero_state.mode == 1) hero_l00_set_move_state(29, 1);
         if (g_hero_state.scope) {
             if (data->scoped == 0) g_render_state_word = 0;
             data->scoped = 1;
@@ -247,14 +247,14 @@ void vaporizer_update(u8 *object)
         if (g_hero_state.blocked == 0 && (g_pad_state[0x1A4/4] & g_hero_state.input) && canFire) {
             if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
-                data->sound = slot_copy_records_to_free(g_vaporizer_sound_records);
+                data->sound = actuator_play_waves(g_vaporizer_rumble_waves);
                 data->firingDelay = 2;
                 object[0x20] = 2;
                 anim_start_blended(object, 2, 0, 0);
             } else PlayMobySound(1, 0, object);
             if ((g_pad_state[0x1A0/4] & g_hero_state.input) && get_ammo(-1) && g_hero_state.active) break;
             if (data->sound >= 0) {
-                slot_reset_active(data->sound);
+                actuator_end_looping_waves(data->sound);
                 data->sound = -1;
             }
         }

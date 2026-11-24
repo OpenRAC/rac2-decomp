@@ -156,7 +156,7 @@ extern f32 cam_get_view_space_vector_length(s32);
 extern f32 cam_get_view_space_height(s32);
 extern void cam_set_view_space_height(s32, s32, f32);
 extern void cam_set_view_space_vector_length(s32, s32, f32);
-extern s32 queue_copy_record_by_index(s32);
+extern s32 actuator_play_pattern(s32);
 extern s32 func_L00_002EE4D8(s32, s32, f32);
 extern s32 math_lerp_int(s32, s32, f32);
 extern void level_init_pending_slot(s32, s32);
@@ -175,7 +175,7 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 hero_get_screen_id(s32);
 extern void hero_detach_from_object(s32);
 extern void ClipHeroVelocityAtWall(s32);
-extern s32 hero_l18_set_action(s32, s32);
+extern s32 hero_l18_set_move_state(s32, s32);
 /* Runs the hero's per-frame state machine, switching on the current state and updating movement, animation and effects. */
 void hero_l18_update_state_machine(void) {
     f32 speed62;
@@ -683,7 +683,7 @@ void hero_l18_update_state_machine(void) {
                 (*(u16*)&g_hero_state_machine_word) = 0xFFFF;
             }
             snd_update_slot_object(5, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0xF);
-            queue_copy_record_by_index(0x16);
+            actuator_play_pattern(0x16);
         } else {
             temp_a2 = ((Hero *)g_hero_state)->i[0x2440/4];
             if (temp_a2 != -1) {
@@ -1388,7 +1388,7 @@ block_224:
             coll_process_hit(0.4f, (s32)((TI128*)vec0), 0x10, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], (s32) ((TI128*)vec10));
         }
         if (math_is_below_plane_within_depth(25.7f) != 0) {
-            queue_copy_record_by_index(0x19);
+            actuator_play_pattern(0x19);
             ((Hero *)g_hero_state)->h[0x1FA/2] = 0x32;
             if (g_hero_override_flag != 0) {
                 ((Hero *)g_hero_l18_state_extra)->f[0x180/4] = 0.1f;
@@ -2756,7 +2756,7 @@ block_807:
             }
             hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             if (shooter_update_ranged_attack((s32) temp_fp) != 0) {
-                hero_l18_set_action(0x8D, 1);
+                hero_l18_set_move_state(0x8D, 1);
             }
         }
         break;

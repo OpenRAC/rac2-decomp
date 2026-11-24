@@ -65,7 +65,7 @@ extern void add_vectors(void *,void *,void *);
 extern unsigned char *SpawnHomingShot_pal(void *,void *,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern unsigned char *bike_find_aim_target(void *,void *,void *,void *,void *,void *,float,float);
-extern int queue_copy_record_by_index(int);
+extern int actuator_play_pattern(int);
 extern void * homing_rocket_spawn_pal(void *,void *,void *,float,float,float,float,float);
 extern void * shield_dome_spawn_pal(void *,void *);
 /* Handles the racer item use each frame: collects item boxes, then fires the current weapon (shot,
@@ -130,7 +130,7 @@ void racer_update_item_use_pal(unsigned char *moby)
     FastVecSub(delta,origin,target+16);
     if(func_L00_002EE290(delta)<25) {pitch=aim_pitch;yaw=aim_yaw;}
    } else {aim_pitch=pitch;aim_yaw=yaw;extra=0.2f;}
-   queue_copy_record_by_index(47);add_vectors(temp,origin,dir);
+   actuator_play_pattern(47);add_vectors(temp,origin,dir);
    homing_rocket_spawn_pal(moby,origin,target,aim_pitch,aim_yaw,extra,pitch,yaw);PlayMobySound(8,0,moby);
    if(math_fast_float_d(&vars->duration))vars->state=0;
   }return; }

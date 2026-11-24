@@ -83,7 +83,7 @@ extern void cam_project_vector_onto_view_plane(void *, void *);
 extern float cam_get_view_space_vector_length(void *);
 extern float cam_get_view_space_height(void *);
 extern void cam_set_view_space_vector_length(void *, void *, float);
-extern int queue_copy_record_by_index(unsigned int index);
+extern int actuator_play_pattern(unsigned int index);
 extern void moby_update_transform_history_followers(void *, int);
 extern float ReadPadFloatHistory(int);
 extern void UpdateHeroAimTarget(float, float, float);
@@ -478,7 +478,7 @@ case 0x32: case 0x33: case 0x34:
     float oldPitch,steer,minimumSteer,pitchChange,controllerScale,rate,maximumInput,steeringLimit;
     if (H(u32,0x2294)==0x34) {
         if (H(s32,0x1B8)>58) g_hero_state_machine_word=65535;
-        snd_update_slot_object(5,H(void*,0x2290),15);queue_copy_record_by_index(22);
+        snd_update_slot_object(5,H(void*,0x2290),15);actuator_play_pattern(22);
     } else {
         int slot=H(s32,0x2440);
         if (slot!=-1 && FLD(g_sound_state+slot*0x70, void *, 0x88)==H(void*,0x2290) &&
@@ -1083,7 +1083,7 @@ case 20:
         coll_process_hit(0.4f, &workspace.state_14.delta, 0x10, H(void *, 0x2290), workspace.state_14.u.contact);
     }
     if (math_is_below_plane_within_depth(25.7f)) {
-        queue_copy_record_by_index(25);
+        actuator_play_pattern(25);
         H(u16, 0x1FA) = 42;
         if (g_hero_override_flag) {
             FLD(g_hero_l23_state_block, float, 0x180) = 0.1f;

@@ -420,7 +420,7 @@
 #define g_sweeping_beam_draw_callback           D_L12_0041BF88
 #define hero_l12_apply_contact_push             func_L12_002B85E0
 #define hero_l12_update_state_machine           func_L12_002C0008
-#define hero_l12_set_action                     func_L12_002C8BD0
+#define hero_l12_set_move_state                 func_L12_002C8BD0
 #define hero_decide_todano_state                func_L12_002CF7B0
 #define todano_build_trail_slice_meshes         func_L12_002FFF88
 #define todano_refresh_scene_tuning             func_L12_00300138

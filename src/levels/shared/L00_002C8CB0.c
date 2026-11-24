@@ -11,7 +11,7 @@ typedef union { Quad q; float v[4]; } Vector;
 extern char g_hero_state[];
 extern int g_pad_pressed_flags;
 extern int g_hero_ledge_move_flag;
-extern s32 hero_l00_set_action(int mode, int flag);
+extern s32 hero_l00_set_move_state(int mode, int flag);
 extern int CollLine(void *start, void *end, int flags, void *object, int mode);
 /* Decides which ledge-grab or climb move the hero starts when close to a ledge, if any. */
 int hero_try_start_ledge_move(void)
@@ -23,7 +23,7 @@ int hero_try_start_ledge_move(void)
     if (*(int *)(pre + 0x229c) == 0x11) {
         if (*(float *)(pre + 0x330) + 0.4f < *(float *)(pre + 0x88)) {
             g_hero_ledge_move_flag = 0;
-            hero_l00_set_action(6, 1);
+            hero_l00_set_move_state(6, 1);
             return 1;
         }
     } else if (*(int *)(pre + 0x2294) != 0x67 && *(int *)(pre + 0x2294) != 0x73) {
@@ -44,9 +44,9 @@ int hero_try_start_ledge_move(void)
     if (CollLine(&start, &end, 2, object, 0) == 0)
         goto fail;
     if (*(short *)(base + 0x24fc) == 0 && (g_pad_pressed_flags & 10) != 0)
-        hero_l00_set_action(0x34, 1);
+        hero_l00_set_move_state(0x34, 1);
     else
-        hero_l00_set_action(0x32, 1);
+        hero_l00_set_move_state(0x32, 1);
     return 1;
 fail:
     return 0;

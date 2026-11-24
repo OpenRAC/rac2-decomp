@@ -75,7 +75,7 @@ extern int resolve_vehicle_movement_collisions_pal(u8 *, u8 *, u8 *, u8 *, Vec *
                              float, float, float, float, float);
 extern void anim_start_blended_pal(void *, int, int, int);
 extern void racer_release_sound_handles(u8 *, u8 *);
-extern int queue_copy_record_by_index(int);
+extern int actuator_play_pattern(int);
 extern void * SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void level_release_slot_list(void *);
 extern float math_random_angle(void);
@@ -387,7 +387,7 @@ void hoverboard_update_rider_physics_pal(u8 *object, u8 *st)
                     ((L04_HoverCfg *)g_hover_config)->unk_180 = 0.1f;
                     tag = g_effect_default_params;
                     ((L04_HoverCfg *)g_hover_config)->unk_16C = 0;
-                    queue_copy_record_by_index(0x1C);
+                    actuator_play_pattern(0x1C);
                     SpawnExplosion_pal((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
                     level_release_slot_list(st + 0x4E0);
                     PlayMobySound(3, 0, object);

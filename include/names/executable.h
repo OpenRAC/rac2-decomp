@@ -2812,10 +2812,10 @@
 #define g_str_reward_trigger_debug                   D_0026E6A0
 #define g_class_dispatch_table                       D_0026E880
 #define g_object_dispatch_table                      D_0026E900
-#define g_minirocket_sound_records                   D_00294880
+#define g_minirocket_rumble_waves                    D_00294880
 #define g_museum_exhibit_models                      D_00295BF0
 #define g_pickup_notice_ids                          D_0029CAE0
-#define g_megarocket_sound_records                   D_0029FCC8
+#define g_megarocket_rumble_waves                    D_0029FCC8
 #define g_bolt_amount_by_level                       D_002A0D50
 #define g_slot_value_table                           D_002A1800
 #define g_moby_class_dispatch_table                  D_002A3A00

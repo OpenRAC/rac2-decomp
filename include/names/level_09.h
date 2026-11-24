@@ -302,7 +302,7 @@
 #define hero_l09_update_blend_channels       func_L09_002B5CE8
 #define hero_probe_ground                    func_L09_002B7238
 #define hero_l09_update_state_machine        func_L09_002BC490
-#define hero_l09_set_state                   func_L09_002C3580
+#define hero_l09_set_move_state              func_L09_002C3580
 #define hero_l09_decide_state_transition     func_L09_002C9738
 #define glow_place_state_nine_corners        func_L09_002F89F8
 #define gfx_draw_state_nine_pulsing_quad     func_L09_002F8BA0

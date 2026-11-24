@@ -11,7 +11,7 @@ extern int IsPointInCuboid(void *, int);
 extern int flag_set_first_pending(char *);
 extern void cam_lock_entry(int);
 extern int ForceClaimNotice(int, int, int);
-extern int hero_l11_enter_state(int, int);
+extern int hero_l11_set_move_state(int, int);
 extern float FastAddRotations(float, float);
 
 /* Per-frame update of the Levitator Pad (moby class 2274). */
@@ -51,7 +51,7 @@ void levitator_l11_pad_update(char *obj)
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
                 if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
-                    hero_l11_enter_state(6, 1);
+                    hero_l11_set_move_state(6, 1);
             }
         }
         break;

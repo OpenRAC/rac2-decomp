@@ -114,7 +114,7 @@ extern void moby_store_position_private(u8 *, void *);
 extern int player_slot_has_object(unsigned int);
 extern int charged_shot_get_for_owner(int);
 extern void charged_shot_release(int, int);
-extern int queue_copy_record_by_index(unsigned int);
+extern int actuator_play_pattern(unsigned int);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern void boss_turn_gun_toward_target_pal(char *);
 extern void mothership_project_point_onto_surface(char *, float);
@@ -150,7 +150,7 @@ extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float
 extern void FadeToBlack(int);
 extern void moby_copy_joint_transform_to_object(u8 *, char *, int, int);
 extern void hero_reset_position_and_direction_pal(char *, char *, int, int);
-extern int hero_l22_set_action_pal(int, int);
+extern int hero_l22_set_move_state_pal(int, int);
 extern char *effect_create_attached(char *, char *);
 extern void build_axis_rotation_quaternion(char *, int, float);
 
@@ -579,7 +579,7 @@ state20:
         cancel_hero_item_animation_pal();
         release_moby_animation_slot((LvlSlotCtx *)(((ResidentHeroView *)g_hero_state)->player), &((ResidentHeroView *)g_hero_state)->slotList);
         ((ResidentHeroView *)g_hero_state)->slotCount = 0;
-        hero_l22_set_action_pal(0, 1);
+        hero_l22_set_move_state_pal(0, 1);
         g_charged_l23_blast_timer = 0;
         return;
     }
@@ -649,5 +649,5 @@ state_default:
     }
     math_fast_float_d((char *)&g_boss_camera_timer[0]);
     if (g_boss_camera_timer[0])
-        queue_copy_record_by_index(0x2b);
+        actuator_play_pattern(0x2b);
 }

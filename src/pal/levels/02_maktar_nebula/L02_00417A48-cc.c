@@ -62,7 +62,7 @@ extern float vec_length_xy(void *);
 extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
 extern double __extendsfdf2(float);
 extern void STUB_printf(const char *, ...);
-extern int hero_l00_set_action_pal(s32, s32);
+extern int hero_l00_set_move_state_pal(s32, s32);
 extern float vec_distance_xy(void *, void *);
 extern void cam_set_mode_state(s32);
 extern s32 flag_set_first_pending(u8 *);
@@ -170,7 +170,7 @@ void lift_l02_update_pal(u8 *object)
             vec_transform_by_object_or_given((char *)object, (char *)&delta, (char *)&delta, 0);
             if (delta.f[2] < -0.6f) {
                 STUB_printf(g_str_lift_distance, __extendsfdf2(distance));
-                hero_l00_set_action_pal(0x6F, 1);
+                hero_l00_set_move_state_pal(0x6F, 1);
                 moby_set_state(object, 2, -1);
             }
         } else if ((g_frame_l02_counter[0] & 0x3F) == 0) {
@@ -251,7 +251,7 @@ void lift_l02_update_pal(u8 *object)
                 s32 slot;
                 u8 *sound_record;
                 if ((u16)ticks == 37)
-                    hero_l00_set_action_pal(0x6F, 1);
+                    hero_l00_set_move_state_pal(0x6F, 1);
                 slot = state->sound;
                 sound_record = (u8 *)&g_sound_state[slot];
                 if (*(u8 **)(sound_record + 0x88) != object || !sound_record[0x74])
@@ -260,7 +260,7 @@ void lift_l02_update_pal(u8 *object)
         }
         if (g_grab_highlight_level[0] >= 1.0f) {
             s32 slot;
-            hero_l00_set_action_pal(0, 1);
+            hero_l00_set_move_state_pal(0, 1);
             slot = state->sound;
             if (slot != -1) {
                 u8 *sound_record = (u8 *)&g_sound_state[slot];

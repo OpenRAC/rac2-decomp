@@ -19,7 +19,7 @@ extern u8 g_item_slot_to_record[];
 extern Statistics g_progress_statistics[];
 extern u32 g_frame_counter;
 extern u32 g_current_map_index;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_lancer_sound_records_a[], g_lancer_sound_records_b[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_lancer_shot_rumble_waves[], g_lancer_held_rumble_waves[];
 extern int g_game_l00_mode;
 extern float g_lancer_horizontal_arc;
 extern float g_lancer_range;
@@ -55,7 +55,7 @@ extern float math_fabs(float);
 extern float IntToFloat(int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void anim_start_blended_pal(void *, int, int, int);
-extern s32 hero_l00_set_action_pal(int, int);
+extern s32 hero_l00_set_move_state_pal(int, int);
 extern void EmitParticleTrailLayers_pal(char *);
 extern void part_spawn_line_at_moby_pal(char *);
 extern void start_equipped_item_animation_pal(void);
@@ -63,15 +63,15 @@ extern void cancel_hero_item_animation_pal(void);
 extern int gfx_add_point_light(void *, int, float, float);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int PlayMobySound(int, int, char *);
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern int slot_is_entry_nonzero(int);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern int actuator_is_channel_active(int);
 extern char *CreateTargetedMovingEffect_pal(void *, char *, char *, float);
 extern char *SpawnAimedShot_pal(void *, char *, char *);
 extern int coll_process_hit(float, void *, int, void *, int);
 extern void QueueMobyImpact(void *, void *);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_spark_burst_3_pal(void *, int, int);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern void gfx_free_point_light(int);
 extern void matrix_mul_vec3(void *, void *, void *);
 
@@ -197,7 +197,7 @@ void lancer_update_pal(char *moby)
     case 1: {
         int ready;
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-            hero_l00_set_action_pal(29, 1);
+            hero_l00_set_move_state_pal(29, 1);
         ready = 1;
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 29)
         {
@@ -231,9 +231,9 @@ void lancer_update_pal(char *moby)
                 *(int *)(state + 0x28) = 8;
                 snd_play_from_class_bank(0, 0, moby, TYPE(moby));
                 if (TYPE(moby) == 0x5D2)
-                    slot_copy_records_to_free(g_lancer_sound_records_a);
+                    actuator_play_waves(g_lancer_shot_rumble_waves);
                 else if (*(int *)(state + 0x3C) < 0)
-                    *(int *)(state + 0x3C) = slot_copy_records_to_free(g_lancer_sound_records_b);
+                    *(int *)(state + 0x3C) = actuator_play_waves(g_lancer_held_rumble_waves);
                 if (TYPE(moby) == 0x5D2)
                     CreateTargetedMovingEffect_pal(muzzle, moby, target, previousRange);
                 else
@@ -281,11 +281,11 @@ void lancer_update_pal(char *moby)
         }
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && get_ammo(-1) && ((Hero *)g_hero_state)->b[0x22B8])) {
             if (*(int *)(state + 0x3C) >= 0) {
-                slot_reset_active(*(int *)(state + 0x3C));
+                actuator_end_looping_waves(*(int *)(state + 0x3C));
                 *(int *)(state + 0x3C) = -1;
             }
         }
-        if (*(int *)(state + 0x3C) > 0 && !slot_is_entry_nonzero(*(int *)(state + 0x3C) - 1))
+        if (*(int *)(state + 0x3C) > 0 && !actuator_is_channel_active(*(int *)(state + 0x3C) - 1))
             *(int *)(state + 0x3C) = -1;
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && get_ammo(-1))
             && !(((Hero *)g_hero_state)->i[0x1D8 / 4] < 8 && ((Hero *)g_hero_state)->b[0x22B8])) {

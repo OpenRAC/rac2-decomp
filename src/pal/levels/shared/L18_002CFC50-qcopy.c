@@ -14,7 +14,7 @@ extern void attachment_reset_all(void);
 extern void hero_l18_update_speed_targets_pal(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(void *);
-extern s32 hero_l18_set_action_pal(s32, s32);
+extern s32 hero_l18_set_move_state_pal(s32, s32);
 extern void set_hero_animation_pal(s32, s32, float);
 extern u8 g_hero_state[];
 extern u8 g_hero_state[];
@@ -62,6 +62,6 @@ void hero_attach_to_object_pal(s32 mode, s32 index, u8 *object)
         *(s16 *)(g_hero_state + 0x24D4) = *(u16 *)(g_hero_state + 0x24CC);
         *(s32 *)(g_hero_state + 0x24CC) = 3;
     }
-    hero_l18_set_action_pal(index, 2);
+    hero_l18_set_move_state_pal(index, 2);
     if (mode == 4) set_hero_animation_pal(15, 0, 4.0f);
 }

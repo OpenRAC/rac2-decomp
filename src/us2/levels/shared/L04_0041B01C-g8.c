@@ -62,7 +62,7 @@ extern Quad g_collision_quad;
 extern float g_projection_scale_float NOT_SDA;
 extern void hero_record_play_counters(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
-extern int hero_l04_enter_state_us2(int, int);
+extern int hero_l04_set_move_state_us2(int, int);
 extern void cam_set_transition_frames(float);
 extern int coll_test_point(void *, int, void *, float);
 extern void UpdateViewContext(void);
@@ -310,7 +310,7 @@ void hoverbike_race_update_us2(u8 *moby)
             I(vars, 0x330) = -1;
         }
         if (g_current_map_index == 0xCE) {
-            hero_l04_enter_state_us2(0x86, 1);
+            hero_l04_set_move_state_us2(0x86, 1);
         } else {
             if (I(vars, 0x198) != -1) {
                 if (I(vars, 0x19C) != -1) {
@@ -323,7 +323,7 @@ void hoverbike_race_update_us2(u8 *moby)
                 Q(moby, 0x10) = Q(NODE(I(vars, 0x198)), 0x30);
                 Q(moby, 0xF0) = Q(NODE(I(vars, 0x198)), 0x70);
             }
-            hero_l04_enter_state_us2(0x31, 1);
+            hero_l04_set_move_state_us2(0x31, 1);
             load_scene_chunk(1, I(vars, 0x488));
             I(vars, 0x58) |= 1;
             I(vars, 0x340) = 0;

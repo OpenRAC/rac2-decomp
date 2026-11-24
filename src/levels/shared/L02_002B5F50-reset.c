@@ -32,7 +32,7 @@ extern void hero_clear_queued_anim(void);
 
 extern int anim_copy_entry_data(char *a0, int a1, int a2, char *a3);
 
-extern s32 hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_move_state(int a0, int a1);
 
 /* Clears the hero's carried objects and state, then restores the normal setup. */
 void hero_reset_carried_objects(void) {
@@ -85,5 +85,5 @@ void hero_reset_carried_objects(void) {
     *(int *)(*(char **)(hero + 0x2290) + 0x5C) = handle;
     if (*(int *)(hero + 0x2294) != 0x61 ||
         (g_area_start_mode != 2 && g_area_start_mode != 6))
-        hero_l00_set_action(0, 1);
+        hero_l00_set_move_state(0, 1);
 }

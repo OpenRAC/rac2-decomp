@@ -1063,7 +1063,7 @@
 #define hero_l00_update_timers_pal                     func_PAL_L00_002C3250
 #define hero_update_landing_slide_pal                  func_PAL_L00_002C39D8
 #define hero_get_step_offset_from_direction_pal        func_PAL_L00_002C3BE0
-#define hero_l00_set_action_pal                        func_PAL_L00_002C4480
+#define hero_l00_set_move_state_pal                    func_PAL_L00_002C4480
 #define hero_try_start_transition_pal                  func_PAL_L00_002C8F98
 #define hero_update_height_offset_pal                  func_PAL_L00_002C95C0
 #define ProcessHeroEquippedItemInput_pal               func_PAL_L00_002C97E0
@@ -2033,7 +2033,7 @@
 #define hero_l03_push_out_of_collision_pal             func_PAL_L03_002BADC8
 #define hero_update_hop_velocity_pal                   func_PAL_L03_002BC3A0
 #define hero_l03_update_state_machine_pal              func_PAL_L03_002BF860
-#define hero_l03_enter_state_pal                       func_PAL_L03_002C7068
+#define hero_l03_set_move_state_pal                    func_PAL_L03_002C7068
 #define hero_l03_decide_state_pal                      func_PAL_L03_002CCED8
 #define part_spawn_particle_burst_l03_pal              func_PAL_L03_002EE460
 #define sky_update_scroll_pal                          func_PAL_L03_002FF6E0
@@ -2150,7 +2150,7 @@
 #define ApplyHeroVelocityAndResolveDisplacement_pal    func_PAL_L04_002DBE18
 #define hero_steer_airborne_by_state_pal               func_PAL_L04_002DCE68
 #define hero_l04_update_state_machine_pal              func_PAL_L04_002E04A0
-#define hero_l04_enter_state_pal                       func_PAL_L04_002E7DA8
+#define hero_l04_set_move_state_pal                    func_PAL_L04_002E7DA8
 #define hero_l04_decide_state_transition_pal           func_PAL_L04_002EDFB8
 #define text_draw_scaled_medium_pal                    func_PAL_L04_0030B2C8
 #define level_update_mob_list_by_type_pal              func_PAL_L04_0031F198
@@ -2488,7 +2488,7 @@
 #define cam_volume_update_pal                          func_PAL_L06_00480660
 #define UpdateHeroVelocityForStateWithYawSpring_pal    func_PAL_L07_002B5728
 #define hero_l07_update_state_machine_pal              func_PAL_L07_002B8608
-#define hero_l07_enter_state_pal                       func_PAL_L07_002BE8C8
+#define hero_l07_set_move_state_pal                    func_PAL_L07_002BE8C8
 #define hero_l07_decide_state_transition_pal           func_PAL_L07_002C4018
 #define moby_build_followed_points_pal                 func_PAL_L07_002F4618
 #define hero_adjust_jump_speed_to_target_pal           func_PAL_L07_00324F58
@@ -2555,7 +2555,7 @@
 #define siberius_debris_update_pal                     func_PAL_L07_00415B88
 #define UpdateHeldBeamWeapon_pal                       func_PAL_L07_0041B7D8
 #define hero_l08_update_state_machine_pal              func_PAL_L08_002CB6E0
-#define hero_l08_enter_state_pal                       func_PAL_L08_002D3078
+#define hero_l08_set_move_state_pal                    func_PAL_L08_002D3078
 #define hero_l08_update_state_transitions_pal          func_PAL_L08_002D94C0
 #define tabora_cutscene_update_effects_pal             func_PAL_L08_0030A2B8
 #define gfx_run_screen_update_steps_pal                func_PAL_L08_0030C3A8
@@ -2632,7 +2632,7 @@
 #define item_trader_npc_update_pal                     func_PAL_L08_0043B690
 #define hero_l09_update_blend_channels_pal             func_PAL_L09_002B5C80
 #define hero_l09_update_state_machine_pal              func_PAL_L09_002BC480
-#define hero_l09_set_state_pal                         func_PAL_L09_002C3708
+#define hero_l09_set_move_state_pal                    func_PAL_L09_002C3708
 #define hero_l09_decide_state_transition_pal           func_PAL_L09_002C9B18
 #define gfx_draw_state_nine_pulsing_quad_pal           func_PAL_L09_002FA660
 #define mob_list_update_flags_pal                      func_PAL_L09_002FAA98
@@ -2768,7 +2768,7 @@
 #define hero_handle_contact_hit_pal                    func_PAL_L11_002CB0C8
 #define HeroApplyMotionCollision_pal                   func_PAL_L11_002CDDB8
 #define hero_l11_update_state_machine_pal              func_PAL_L11_002D22B8
-#define hero_l11_enter_state_pal                       func_PAL_L11_002D9038
+#define hero_l11_set_move_state_pal                    func_PAL_L11_002D9038
 #define hero_decide_next_state_pal                     func_PAL_L11_002DED28
 #define moby_update_list_flags_pal                     func_PAL_L11_00310B38
 #define moby_call_helper_with_blocks_pal               func_PAL_L11_00342558
@@ -2916,7 +2916,7 @@
 #define moby_group_trigger_update_pal                  func_PAL_L11_00480AF0
 #define hero_l12_apply_contact_push_pal                func_PAL_L12_002B8478
 #define hero_l12_update_state_machine_pal              func_PAL_L12_002BFF00
-#define hero_l12_set_action_pal                        func_PAL_L12_002C8C58
+#define hero_l12_set_move_state_pal                    func_PAL_L12_002C8C58
 #define hero_decide_todano_state_pal                   func_PAL_L12_002CFA90
 #define todano_build_trail_slice_meshes_pal            func_PAL_L12_00301950
 #define todano_scene_update_events_pal                 func_PAL_L12_00301DD8
@@ -3003,7 +3003,7 @@
 #define UpdateSpinningBlastProjectile_pal              func_PAL_L12_0042F068
 #define gfx_draw_laser_beam_pal                        func_PAL_L12_0042F4F0
 #define hero_l13_update_state_machine_pal              func_PAL_L13_002C56D8
-#define hero_set_action_state_pal                      func_PAL_L13_002CF0A0
+#define hero_l13_set_move_state_pal                    func_PAL_L13_002CF0A0
 #define hero_l13_decide_state_pal                      func_PAL_L13_002D62D0
 #define boldan_init_level_objects_pal                  func_PAL_L13_00308A88
 #define trigger_list_check_hero_pal                    func_PAL_L13_0038EF88
@@ -3140,7 +3140,7 @@
 #define hero_l16_push_out_of_collision_pal             func_PAL_L16_002B5848
 #define hero_apply_movement_pal                        func_PAL_L16_002B5D88
 #define hero_update_state_handler_pal                  func_PAL_L16_002B9EE0
-#define hero_l16_enter_state_pal                       func_PAL_L16_002C0CB0
+#define hero_l16_set_move_state_pal                    func_PAL_L16_002C0CB0
 #define hero_decide_state_snivelak_pal                 func_PAL_L16_002C6668
 #define snivelak_room_scene_update_pal                 func_PAL_L16_002F7B18
 #define menu_l00_init_entry_table_pal                  func_PAL_L16_0034F000
@@ -3275,7 +3275,7 @@
 #define ClipHeroVelocityAtWall_pal                     func_PAL_L18_002D1890
 #define hero_l18_update_state_machine_pal              func_PAL_L18_002D7598
 #define hero_update_timers_reach_pal                   func_PAL_L18_002DF168
-#define hero_l18_set_action_pal                        func_PAL_L18_002E01E0
+#define hero_l18_set_move_state_pal                    func_PAL_L18_002E01E0
 #define hero_update_state_decider_pal                  func_PAL_L18_002E6C50
 #define text_measure_width_scaled_l18_pal              func_PAL_L18_00304BD8
 #define FontPrintCenterScaled_pal                      func_PAL_L18_00305968
@@ -3365,7 +3365,7 @@
 #define hero_l19_apply_contact_push_pal                func_PAL_L19_002B5AD8
 #define hero_l19_update_speed_targets_pal              func_PAL_L19_002B6160
 #define hero_l19_update_state_machine_pal              func_PAL_L19_002BC990
-#define hero_l19_set_state_pal                         func_PAL_L19_002C45D0
+#define hero_l19_set_move_state_pal                    func_PAL_L19_002C45D0
 #define hero_l19_decide_state_transition_pal           func_PAL_L19_002CADE8
 #define cutscene_l19_update_effects_pal                func_PAL_L19_002FBA78
 #define bouncing_l19_shot_update_ripple_pal            func_PAL_L19_0038E3B0
@@ -3406,7 +3406,7 @@
 #define hero_slide_along_wall_pal                      func_PAL_L20_002C7500
 #define hero_l20_update_state_machine_pal              func_PAL_L20_002CD8F0
 #define hero_l20_update_timers_pal                     func_PAL_L20_002D6678
-#define hero_l20_set_state_pal                         func_PAL_L20_002D7920
+#define hero_l20_set_move_state_pal                    func_PAL_L20_002D7920
 #define hero_l20_decide_state_transition_pal           func_PAL_L20_002DF028
 #define level_script_update_pal                        func_PAL_L20_00312A28
 #define spark_l20_burst_update_pal                     func_PAL_L20_0039D9C8
@@ -3505,7 +3505,7 @@
 #define hero_slide_along_walls_pal                     func_PAL_L22_002B8CB8
 #define hero_l22_update_state_machine_pal              func_PAL_L22_002BF0A8
 #define hero_update_timers_and_reach_pal               func_PAL_L22_002C8740
-#define hero_l22_set_action_pal                        func_PAL_L22_002C99C8
+#define hero_l22_set_move_state_pal                    func_PAL_L22_002C99C8
 #define hero_update_actions_pal                        func_PAL_L22_002D1020
 #define part_update_fade_record_pal                    func_PAL_L22_00337244
 #define part_spawn_homing_trail_pal                    func_PAL_L22_0033BBB0

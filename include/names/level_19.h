@@ -247,7 +247,7 @@
 #define hero_l19_update_speed_targets       func_L19_002B6278
 #define UpdateGrelbinHeroGroundContacts     func_L19_002B7820
 #define hero_l19_update_state_machine       func_L19_002BCA50
-#define hero_l19_set_state                  func_L19_002C44F8
+#define hero_l19_set_move_state             func_L19_002C44F8
 #define hero_l19_decide_state_transition    func_L19_002CAAB0
 #define UpdateCutsceneEffects               func_L19_002FA1A8
 #define linked_object_watcher_update        func_L19_00380918

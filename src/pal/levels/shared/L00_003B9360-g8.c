@@ -16,7 +16,7 @@ extern Vector g_camera_offset_vector MACRO_ADDR;
 extern float g_electrolyzer_turn_step __attribute__((sda));
 extern void moby_set_state(unsigned char *,int,int),cam_set_mode_state(int);
 extern void level_start_timed_object_once_pal(void);
-extern s32 hero_l00_set_action_pal(int,int);
+extern s32 hero_l00_set_move_state_pal(int,int);
 extern int ForceClaimNotice(int,int,int);
 extern void euler_rotation_basis(float *,float *),vec_scale_to_length(void *,void *,float),FastVecAdd(void *,void *,void *);
 extern float ApproachValue(float *,float,float),fast_vec_dist(void *,void *),FastVecDot(void *,void *),math_fabs(float),mat_fast_helper_a(float,float);
@@ -41,7 +41,7 @@ void electrolyzer_update_pal(unsigned char *object)
     case 1:
         break;
     case 2:
-        if(g_pad_state.pressed&0x200) {cam_set_mode_state(0);hero_l00_set_action_pal(0,1);moby_set_state(object,1,-1);}
+        if(g_pad_state.pressed&0x200) {cam_set_mode_state(0);hero_l00_set_move_state_pal(0,1);moby_set_state(object,1,-1);}
         level_start_timed_object_once_pal();
         object[0x31]=0;*(unsigned short *)(object+0x34)|=1;
         g_partial_camera_lock.active=1;

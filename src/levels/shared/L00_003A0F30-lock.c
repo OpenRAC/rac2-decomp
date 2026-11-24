@@ -57,11 +57,11 @@ extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_table_2[];
-extern u8 g_minirocket_sound_records[];
+extern u8 g_minirocket_rumble_waves[];
 
 extern void EmitLayeredSparks(void *);
 extern int vec_fast_helper_b(void *);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern int get_ammo(int);
@@ -83,8 +83,8 @@ extern void part_spawn_fragment_fan_and_smoke(Moby *);
 extern void weapon_spawn_muzzle_effect(Moby *);
 extern void set_hero_animation(int, int, float);
 extern void start_equipped_item_animation(void);
-extern void slot_reset_active(int);
-extern int slot_copy_records_to_free(void *);
+extern void actuator_end_looping_waves(int);
+extern int actuator_play_waves(void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 extern void gfx_free_point_light(int);
@@ -113,7 +113,7 @@ void minirocket_tube_update(Moby *moby)
     EmitLayeredSparks(moby);
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
         anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     if (((Hero *)g_hero_state)->i[0x1450 / 4] != 0)
@@ -248,7 +248,7 @@ void minirocket_tube_update(Moby *moby)
             else
                 start_equipped_item_animation();
             anim_start_blended(moby, 2, 0, 0);
-            vars->sound = slot_copy_records_to_free(g_minirocket_sound_records);
+            vars->sound = actuator_play_waves(g_minirocket_rumble_waves);
             {
                 WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
                 vars->cooldown = 1.0f / weapon->rate;
@@ -259,7 +259,7 @@ void minirocket_tube_update(Moby *moby)
         }
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && get_ammo(-1) && ((Hero *)g_hero_state)->b[0x22B8]) &&
             vars->sound >= 0) {
-            slot_reset_active(vars->sound);
+            actuator_end_looping_waves(vars->sound);
             vars->sound = -1;
         }
     }

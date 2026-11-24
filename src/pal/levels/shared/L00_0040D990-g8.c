@@ -24,7 +24,7 @@ extern void mem_fast_helper_b(void *, int);
 extern int math_fast_float_d(void *);
 extern int get_ammo(int);
 extern void start_equipped_item_animation_pal(void);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *spark_effect_spawn_pal(void *, int, char *);
@@ -61,7 +61,7 @@ extern int g_charging_weapon_initial_value __attribute__((sda));
 extern unsigned char g_charging_weapon_index __attribute__((nosda));
 extern RateEntry g_weapon_l00_table[];
 extern float g_weapon_effect_scale __attribute__((nosda));
-extern char g_charging_weapon_sound_records[];
+extern char g_charging_weapon_rumble_waves[];
 extern char g_cam_follow_matrix[];
 
 #define I(p, n) (*(int *)((char *)(p) + (n)))
@@ -100,7 +100,7 @@ void charging_weapon_update_pal(char *moby)
         }
         if (get_ammo(-1)) {
             start_equipped_item_animation_pal();
-            I(vars, 24) = slot_copy_records_to_free(g_charging_weapon_sound_records);
+            I(vars, 24) = actuator_play_waves(g_charging_weapon_rumble_waves);
             B(moby, 32) = 2;
             I(vars, 4) = (((int)(g_charging_weapon_initial_value) * 5 + 2) / 6);
         } else {

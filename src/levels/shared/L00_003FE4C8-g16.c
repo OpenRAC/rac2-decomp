@@ -19,7 +19,7 @@ extern int g_spread_shot_count __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
 extern void moby_init_private_data(char *);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int FastDecTimer(s16 *);
 extern int math_fast_float_d(int *);
@@ -44,9 +44,9 @@ extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *
 extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern void slot_reset_active(void);
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_rumble_waves;
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void actuator_end_looping_waves(void);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void moby_draw_attached_effect(void *);
 
@@ -71,7 +71,7 @@ void tetrabomb_gun_update(unsigned char *object) {
     int phase;
 
     moby_init_private_data(object);
-    if (H->i[2213] == 1) hero_l00_set_action(29, 1);
+    if (H->i[2213] == 1) hero_l00_set_move_state(29, 1);
     if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 6, 0);

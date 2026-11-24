@@ -106,7 +106,7 @@ extern s32 slot_find_active_in_chain(s32 index);
 extern void level_select_random_object(void);
 extern void level_store_pair_with_increment(s32 a0, s32 a1);
 extern void moby_set_flag_bit(Moby *moby, s32 enabled);
-extern s32 hero_l00_set_action(s32 action, s32 animate);
+extern s32 hero_l00_set_move_state(s32 action, s32 animate);
 extern void hero_set_state_value_c(s32 value);
 extern s32 LockedEntryMenuInput(void);
 extern void ship_save_transform_state(void);
@@ -209,7 +209,7 @@ void UpdateGornController(Moby *moby)
         if (g_gorn_message_counter++ < 5 || g_challenge_mode == 2)
             break;
 
-        hero_l00_set_action(0x31, 0);
+        hero_l00_set_move_state(0x31, 0);
         if (g_gorn_enabled_flag) {
             hero_set_state_value_c(on);
             g_challenge_menu_choice = LockedEntryMenuInput();

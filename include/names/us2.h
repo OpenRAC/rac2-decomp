@@ -652,7 +652,7 @@
 #define hero_update_zapper_us2                         func_US2_L00_002B2408
 #define hero_try_grab_object_us2                       func_US2_L00_002B2DD0
 #define hero_update_move_physics_us2                   func_US2_L00_002BA8E0
-#define hero_l00_change_action_us2                     func_US2_L00_002C4560
+#define hero_l00_set_move_state_us2                    func_US2_L00_002C4560
 #define hero_select_context_action_us2                 func_US2_L00_002C96D0
 #define hero_l00_update_move_decider_us2               func_US2_L00_002CB650
 #define hero_update_collection_progress_us2            func_US2_L00_002D6258
@@ -852,7 +852,7 @@
 #define game_update_frame_us2                          func_US2_L01_002A8D48
 #define hero_l01_apply_hazard_contact_us2              func_US2_L01_002B3990
 #define hero_l01_update_state_machine_us2              func_US2_L01_002BA3C8
-#define hero_set_move_state_us2                        func_US2_L01_002BEEA8
+#define SetHeroMoveState_us2                           func_US2_L01_002BEEA8
 #define hero_process_item_action_input_us2             func_US2_L01_002C1D90
 #define hero_l01_update_state_transitions_us2          func_US2_L01_002C3B08
 #define level_tick_timer_get_value_us2                 func_US2_L01_002F2458
@@ -904,7 +904,7 @@
 #define level_update_frame_us2                         func_US2_L03_002AD640
 #define hero_l03_apply_contact_push_us2                func_US2_L03_002B8910
 #define hero_l03_update_state_machine_us2              func_US2_L03_002BFAF8
-#define hero_l03_enter_state_us2                       func_US2_L03_002C7288
+#define hero_l03_set_move_state_us2                    func_US2_L03_002C7288
 #define hero_l03_decide_state_us2                      func_US2_L03_002CCF18
 #define level_update_objects_us2                       func_US2_L03_002FEB58
 #define bot_update_us2                                 func_US2_L03_003C31F8
@@ -923,7 +923,7 @@
 #define laser_bot_init_check_hit_us2                   func_US2_L03_004201B8
 #define hero_check_surface_contact_us2                 func_US2_L04_002D93C0
 #define hero_l04_update_state_machine_us2              func_US2_L04_002E06B0
-#define hero_l04_enter_state_us2                       func_US2_L04_002E7F28
+#define hero_l04_set_move_state_us2                    func_US2_L04_002E7F28
 #define hero_l04_decide_state_transition_us2           func_US2_L04_002EDF10
 #define level_update_mob_list_by_type_us2              func_US2_L04_0031E208
 #define barlow_creature_update_us2                     func_US2_L04_003E38E8
@@ -973,14 +973,14 @@
 #define item_l06_trigger_update_us2                    func_US2_L06_004571C8
 #define destructible_machine_update_us2                func_US2_L06_00458A00
 #define hero_l07_update_state_machine_us2              func_US2_L07_002B8720
-#define hero_l07_enter_state_us2                       func_US2_L07_002BE988
+#define hero_l07_set_move_state_us2                    func_US2_L07_002BE988
 #define hero_l07_decide_state_transition_us2           func_US2_L07_002C3F00
 #define shooter_entity_update_us2                      func_US2_L07_003EBC40
 #define boss_update_us2                                func_US2_L07_003F83E8
 #define siberius_trigger_update_us2                    func_US2_L07_00409480
 #define tv_l07_screens_update_us2                      func_US2_L07_0040A6A0
 #define hero_l08_update_state_machine_us2              func_US2_L08_002CB8F0
-#define hero_l08_enter_state_us2                       func_US2_L08_002D31F8
+#define hero_l08_set_move_state_us2                    func_US2_L08_002D31F8
 #define hero_l08_update_state_transitions_us2          func_US2_L08_002D9410
 #define tabora_cutscene_update_effects_us2             func_US2_L08_003093B8
 #define level_set_game_state_pair_us2                  func_US2_L08_0031A090
@@ -999,7 +999,7 @@
 #define sandfly_update_us2                             func_US2_L08_00424F74
 #define item_trader_npc_update_us2                     func_US2_L08_004370E0
 #define hero_l09_update_state_machine_us2              func_US2_L09_002BC618
-#define hero_l09_set_state_us2                         func_US2_L09_002C3818
+#define hero_l09_set_move_state_us2                    func_US2_L09_002C3818
 #define hero_l09_decide_state_transition_us2           func_US2_L09_002C99F8
 #define mob_list_update_flags_us2                      func_US2_L09_002F9B28
 #define region_scan_objects_us2                        func_US2_L09_003E46F8
@@ -1026,7 +1026,7 @@
 #define gate_course_update_us2                         func_US2_L10_00426260
 #define hero_handle_contact_hit_us2                    func_US2_L11_002CB338
 #define hero_l11_update_state_machine_us2              func_US2_L11_002D24D0
-#define hero_l11_enter_state_us2                       func_US2_L11_002D9208
+#define hero_l11_set_move_state_us2                    func_US2_L11_002D9208
 #define hero_decide_next_state_us2                     func_US2_L11_002DED18
 #define moby_update_list_flags_us2                     func_US2_L11_0030FC28
 #define level_update_progress_flags_us2                func_US2_L11_00399764
@@ -1051,7 +1051,7 @@
 #define item_l11_trigger_update_us2                    func_US2_L11_0046F118
 #define hero_l12_apply_contact_push_us2                func_US2_L12_002B86E8
 #define hero_l12_update_state_machine_us2              func_US2_L12_002C0110
-#define hero_l12_set_action_us2                        func_US2_L12_002C8DD8
+#define hero_l12_set_move_state_us2                    func_US2_L12_002C8DD8
 #define hero_decide_todano_state_us2                   func_US2_L12_002CF9E0
 #define todano_scene_update_events_us2                 func_US2_L12_00300ED0
 #define UpdateTodanoItemTradeNpc_us2                   func_US2_L12_003B6518
@@ -1066,7 +1066,7 @@
 #define flying_boss_update_us2                         func_US2_L12_00429A10
 #define gfx_draw_laser_beam_us2                        func_US2_L12_0042B340
 #define hero_l13_update_state_machine_us2              func_US2_L13_002C58E8
-#define hero_l13_change_action_us2                     func_US2_L13_002CF1F8
+#define hero_l13_set_move_state_us2                    func_US2_L13_002CF1F8
 #define hero_l13_decide_state_us2                      func_US2_L13_002D61F8
 #define boldan_init_level_objects_us2                  func_US2_L13_00307BE0
 #define l13_pulse_trigger_update_us2                   func_US2_L13_003C6DC0
@@ -1100,7 +1100,7 @@
 #define gorn_path_course_update_us2                    func_US2_L15_00432BA8
 #define hero_handle_contact_reaction_us2               func_US2_L16_002B3358
 #define hero_update_state_handler_us2                  func_US2_L16_002BA0F8
-#define hero_l16_enter_state_us2                       func_US2_L16_002C0E50
+#define hero_l16_set_move_state_us2                    func_US2_L16_002C0E50
 #define hero_decide_state_snivelak_us2                 func_US2_L16_002C6628
 #define snivelak_room_scene_update_us2                 func_US2_L16_002F6CE0
 #define menu_l16_fill_entries_from_item_list_us2       func_US2_L16_0034DE08
@@ -1122,7 +1122,7 @@
 #define hero_detach_from_object_us2                    func_US2_L18_002D0050
 #define hero_handle_hit_object_contact_us2             func_US2_L18_002D02B8
 #define hero_l18_update_state_machine_us2              func_US2_L18_002D7758
-#define hero_l18_set_action_us2                        func_US2_L18_002E02E8
+#define hero_l18_set_move_state_us2                    func_US2_L18_002E02E8
 #define hero_update_state_decider_us2                  func_US2_L18_002E6B50
 #define text_measure_font_texture_us2                  func_US2_L18_00304470
 #define UpdateDamoselTimedExplosions_us2               func_US2_L18_00317D10
@@ -1137,7 +1137,7 @@
 #define UpdatePartsPurchaseNpc_us2                     func_US2_L18_00441C08
 #define hero_l19_apply_contact_push_us2                func_US2_L19_002B5CF8
 #define hero_l19_update_state_machine_us2              func_US2_L19_002BCB58
-#define hero_l19_set_state_us2                         func_US2_L19_002C4708
+#define hero_l19_set_move_state_us2                    func_US2_L19_002C4708
 #define hero_l19_decide_state_transition_us2           func_US2_L19_002CACE8
 #define UpdateCutsceneEffects_us2                      func_US2_L19_002FABB0
 #define menu_l19_fill_entries_from_item_list_us2       func_US2_L19_00353D38
@@ -1156,7 +1156,7 @@
 #define hero_exit_vehicle_mode_us2                     func_US2_L20_002C5B50
 #define hero_handle_hazard_contact_us2                 func_US2_L20_002C5E08
 #define hero_l20_update_state_machine_us2              func_US2_L20_002CDA30
-#define hero_l20_set_state_us2                         func_US2_L20_002D79B0
+#define hero_l20_set_move_state_us2                    func_US2_L20_002D79B0
 #define hero_l20_decide_state_transition_us2           func_US2_L20_002DEE88
 #define level_script_update_us2                        func_US2_L20_00311A60
 #define scripted_pickup_update_us2                     func_US2_L20_003C1450
@@ -1170,7 +1170,7 @@
 #define eased_platform_update_us2                      func_US2_L20_00448E78
 #define hero_l22_apply_hazard_contact_us2              func_US2_L22_002B7658
 #define hero_l22_update_state_machine_us2              func_US2_L22_002BF2B8
-#define hero_set_action_us2                            func_US2_L22_002C9B20
+#define hero_l22_set_move_state_us2                    func_US2_L22_002C9B20
 #define hero_action_state_update_us2                   func_US2_L22_002D0F48
 #define moby_wait_no_active_trigger_event_us2          func_US2_L22_00387310
 #define space_ship_update_us2                          func_US2_L22_0039EB38

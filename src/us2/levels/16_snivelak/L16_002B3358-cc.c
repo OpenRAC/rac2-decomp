@@ -67,7 +67,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 hero_l16_enter_state_us2(unsigned long, unsigned long);
+extern s32 hero_l16_set_move_state_us2(unsigned long, unsigned long);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth_us2(s32);
 extern int hero_play_sound(s32, s32);
@@ -143,7 +143,7 @@ s32 hero_handle_contact_reaction_us2(s32 apply_reaction) {
     case 0:
         other = g_hero_state.f249C;
         if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB || *(s16 *)(other + 0xAA) == 0x558)) {
-            hero_l16_enter_state_us2(0x7D, 1);
+            hero_l16_set_move_state_us2(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
@@ -154,7 +154,7 @@ s32 hero_handle_contact_reaction_us2(s32 apply_reaction) {
                 AdjustPlayerHealth_us2(FloatToInt(*(float *)(r + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                hero_l16_enter_state_us2(0x16, 1);
+                hero_l16_set_move_state_us2(0x16, 1);
             }
             g_hero_state.f1DC = 0x4D;
             if (g_hero_state.f21C == 0) {
@@ -164,9 +164,9 @@ s32 hero_handle_contact_reaction_us2(s32 apply_reaction) {
             return 0;
         }
         if (entry->f24 & 8) {
-            hero_l16_enter_state_us2(0x8C, 1);
+            hero_l16_set_move_state_us2(0x8C, 1);
         } else {
-            hero_l16_enter_state_us2(0x16, 1);
+            hero_l16_set_move_state_us2(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
             qzero(&vec);

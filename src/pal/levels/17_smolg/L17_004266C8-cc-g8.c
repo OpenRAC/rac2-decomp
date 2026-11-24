@@ -193,7 +193,7 @@ extern int ForceClaimNotice(s32, s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
 extern void moby_set_flag_bit(void *, s32);
 extern void cam_lock_entry(s32);
-extern s32 hero_change_action(s32, s32);
+extern s32 hero_l13_set_move_state(s32, s32);
 
 /* func_L17_0041EAA8's state record. */
 typedef struct {

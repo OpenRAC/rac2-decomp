@@ -50,7 +50,7 @@ extern char *part_find_owned_effect_slot(char *,int,int);
 extern void gfx_start_color_fade_pal(char *,void *), gfx_update_color_fade_pal(char *,void *);
 extern float vec_length_xy(void *), func_002A0558(char *,char *), FastAddRotations(float,float), math_fast_sin_or_cos_b(float), fast_vec_dist(void *,void *);
 extern int TryClaimNotice(int,int,int), math_random_int_below(int), flag_set_first_pending(char *);
-extern int hero_l00_set_action_pal(int,int);
+extern int hero_l00_set_move_state_pal(int,int);
 extern void UpdateHoverVehicleMotion_pal(char *,int), set_hero_animation_pal(int,int,float), moby_mark_in_range(char *);
 extern void moby_set_state(char *,int,int), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
 extern void moby_transform_joint_to_world(char *,int,void *);
@@ -136,7 +136,7 @@ void MuseumVehicleUpdate_pal(MuseumVehicle *obj) {
             if (g_pad_state.pressed&16) activate=prompt_shown;
         }
         if (activate) {
-            hero_l00_set_action_pal(49,0);set_hero_animation_pal(g_vehicle_animation_id,0,15.0f);
+            hero_l00_set_move_state_pal(49,0);set_hero_animation_pal(g_vehicle_animation_id,0,15.0f);
             qcopy(g_hero_state.rotation,obj->rotation);qcopy(g_hero_state.position,obj->position);
             g_hero_state.vehicle=obj;obj->state=3;obj->flags=0;I(g_hero_state.hero,0x9C)=-1;
         }
@@ -156,7 +156,7 @@ void MuseumVehicleUpdate_pal(MuseumVehicle *obj) {
         break;
     case 4:
         if (flag_set_first_pending(obj)) {
-            g_hero_state.camera_x=0;g_hero_state.camera_y=-1.0f;hero_l00_set_action_pal(11,1);
+            g_hero_state.camera_x=0;g_hero_state.camera_y=-1.0f;hero_l00_set_move_state_pal(11,1);
             g_hero_state.vehicle=0;g_hero_state.vehicle_id=-1;
         }
         obj->flags=0;I(g_hero_state.hero,0x9C)=0;UpdateHoverVehicleMotion_pal(obj,0);
@@ -166,7 +166,7 @@ void MuseumVehicleUpdate_pal(MuseumVehicle *obj) {
     case 6: break;
     case 5:
         obj->flags=I(obj->class_data,0x10);I(g_hero_state.hero,0x9C)=0;
-        hero_l00_set_action_pal(0,1);moby_transform_joint_to_world(obj,0,pos);
+        hero_l00_set_move_state_pal(0,1);moby_transform_joint_to_world(obj,0,pos);
         SpawnExplosionEffects_pal(obj,vars,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         qcopy(obj->position,&vars->spawn);g_hero_state.vehicle_id=-1;g_hero_state.vehicle=0;obj->state=0;
         break;

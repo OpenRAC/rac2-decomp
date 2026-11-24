@@ -202,7 +202,7 @@
 #define g_reward_switch_links                   D_L13_002AA9F0
 #define g_str_l13_reward_switch_debug_2         D_L13_002ADB90
 #define hero_l13_update_state_machine           func_L13_002C5760
-#define hero_change_action                      func_L13_002CEF00
+#define hero_l13_set_move_state                 func_L13_002CEF00
 #define hero_l13_decide_state                   func_L13_002D5ED8
 #define boldan_init_level_objects               func_L13_00306F38
 #define menu_build_level_list                   func_L13_0035E890

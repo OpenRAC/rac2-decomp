@@ -8,7 +8,7 @@ extern int g_hero_l09_special_state_flag __attribute__((sda));
 extern u8 g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
-extern int hero_l09_set_state(int, int);
+extern int hero_l09_set_move_state(int, int);
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
 typedef struct {
@@ -99,10 +99,10 @@ void hero_read_button_command(void)
     if (g_hero_state.attack) {
         if (g_hero_state.attack && active &&
             (g_hero_state.state != 0x38 || g_hero_state.animationDone)) {
-            if (g_hero_state.health) { hero_l09_set_state(0x38,1); return; }
-            if (g_current_map_index == 2 && g_hero_l09_special_state_flag) { hero_l09_set_state(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l09_set_state(0x79,1); return; }
-            hero_l09_set_state(0x39,1); return;
+            if (g_hero_state.health) { hero_l09_set_move_state(0x38,1); return; }
+            if (g_current_map_index == 2 && g_hero_l09_special_state_flag) { hero_l09_set_move_state(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l09_set_move_state(0x79,1); return; }
+            hero_l09_set_move_state(0x39,1); return;
         }
     }
     if (g_hero_state.jump && g_hero_state.state != 0x65 && g_hero_state.state != 0x78 &&
@@ -110,16 +110,16 @@ void hero_read_button_command(void)
         g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f &&
         (g_hero_state.state != 0x66 || g_hero_state.animationDone) &&
         (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
-        if (!g_hero_state.health) { hero_l09_set_state(0x78,1); return; }
-        hero_l09_set_state(0x65,1); return;
+        if (!g_hero_state.health) { hero_l09_set_move_state(0x78,1); return; }
+        hero_l09_set_move_state(0x65,1); return;
     }
     if (!g_hero_state.cancel || g_hero_state.state == 0x78 || g_hero_state.state == 0x74) return;
     if (!(math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f)) return;
     if (!(g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f)) return;
     if (!(g_hero_state.motion.f[2] < 0.0f) && g_hero_state.state != 0x7b) return;
     if (g_current_map_index == 13) {
-        hero_l09_set_state(0x74, 1);
+        hero_l09_set_move_state(0x74, 1);
         return;
     }
-    hero_l09_set_state(0x78, 1);
+    hero_l09_set_move_state(0x78, 1);
 }

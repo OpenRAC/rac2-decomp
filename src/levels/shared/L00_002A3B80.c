@@ -153,7 +153,7 @@ void InitializeHero(void)
 extern char g_hero_state[];
 extern int g_current_map_index;
 extern void hero_clear_queued_anim(void);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 extern void trail_reset_slots(void);
 /* Incomplete sda array: retail clears this word as `lui $at; sw` (compiler-notes.md). */
 extern int g_hero_aim_speed_start[] __attribute__((sda));
@@ -173,7 +173,7 @@ void hero_reset_start_aim_speed(void)
     *(int *)(base + 0x2294) = 0;
     *(float *)(base + 0xC24) = 1.0f;
     hero_clear_queued_anim();
-    hero_l00_set_action(0, 1);
+    hero_l00_set_move_state(0, 1);
     trail_reset_slots();
 }
 

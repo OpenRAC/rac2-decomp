@@ -178,7 +178,7 @@ int hero_classify_input_direction(void)
 
 extern unsigned char g_screen_mode_flag[];
 
-extern s32 hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_move_state(int a0, int a1);
 
 /* Picks the variant of the shared loader the current game state selects. */
 void hero_start_loader_state(int useAlternate)
@@ -187,10 +187,10 @@ void hero_start_loader_state(int useAlternate)
 
     switch (g_screen_mode_flag[0]) {
     case 0:
-        hero_l00_set_action(0, variant);
+        hero_l00_set_move_state(0, variant);
         break;
     case 1:
-        hero_l00_set_action(0x3F, variant);
+        hero_l00_set_move_state(0x3F, variant);
         break;
     }
 }
@@ -215,7 +215,7 @@ int hero_try_start_transition(void)
             return 0;
         cancel_hero_item_animation();
         *(int *)(hero + 0xEA4) = 2;
-        hero_l00_set_action(0x22, 1);
+        hero_l00_set_move_state(0x22, 1);
         return 1;
     }
     return 0;
@@ -298,7 +298,7 @@ int hero_try_start_move_from_buffer(int slot, int allowFallback)
     offset = hero_get_step_offset_from_direction();
     if ((g_pad_pressed_flags[0] & 8) && offset > 0) {
         if (pad_presses_within_frames(0x40, 0x1F000, slot + offset, offset) != 0) {
-            hero_l00_set_action(0xB, 1);
+            hero_l00_set_move_state(0xB, 1);
             return 1;
         }
     }
@@ -306,14 +306,14 @@ int hero_try_start_move_from_buffer(int slot, int allowFallback)
     if (*(short *)(hero + 0x1454) != 0) {
         if (0.9f < *(float *)(hero + 0x24B8)) {
             if (hero_classify_input_direction() != 2) {
-                hero_l00_set_action(0xB, 1);
+                hero_l00_set_move_state(0xB, 1);
                 return 1;
             }
         }
     }
     if (allowFallback != 0)
         return 0;
-    hero_l00_set_action(7, 1);
+    hero_l00_set_move_state(7, 1);
     return 1;
 }
 

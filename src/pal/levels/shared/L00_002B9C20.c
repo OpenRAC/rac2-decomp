@@ -44,7 +44,7 @@ extern void hero_reset_speeds_and_vectors(void);
 extern void level_release_slot_list(void *p);
 extern void cancel_hero_item_animation_pal(void);
 extern void attachment_reset_all(void);
-extern s32 hero_l00_set_action_pal(int a0, int a1);
+extern s32 hero_l00_set_move_state_pal(int a0, int a1);
 extern void anim_start_object_at_frame(int a0, int a1);
 extern void hero_l00_update_ground_contact(void);
 extern float fast_vec_dist(void *a, void *b);
@@ -93,7 +93,7 @@ void hero_reset_position_and_direction_pal(void *position, void *direction, int 
     attachment_reset_all();
 
     if (sound != -1)
-        hero_l00_set_action_pal(sound, 2);
+        hero_l00_set_move_state_pal(sound, 2);
 
     anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 

@@ -23,7 +23,7 @@ extern int PlayMobySound(int,int,char *);
 extern void hero_start_target_state(Quad *,int,float);
 extern int coll_sweep_from_object(void *,float,float *,int,float,float,int,int,int);
 extern int hero_get_target_state_kind(void);
-extern int hero_l00_set_action_pal(int,int);
+extern int hero_l00_set_move_state_pal(int,int);
 extern void gfx_add_draw_callback_first(DrawCallback,void *);
 extern void gfx_add_draw_callback_third(DrawCallback,void *);
 extern float ApproachValue(float *,float,float);
@@ -111,7 +111,7 @@ void teleporter_l02_update_pal(u8 *object)
         } else if(state->orbitB<1.0f) {
             math_step_value_toward_target(&state->orbitB,&state->rateB,1.0f,g_teleporter_orbit_speed*0.00040000002f,g_teleporter_orbit_accel*0.00040000002f,g_teleporter_orbit_rate_limit*0.020000001f);
         } else if(g_teleporter_state!=11 || !(state->orbitA>0.25f)) {
-            if(answer==2) {hero_l00_set_action_pal(0x6F,1);state->timer=1.95f;object[0x20]=3;}
+            if(answer==2) {hero_l00_set_move_state_pal(0x6F,1);state->timer=1.95f;object[0x20]=3;}
             else if(answer==0) object[0x20]=4;
         }
         teleporter_update_orbiting_children(object);

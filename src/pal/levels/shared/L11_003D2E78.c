@@ -10,7 +10,7 @@ extern int IsPointInCuboid(void *, int);
 extern int flag_set_first_pending(char *);
 extern void cam_lock_entry(int);
 extern int ForceClaimNotice(int, int, int);
-extern int hero_l11_enter_state_pal(int, int);
+extern int hero_l11_set_move_state_pal(int, int);
 extern float FastAddRotations(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
@@ -49,7 +49,7 @@ void levitator_l11_pad_update_pal(char *obj)
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
                 if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
-                    hero_l11_enter_state_pal(6, 1);
+                    hero_l11_set_move_state_pal(6, 1);
             }
         }
         break;

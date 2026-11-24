@@ -8,7 +8,7 @@ extern int g_arena_l11_active_flag __attribute__((sda));
 extern u8 g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
-extern int hero_l00_set_action(int, int);
+extern int hero_l00_set_move_state(int, int);
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
 typedef struct {
@@ -101,42 +101,42 @@ void hero_process_action_command(void)
     if (command == 12) g_hero_state.hover = 1;
     if (g_hero_state.attackB && active && g_hero_state.movement != 16 && g_hero_state.movement != 20 &&
         g_hero_state.movement != 7) {
-        hero_l00_set_action(0x30, 1);
+        hero_l00_set_move_state(0x30, 1);
         return;
     }
     if (g_hero_state.attack) {
         if (active && g_hero_state.mode == 1 && g_hero_state.state != 0x7a) {
-            hero_l00_set_action(0x7a,1); return;
+            hero_l00_set_move_state(0x7a,1); return;
         }
         if (g_hero_state.attack && active &&
             (g_hero_state.state != 0x38 || g_hero_state.animationDone)) {
-            if (g_hero_state.health) { hero_l00_set_action(0x38,1); return; }
-            if (g_current_map_index == 2 && g_arena_l11_active_flag) { hero_l00_set_action(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l00_set_action(0x79,1); return; }
-            hero_l00_set_action(0x39,1); return;
+            if (g_hero_state.health) { hero_l00_set_move_state(0x38,1); return; }
+            if (g_current_map_index == 2 && g_arena_l11_active_flag) { hero_l00_set_move_state(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l00_set_move_state(0x79,1); return; }
+            hero_l00_set_move_state(0x39,1); return;
         }
     }
     if (g_hero_state.flag149c && g_hero_state.state != 0x7c &&
         math_fabs(g_hero_state.t330-(g_hero_state.position.f[2]+0.25f)) < 1.0f &&
         g_hero_state.t330-g_hero_state.position.f[2] > 0.0f &&
         (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
-        hero_l00_set_action(0x7c,1); return;
+        hero_l00_set_move_state(0x7c,1); return;
     }
     if (g_hero_state.jump && g_hero_state.state != 0x65 && g_hero_state.state != 0x78 &&
         math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f &&
         g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f &&
         (g_hero_state.state != 0x66 || g_hero_state.animationDone) &&
         (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
-        if (!g_hero_state.health) { hero_l00_set_action(0x78,1); return; }
-        hero_l00_set_action(0x65,1); return;
+        if (!g_hero_state.health) { hero_l00_set_move_state(0x78,1); return; }
+        hero_l00_set_move_state(0x65,1); return;
     }
     if (!g_hero_state.cancel || g_hero_state.state == 0x78 || g_hero_state.state == 0x74) return;
     if (!(math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f)) return;
     if (!(g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f)) return;
     if (!(g_hero_state.motion.f[2] < 0.0f) && g_hero_state.state != 0x7b) return;
     if (g_current_map_index == 13) {
-        hero_l00_set_action(0x74, 1);
+        hero_l00_set_move_state(0x74, 1);
         return;
     }
-    hero_l00_set_action(0x78, 1);
+    hero_l00_set_move_state(0x78, 1);
 }

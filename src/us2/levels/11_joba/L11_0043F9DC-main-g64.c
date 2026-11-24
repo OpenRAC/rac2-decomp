@@ -219,7 +219,7 @@ extern void global_object_start(char *, int);
 extern void script_queue_keyed_request(s32, s32);
 extern s32 moby_has_free_child_slot_state2(u8 *);
 extern void moby_try_alloc_enter_state2(void *);
-extern s32 hero_l11_enter_state(s32, s32);
+extern s32 hero_l11_set_move_state(s32, s32);
 extern int arena_get_challenge_display_id(unsigned int);
 extern int arena_get_challenge_flag_index(unsigned int);
 extern void arena_end_frame(u8 *);
@@ -773,10 +773,10 @@ void arena_controller_update_us2(u8 *obj) {
                 ((Hero *)g_hero_state)->i[0xF4 / 4] = 0;
                 if (((Hero *)g_hero_state)->i[0x2294 / 4] != 7) {
                     if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x81) {
-                        hero_l11_enter_state(7, 1);
+                        hero_l11_set_move_state(7, 1);
                     }
                 } else {
-                    hero_l11_enter_state(0x81, 1);
+                    hero_l11_set_move_state(0x81, 1);
                 }
                 if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], lt1->pos) < 0.01f) {
                     ((Hero *)g_hero_state)->f[0x84 / 4] += 0.01f;
@@ -898,7 +898,7 @@ void arena_controller_update_us2(u8 *obj) {
                         arena_queue_voice_line(obj, 4);
                     }
                 } else {
-                    hero_l11_enter_state(0x6F, 1);
+                    hero_l11_set_move_state(0x6F, 1);
                     OBJ->phase = 2;
                     st->mode = 4;
                     OBJ->timer = 0;
@@ -933,7 +933,7 @@ void arena_controller_update_us2(u8 *obj) {
             if (OBJ->timer >= 0xB5) {
                 ((Hero *)g_hero_state)->h[0x348 / 2] = 0;
                 g_hero_speed_param = 5.0f;
-                hero_l11_enter_state(0x81, 1);
+                hero_l11_set_move_state(0x81, 1);
                 OBJ->phase = 3;
             }
         } else if (OBJ->phase == 3) {

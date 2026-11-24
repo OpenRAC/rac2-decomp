@@ -21,7 +21,7 @@ extern void FastVecSub(void *,void *,void *),vec_fast_normalize(void *,void *,vo
 extern void FastVecScale(void *,void *,float);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern int snd_play_from_class_bank(int,int,void *,int),GetCollHitMaterial(void);
-extern int hero_l08_enter_state(int,int);
+extern int hero_l08_set_move_state(int,int);
 extern void anim_start_blended(void *,int,int,int),moby_set_state(void *,int,int);
 extern void moby_place_at_stored_transform(void *),set_hero_animation(int,int,float);
 
@@ -73,7 +73,7 @@ int vehicle_handle_collision(char *object, void *prev_pos)
             g_vehicle_collision_x=g_vehicle_saved_x;
             g_vehicle_collision_y=g_vehicle_saved_y;
             *(int *)(vars+0x50)=0;
-            hero_l08_enter_state(0,1);
+            hero_l08_set_move_state(0,1);
             if (*(unsigned char *)(object+0x43)) anim_start_blended(object,0,0,10);
             checkpoint_index=*(int *)(vars+0x6C);
             if (checkpoint_index>0) {

@@ -105,7 +105,7 @@ extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern void SetCamera5Pose(void *, void *, int, int, int);
 extern void cancel_hero_item_animation(void);
-extern int queue_copy_record_by_index(int);
+extern int actuator_play_pattern(int);
 extern void release_moby_animation_slot(void *, void *);
 extern void moby_set_flag_bit(void *, int);
 extern int snd_start_in_slot(int, int, int);
@@ -120,7 +120,7 @@ extern int moby_call_helper_with_blocks(void *);
 extern int joba_enemy_apply_source_damage(void *);
 extern int tribesman_turn_toward_point(void *, void *, float, float, float, float);
 extern void tribesman_rearm_guard_nodes(void *);
-extern int hero_l22_set_action(int, int);
+extern int hero_l22_set_move_state(int, int);
 extern void math_steer_along_direction(void *, void *, void *, void *, float, float, float);
 extern void moby_update_timed(void *);
 extern void arena_push_point_out(void *, float);
@@ -465,7 +465,7 @@ void space_ship_update(s8 *moby) {
                 cancel_hero_item_animation();
                 release_moby_animation_slot(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
                 M2C_FIELD(game, s32 *, 0x187C) = 0;
-                hero_l22_set_action(0, 1);
+                hero_l22_set_move_state(0, 1);
                 M2C_FIELD(vars, s32 *, 0x344) = 0;
             }
             val43 = M2C_FIELD(vars, u16 *, 0x41E);
@@ -1016,7 +1016,7 @@ block_184:
                                 }
 
                                 if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < g_space_ship_trigger_distance) {
-                                    queue_copy_record_by_index(0x2B);
+                                    actuator_play_pattern(0x2B);
                                     g_space_ship_boost_timer = g_space_ship_state_default;
                                 }
                             }

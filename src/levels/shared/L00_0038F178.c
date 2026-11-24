@@ -52,7 +52,7 @@ extern void func_002A0F48(char *object);
 
 extern void cam_pick_state_from_hero_turn(int value);
 
-extern int hero_l00_set_action(int a, int b);
+extern int hero_l00_set_move_state(int a, int b);
 
 extern void level_clear_second_table_entry(void);
 
@@ -288,7 +288,7 @@ void tether_release(char *actor, char *tether)
     D_18C0A0 = 0;
     cam_pick_state_from_hero_turn(*(int *)(tetherRef + 0x14));
     *(int *)(tetherRef + 0x14) = 0;
-    hero_l00_set_action(0, 1);
+    hero_l00_set_move_state(0, 1);
     level_restore_lighting(actorRef, 1);
     level_clear_second_table_entry();
     table_clear_entry_flag(*(int *)(tetherRef + 0x4C));

@@ -625,7 +625,7 @@
 #define g_energy_blast_points                D_L05_002B8330
 #define g_energy_blast_glint_params          D_L05_002B8550
 #define g_energy_blast_outer_points          D_L05_002B8670
-#define g_slot_record_source                 D_L05_002B8770
+#define g_ship_l05_rumble_waves              D_L05_002B8770
 #define g_lock_target_rules                  D_L05_002B87F0
 #define g_aim_crosshair_vertices             D_L05_002B8850
 #define g_aim_crosshair_uvs                  D_L05_002B88E0

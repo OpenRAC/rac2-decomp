@@ -48,7 +48,7 @@ extern int FastDecTimer(void *);
 extern void anim_start_blended(void *,int,int,int);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
-extern s32 hero_l00_change_action_us2(int,int);
+extern s32 hero_l00_set_move_state_us2(int,int);
 extern void copy_matrix3x4(void *,void *);
 extern void matrix_from_basis_rows(void *,void *);
 extern void transform_vector(void *,void *,void *);
@@ -114,7 +114,7 @@ void MorphorayUpdate_us2(char *morphoray)
         offset.x=0.15f; offset.y=-1.0f; offset.z=0.06f; offset.w=1.0f;
         matrix_mul_vec3(&offset,&offset,morphoray+0xc0);
         FastVecAdd(beam,morphoray+0x10,&offset);
-        if (g_hero_state.current==1) hero_l00_change_action_us2(29,1);
+        if (g_hero_state.current==1) hero_l00_set_move_state_us2(29,1);
         *(Quad *)&direction=0;
         if (g_hero_state.current==29 && (U(g_hero_state.object,0x34)&1)) {
             copy_matrix3x4(matrix,g_scalar_transition_state);

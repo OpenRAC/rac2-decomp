@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 struct Rac2Native_5f824a0e369ccf7b_src_record { u8 b0,b1,b2,b3; u16 s4,s6,s8,s10,s12; u8 e,f; };
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_blitz_gun_sound_records[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_blitz_gun_rumble_waves[];
 extern u8 g_item_slot_to_record[];
 extern float g_blitz_gun_euler_angles[4] __attribute__((sda));
 extern unsigned int g_blitz_startup_ticks __attribute__((sda));
@@ -51,12 +51,12 @@ extern char *g_area_hit_targets[];
 extern int FastDecTimer(void *),math_fast_float_d(void *),vec_fast_helper_b(void *);
 extern int PlayMobySound(int,int,char *);
 extern void anim_start_blended_with_flags(void *,int,int,int,int),anim_start_blended(void *,int,int,int);
-extern int hero_l00_set_action(int,int);
+extern int hero_l00_set_move_state(int,int);
 extern int get_ammo(int),weapon_spend_ammo(int,int);
 extern void hud_add_moby_marker(void *,unsigned int,void *,int,int,int,float,float,float);
 extern void start_equipped_item_animation(void);
-extern void slot_reset_active(int);
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void actuator_end_looping_waves(int);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern float math_random_angle(void),IntToFloat(int),math_random_float_range(float,float),FastAddRotations(float,float);
 extern void beam_draw_ring_and_core(void *);
 /* The binder: func_L00_002E6EF8 in 23 programs, its twin func_L08_002F2D10 in levels 08, 09,
@@ -110,7 +110,7 @@ void blitz_gun_update(char *moby)
             anim_start_blended_with_flags(moby,1,0,2,0);
     }
     if (g_hero_state.c0b4 == 1)
-        hero_l00_set_action(29,1);
+        hero_l00_set_move_state(29,1);
     vec_fast_helper_b(state);
     if (g_hero_state.c0b4 == 29) {
         unsigned int color;
@@ -153,7 +153,7 @@ void blitz_gun_update(char *moby)
                     *(int *)(state + 0x48) = 0;
                 }
                 start_equipped_item_animation();
-                *(int *)(state + 0x4C) = slot_copy_records_to_free(g_blitz_gun_sound_records);
+                *(int *)(state + 0x4C) = actuator_play_waves(g_blitz_gun_rumble_waves);
                 *(u8 *)(moby + 0x20) = 2;
                 *(float *)(state + 0xC) = math_random_angle();
                 anim_start_blended(moby,2,0,0);
@@ -172,7 +172,7 @@ void blitz_gun_update(char *moby)
             }
             if (!((g_pad_state.b320 & g_hero_state.b050) && get_ammo(-1) && g_hero_state.c0d8) &&
                 *(int *)(state + 0x4C) >= 0) {
-                slot_reset_active(*(int *)(state + 0x4C));
+                actuator_end_looping_waves(*(int *)(state + 0x4C));
                 *(int *)(state + 0x4C) = -1;
             }
         }

@@ -317,7 +317,7 @@
 #define hero_l07_update_ground_contact          func_L07_002B3580
 #define UpdateHeroVelocityForStateWithYawSpring func_L07_002B5738
 #define hero_l07_update_state_machine           func_L07_002B8618
-#define hero_l07_enter_state                    func_L07_002BE770
+#define hero_l07_set_move_state                 func_L07_002BE770
 #define hero_l07_decide_state_transition        func_L07_002C3CC0
 #define part_spawn_between_points_depth_push    func_L07_002E2090
 #define moby_build_followed_points              func_L07_002F2C70

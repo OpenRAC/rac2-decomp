@@ -30,7 +30,7 @@ extern float g_screen_l05_scale[] __attribute__((sda));
 extern char *g_feltzin_target_mobys[] __attribute__((sda));
 extern void hero_set_state_value_a(int), hero_set_state_value_b(int), level_select_random_object(void);
 extern void level_store_pair_with_increment(int, int), moby_set_flag_bit(void *, int);
-extern int hero_l00_set_action_pal(int, int);
+extern int hero_l00_set_move_state_pal(int, int);
 extern void hero_set_state_value_c(int);
 extern int LockedEntryMenuInput_pal(void);
 extern void ship_save_transform_state_pal(void);
@@ -146,7 +146,7 @@ void feltzin_challenge_controller_update_pal(char *object)
             g_feltzin_frame_counter = 0;
         }
         if (g_feltzin_frame_counter++ < 5 || g_game_mode_a[0] == 2) break;
-        hero_l00_set_action_pal(0x31,0);
+        hero_l00_set_move_state_pal(0x31,0);
         if (g_feltzin_needs_reset) {
             hero_set_state_value_c(1);
             g_feltzin_menu_mode = LockedEntryMenuInput_pal();

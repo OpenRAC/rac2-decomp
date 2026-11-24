@@ -55,7 +55,7 @@ extern int AcquireEntitySlot(void *,int,void *);
 extern u8 *level_get_slot_body(int,int);
 extern float math_random_signed_float_range(float,float), math_random_float_range(float,float);
 extern void vec_clear_128(void *), sheepinator_clear_records(void);
-extern s32 hero_l00_set_action(int,int);
+extern s32 hero_l00_set_move_state(int,int);
 extern int math_fast_float_d(void *), get_ammo(int);
 extern void hud_add_moby_marker(void *,unsigned int,float,void *,float,int,int,float,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
@@ -124,7 +124,7 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
         g_charge_weapon_effects.reticle=-1;
         if (g_hero_state.selected) g_hero_state.held=g_hero_state.selected;
         if (!g_charge_weapon_initialized) g_charge_weapon_initialized=1;
-        if (g_hero_state.mode==1) hero_l00_set_action(29,1);
+        if (g_hero_state.mode==1) hero_l00_set_move_state(29,1);
         enabled=1;
         if (g_hero_state.mode==29) {
             if (!math_fast_float_d(&g_hero_state.timer)) enabled=0;

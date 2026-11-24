@@ -30,7 +30,7 @@ extern u8 g_item_slot_to_record[];
 extern Entry_2CAF20 g_weapon_l00_table[];
 extern s32 hero_slot_item_id(s32);
 extern void cancel_hero_item_animation_pal(void);
-extern int hero_l00_set_action_pal(int a0, int a1);
+extern int hero_l00_set_move_state_pal(int a0, int a1);
 extern void set_hero_animation_pal(void *, int, f32);
 extern void vec_clamp_length(float *, float);
 
@@ -48,7 +48,7 @@ int hero_try_start_grab_pal(void)
         return 0;
     }
     moby = (g_weapon_l00_table + g_item_slot_to_record[idx])->moby;
-    if (hero_l00_set_action_pal(0, 0) == 0)
+    if (hero_l00_set_move_state_pal(0, 0) == 0)
         return 0;
     vec_clamp_length(h->v160, 0.030000001f);
     if (0.030000001f < h->f1B4)

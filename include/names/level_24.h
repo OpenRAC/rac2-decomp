@@ -41,7 +41,7 @@
 #define g_tether_l24_segment_fades        D_L24_001B2050
 #define g_tether_l24_segment_timer_resets D_L24_001B2058
 #define g_tether_l24_segment_offsets      D_L24_001B2060
-#define g_slot_entry_table                D_L24_001B8500
+#define g_wave_l24_channels               D_L24_001B8500
 #define g_hero_object_ref                 D_L24_001B8580
 #define g_tether_l24_origin_vec           D_L24_001B86C0
 #define g_data_bank_context               D_L24_001BC3C0

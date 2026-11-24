@@ -15,7 +15,7 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
 };
 extern AimQueryConfig g_nuke_l00_aim_query_config;
 extern AimTuning g_weapon_l00_table[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_mini_nuke_sound_records[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_mini_nuke_rumble_waves[];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
 extern unsigned char g_gravity_bomb_weapon_index[];
@@ -34,11 +34,11 @@ extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, v
 extern void cancel_hero_item_animation_pal(void);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation_pal(void);
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern int PlayMobySound(int, int, char *);
 extern char *mini_nuke_projectile_spawn_pal(int, char *, char *);
 extern int get_ammo(int);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern int vec_fast_helper_b(void *);
 extern void moby_apply_active_effect_pal(void *);
 extern void ref_L00_003C2FC8_00(void (*)(void *), void *);
@@ -90,7 +90,7 @@ void mini_l04_nuke_update_pal(unsigned char *object) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_nuke_fire_held = 1;
                 start_equipped_item_animation_pal();
-                *(int *)(state + 0x2C) = slot_copy_records_to_free(g_mini_nuke_sound_records);
+                *(int *)(state + 0x2C) = actuator_play_waves(g_mini_nuke_rumble_waves);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 mini_nuke_projectile_spawn_pal((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
@@ -104,7 +104,7 @@ void mini_l04_nuke_update_pal(unsigned char *object) {
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(state + 0x2C) >= 0) {
-                    slot_reset_active(*(int *)(state + 0x2C));
+                    actuator_end_looping_waves(*(int *)(state + 0x2C));
                     *(int *)(state + 0x2C) = -1;
                 }
             }

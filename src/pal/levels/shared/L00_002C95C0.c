@@ -92,7 +92,7 @@ void hero_update_height_offset_pal(void)
 
 
 extern char D_00189E20_4[];
-extern s32 hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_move_state(int a0, int a1);
 extern int PadPressedWithin(int, int, int *);
 extern int hero_get_step_offset_from_direction(void);
 extern int pad_presses_within_frames(int, int, int, int);
@@ -113,7 +113,7 @@ int hero_try_start_move_from_buffer_pal(int window, int no_idle_fallback)
     r = hero_get_step_offset_from_direction();
     if ((g_pad_pressed_flags[0] & 8) && r > 0) {
         if (pad_presses_within_frames(0x40, 0x1F000, window + r, r) != 0) {
-            hero_l00_set_action(0xB, 1);
+            hero_l00_set_move_state(0xB, 1);
             return 1;
         }
     }
@@ -121,14 +121,14 @@ int hero_try_start_move_from_buffer_pal(int window, int no_idle_fallback)
     if (*(short *)(p + 0x1454) != 0) {
         if (0.9f < *(float *)(p + 0x24B8)) {
             if (hero_classify_input_direction() != 2) {
-                hero_l00_set_action(0xB, 1);
+                hero_l00_set_move_state(0xB, 1);
                 return 1;
             }
         }
     }
     if (no_idle_fallback != 0)
         return 0;
-    hero_l00_set_action(7, 1);
+    hero_l00_set_move_state(7, 1);
     return 1;
 }
 

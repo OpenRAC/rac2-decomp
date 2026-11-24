@@ -354,7 +354,7 @@
 #define hero_slide_along_walls                     func_L22_002B8E10
 #define hero_l22_update_state_machine              func_L22_002BF1B0
 #define hero_update_timers_and_reach               func_L22_002C8610
-#define hero_l22_set_action                        func_L22_002C9898
+#define hero_l22_set_move_state                    func_L22_002C9898
 #define text_play_mode_message                     func_L22_002CE468
 #define hero_update_actions                        func_L22_002D0C98
 #define math_steer_along_direction                 func_L22_00328220

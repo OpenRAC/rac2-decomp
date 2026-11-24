@@ -3,7 +3,7 @@
 
 extern char g_hero_state[];
 extern void hero_clear_queued_anim(void);
-extern int hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_move_state(int mode, int flag);
 extern int g_pad_pressed_flags;
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
@@ -21,7 +21,7 @@ extern void ref_L22_002B70F8_02(void);
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef float f32;
-extern int hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_move_state(int a0, int a1);
 
 /* func_PAL_L22_002AA488, the PAL copy of func_L22_002AA678: the same C, where the fade rates
    0.07f and 0.13f become 0.08400001f and 0.156f, the timer 5 becomes 4, and the three call
@@ -223,6 +223,6 @@ void hero_restart_in_mode_pal(int mode, int entry_id, void *moby_arg) {
             break;
         }
     }
-    hero_l22_set_action(entry_id, 2);
+    hero_l22_set_move_state(entry_id, 2);
 }
 

@@ -44,7 +44,7 @@ extern void part_l23_spawn_hit_sparks_pal(char *);
 extern void moby_set_state(void *, int, int);
 extern void cancel_hero_item_animation_pal(void);
 extern void release_moby_animation_slot(int, void *);
-extern s32 hero_l22_set_action_pal(int, int);
+extern s32 hero_l22_set_move_state_pal(int, int);
 extern void gfx_update_color_fade_pal(void *, void *);
 extern int part_spawn_damage_debris_pal(void *, void *, void *);
 extern void moby_transform_joint_point(void *, int, void *);
@@ -108,7 +108,7 @@ void UpdateShieldHitsAndStrength_pal(unsigned char *moby) {
                     cancel_hero_item_animation_pal();
                     release_moby_animation_slot(g_hero_state.f2290, g_hero_state.f1870);
                     g_hero_state.f187C = 0;
-                    hero_l22_set_action_pal(0, 1);
+                    hero_l22_set_move_state_pal(0, 1);
                     return;
                 }
             }

@@ -121,7 +121,7 @@ extern void attachment_reset_all(void);
 extern void hero_update_collision_capsule_pal(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
-extern int hero_l00_set_action_pal(int, int);
+extern int hero_l00_set_move_state_pal(int, int);
 extern int level_run_slot_callback(int);
 extern int g_pad_pressed_flags[];
 extern char g_str_timed_state_text_a[];
@@ -178,7 +178,7 @@ void SetHeroMode_pal(int mode, int value, char *object)
                 if (count >= 5)
                     *(int *)(r + 0x24CC) = 4;
             }
-            hero_l00_set_action_pal(value, 2);
+            hero_l00_set_move_state_pal(value, 2);
         }
     }
 }

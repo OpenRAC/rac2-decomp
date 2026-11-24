@@ -1,35 +1,41 @@
 #include "include_asm.h"
 #include "names.h"
 
-/* Measured partial C views; original types and object ownership are unknown. */
+/* The first pad's state (ref_L00_002D6FD8_03 is g_pad_state in every program) as far as the
+ * vibration goes: the two motor bytes the pad's actuator command is built from. */
 typedef struct {
     unsigned char prefix[0x188];
-    unsigned char wrapped;
-    unsigned char value;
-} QwenRecovery_538934d89776_WrapperCollectState132;
+    unsigned char small_motor;
+    unsigned char large_motor;
+} PadMotors;
 
+/* [2]: the motors are only set while it is non-zero (the vibration option, by its use). */
 extern unsigned char ref_L00_002D6FD8_01[3];
 
+/* The small motor's running sum. */
 extern int ref_L00_002D6FD8_00;
 
-extern QwenRecovery_538934d89776_WrapperCollectState132 ref_L00_002D6FD8_03;
+extern PadMotors ref_L00_002D6FD8_03;
 
+/* LevelActuatorCalcPower. */
 extern int ref_L00_002D6FD8_02(int words[2]);
 
-/* Adds a value to a running counter that wraps around at 256, and notes whether it wrapped. */
-void math_add_wrapping_counter(void)
+/* Mixes the vibration's wave channels (LevelActuatorCalcPower) and, with vibration on, sets the
+ * pad's motors: the large one to its mixed value, the small one (only on or off) on each time its
+ * value's running sum reaches 256, which then drops by 255, so its value says how often it is on. */
+void actuator_update(void)
 {
     int words[4];
     ref_L00_002D6FD8_02(words);
     if (ref_L00_002D6FD8_01[2] != 0) {
         ref_L00_002D6FD8_00 += words[0];
         if (ref_L00_002D6FD8_00 >= 256) {
-            ref_L00_002D6FD8_03.wrapped = 1;
+            ref_L00_002D6FD8_03.small_motor = 1;
             ref_L00_002D6FD8_00 -= 255;
         } else {
-            ref_L00_002D6FD8_03.wrapped = 0;
+            ref_L00_002D6FD8_03.small_motor = 0;
         }
-        ref_L00_002D6FD8_03.value = ((unsigned char *)words)[4];
+        ref_L00_002D6FD8_03.large_motor = ((unsigned char *)words)[4];
     } else {
         words[0] = 0;
         words[1] = 0;

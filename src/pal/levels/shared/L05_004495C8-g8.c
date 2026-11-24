@@ -7,7 +7,7 @@ typedef struct {
     int timer, flag;
 } DriverState;
 extern DriverState g_feltzin_challenge_state;
-extern char g_slot_record_source[];
+extern char g_ship_l05_rumble_waves[];
 extern float g_ship_moby_scale_factor __attribute__((sda));
 extern float g_ship_forward_offset __attribute__((sda));
 extern float g_ship_lift_offset_scale __attribute__((sda));
@@ -30,7 +30,7 @@ extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_fast_float_d(void *);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern void ResolveLinkedMobyMovementCollisions_pal(void *, void *);
 extern void ship_update_aim_point(void *, void *);
 extern void moby_sync_equipment_parts(void *);
@@ -87,7 +87,7 @@ void UpdateDrivenMobyTransform_pal(char *obj)
     FastVecAdd(moby + 0x10, moby + 0x10, up_offset);
     if (g_feltzin_challenge_state.flag) {
         if (!math_fast_float_d(&g_feltzin_challenge_state.timer)) {
-            slot_copy_records_to_free(g_slot_record_source);
+            actuator_play_waves(g_ship_l05_rumble_waves);
         } else {
             g_feltzin_challenge_state.flag = 0;
             g_feltzin_challenge_state.timer = 6;

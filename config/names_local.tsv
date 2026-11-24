@@ -2851,7 +2851,7 @@ func_L00_002C3A78	hero_classify_input_direction	maps input angle to 0-3 (was Cla
 func_L00_002C3BB0	hero_find_swingshot_node_in_front	scans class 0x323 nodes (was FindSwingshotNodeInFront)	
 func_L00_002C3E18	hero_find_active_swingshot_node	scans class 0x2F6 nodes (was FindActiveSwingshotNode)	
 func_L00_002C40C0	hero_find_blue_swingshot_target	scans class 0x99D targets (was FindBlueSwingshotTarget)	
-func_L00_002C42E0	hero_l00_set_action	changes player action and animation (was SetHeroAction_L00)	
+func_L00_002C42E0	hero_l00_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l00_set_action)	
 func_L00_002C8BA8	hero_start_loader_state	picks loader variant by state (was StartHeroLoaderState)	
 func_L00_002C8C00	hero_try_start_transition	gated state change (was TryStartHeroTransition)	
 func_L00_002C8CB0	hero_try_start_ledge_move	ledge grab or climb choice (was TryStartLedgeMove)	
@@ -2929,12 +2929,12 @@ func_L00_002D6848	level_is_special_global_value	matches 0x16/0x17/0x2CE (was IsS
 func_L00_002D6878	level_return_zero	constant 0 (was ReturnZero_L00)	
 func_L00_002D6880	level_is_special_mode_active	state 49 and mode 4 or 11 (was IsSpecificGameModeActive)	
 func_L00_002D68E8	level_get_global_word	returns one global (was GetGlobalWord)	
-func_L00_002D6900	queue_copy_record_by_index	index into table then copy (was QueueRecordsByIndex)	
-func_L00_002D6940	slot_clear_active_bytes	clears 8 slot bytes (was ClearSlotActiveBytes)	
-func_L00_002D6978	slot_is_entry_nonzero	tests indexed byte (was IsTableEntryNonzero)	
-func_L00_002D6998	slot_copy_records_to_free	copies into free slots (was CopyRecordsToFreeSlots)	
-func_L00_002D6B70	slot_reset_active	clears active slots (was ResetActiveSlots)	
-func_L00_002D6FD8	math_add_wrapping_counter	wraps at 256 (was AddToWrappingCounter)	
+func_L00_002D6900	actuator_play_pattern	plays pattern INDEX of g_actuator_patterns through actuator_play_waves (was queue_copy_record_by_index)	
+func_L00_002D6940	actuator_stop_all	zeroes the kind byte of all 8 wave channels; hero set-action copies call it on every action change (was slot_clear_active_bytes)	
+func_L00_002D6978	actuator_is_channel_active	tests a wave channel's kind byte (was slot_is_entry_nonzero)	
+func_L00_002D6998	actuator_play_waves	copies a 0xFF-ended wave list into free wave channels, returns a channel or -1 (was slot_copy_records_to_free)	
+func_L00_002D6B70	actuator_end_looping_waves	clears permanent and duration of looping wave channels so the mixer ends them (was slot_reset_active)	
+func_L00_002D6FD8	actuator_update	runs LevelActuatorCalcPower and writes the pad's motor bytes (+0x188, +0x189 of g_pad_state) when vibration is on (was math_add_wrapping_counter)	
 func_L00_002D7068	cam_clear_override_slots	clears 32 slots, selection -1 (was ClearCameraOverrideSlots)	
 func_L00_002D70A0	cam_alloc_override_slot	finds free slot and inits (was AllocCameraOverrideSlot)	
 func_L00_002D7140	cam_end_override	clears active and eases blend (was EndCameraOverride)	
@@ -4733,7 +4733,7 @@ func_L03_002B8708	hero_l03_apply_contact_push	pushes hero along contact directio
 func_L03_002B8D10	cam_update_hero_targets	eases camera settings to targets (was UpdateHeroCameraTargets)	
 func_L03_002BAEA0	hero_l03_push_out_of_collision	capsule push-out loop (was PushHeroOutOfCollision)	
 func_L03_002BF8F0	hero_l03_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L03)	
-func_L03_002C6F08	hero_l03_enter_state	changes hero action and picks animation (was EnterHeroState_L03)	
+func_L03_002C6F08	hero_l03_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l03_enter_state)	
 func_L03_002CCB70	hero_l03_decide_state	hero state decider (was DecideHeroStateEndako)	
 func_L03_002D3498	hero_solve_motion_collision_time	forward collision time per mode (was SolveHeroMotionCollisionTime)	
 func_L03_002FDB10	sky_update_scroll	sets up sky, scrolls offset (was UpdateEndakoSkyScroll)	
@@ -4938,7 +4938,7 @@ func_L04_002D91B8	hero_check_surface_contact	checks standing surface, applies im
 func_L04_002D9780	hero_update_turn_tilt_speeds	sets hero turn values per state, eases camera (was UpdateHeroTurnTiltSpeeds)	
 func_L04_002DCE78	hero_steer_airborne_by_state	per-state airborne steering (was SteerHeroAirborneByState)	
 func_L04_002E04A8	hero_l04_update_state_machine	hero per-frame state switch (was UpdateHeroStateMachine_L04)	
-func_L04_002E7C08	hero_l04_enter_state	changes hero action and inits params (was EnterHeroState_L04)	
+func_L04_002E7C08	hero_l04_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l04_enter_state)	
 func_L04_002EDBC8	hero_l04_decide_state_transition	141 way hero state switch (was DecideHeroStateTransition_L04)	
 func_L04_002FB920	level_clear_leftover_flag	zeroes one global (was ClearLeftoverGlobalFlag)	
 func_L04_0030C4C0	level_build_spawn_record	copies blocks into spawn objects (was BuildSpawnRecordFromBlocks)	
@@ -5493,7 +5493,7 @@ func_L06_0047C1E0	cam_exit_noop	empty function (was CameraExitNoop)
 func_L07_002AC078	hero_queue_action_from_input	reads command and starts hero action (was QueueHeroActionFromInput)	
 func_L07_002B3580	hero_l07_update_ground_contact	ground height slope and feet tilt (was UpdateHeroGroundContact_L07)	
 func_L07_002B8618	hero_l07_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L07)	
-func_L07_002BE770	hero_l07_enter_state	changes hero state and sets animation (was EnterHeroState_L07)	
+func_L07_002BE770	hero_l07_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l07_enter_state)	
 func_L07_002C3CC0	hero_l07_decide_state_transition	hero state transition decider (was DecideHeroStateTransition_L07)	
 func_L07_002E2090	part_spawn_between_points_depth_push	spawns record with +-0.4 z velocities (was SpawnEffectBetweenPointsWithDepthPush)	
 func_L07_002F2C70	moby_build_followed_points	transforms four points by object matrix (was BuildFollowedObjectPoints)	
@@ -5604,7 +5604,7 @@ func_L07_00410B48	effect_l07_spawner_update	class 4769 spawn then remove (was Up
 func_L07_00410C50	siberius_debris_update	moby class 4776 handler (was UpdateSiberiusDebrisMoby)	
 func_L08_002BE8E8	hero_refresh_action_triggers	resets hero trigger flags per action (was RefreshHeroActionTriggers)	
 func_L08_002CB6E8	hero_l08_update_state_machine	hero per-frame state switch (was UpdateHeroStateMachine_L08)	
-func_L08_002D2ED8	hero_l08_enter_state	changes hero action and inits params (was EnterHeroState_L08)	
+func_L08_002D2ED8	hero_l08_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l08_enter_state)	
 func_L08_002D90C8	hero_l08_update_state_transitions	141-way hero state switch (was UpdateHeroStateTransitions_L08)	
 func_L08_002F2D10	gfx_queue_draw_callback	adds callback to 64 entry list (was QueueDrawCallback)	
 func_L08_00300090	hero_begin_saved_float_hold	stores global float once (was BeginSavedFloatHold)	
@@ -5762,7 +5762,7 @@ func_L09_002AFC90	hero_read_button_command	command to action (was ReadPlayerButt
 func_L09_002B5CE8	hero_l09_update_blend_channels	ramps channels (was UpdatePlayerBlendChannels)	
 func_L09_002B7238	hero_probe_ground	hero ground collision probes (was ProbeHeroGround)	
 func_L09_002BC490	hero_l09_update_state_machine	per-frame state switch (was UpdatePlayerStateMachine)	
-func_L09_002C3580	hero_l09_set_state	state entry (was SetPlayerState)	
+func_L09_002C3580	hero_l09_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l09_set_state)	
 func_L09_002C9738	hero_l09_decide_state_transition	hero state switch (was DecideHeroStateTransition_L09)	
 func_L09_002F89F8	glow_place_state_nine_corners	corner quads while state 9 (was PlaceStateNineGlowCorners)	
 func_L09_002F8BA0	gfx_draw_state_nine_pulsing_quad	sine alpha quad (was DrawStateNinePulsingQuad)	
@@ -5983,7 +5983,7 @@ func_L10_00449AD0	level_get_global_pointer	returns a global pointer (was GetLeve
 func_L11_002C51D0	hero_process_input_command	sets input flags, starts states (was ProcessHeroInputCommand)	
 func_L11_002CB130	hero_handle_contact_hit	contact entry knockback (was HandleHeroContactHit)	
 func_L11_002D22C8	hero_l11_update_state_machine	hero per-frame state switch (was UpdateHeroStateMachine_L11)	
-func_L11_002D8EF8	hero_l11_enter_state	changes hero action and animation (was EnterHeroState_L11)	
+func_L11_002D8EF8	hero_l11_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l11_enter_state)	
 func_L11_002DE9E0	hero_decide_next_state	hero next-state decider (was UpdateJobaHeroStateDecider)	
 func_L11_0030ED58	level_start_progress_cue	cue chosen by progress counter (was StartProgressCue)	
 func_L11_0030F060	moby_update_list_flags	walks moby list, flags types (was UpdateJobaMobyListFlags)	
@@ -6257,7 +6257,7 @@ func_L11_004885A0	overlay_set_shared_flag	writes one flag byte (was SetSharedOve
 func_L11_004885B8	moby_init_effect_blocks	default effect values (was InitMobyEffectBlocks)	
 func_L12_002B85E0	hero_l12_apply_contact_push	pushes hero along contact direction (was ApplyHeroContactPush_L12)	
 func_L12_002C0008	hero_l12_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L12)	
-func_L12_002C8BD0	hero_l12_set_action	changes hero action and animation (was SetHeroAction_L12)	
+func_L12_002C8BD0	hero_l12_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l12_set_action)	
 func_L12_002CF7B0	hero_decide_todano_state	hero state decider (was DecideTodanoHeroState)	
 func_L12_002FFF88	todano_build_trail_slice_meshes	positions four mesh slices on object (was BuildTrailSliceMeshes)	
 func_L12_00300138	todano_refresh_scene_tuning	sets two float factors (was RefreshSceneTuningFactors)	
@@ -6376,7 +6376,7 @@ func_L12_00429868	timed_explosion_debris_update	timer then explosion and debris 
 func_L12_00429D60	part_spawn_two_flare_effects	two flare effects (was SpawnTwoFlareEffects)	
 func_L12_00429ED8	gfx_draw_laser_beam	beam strips and glow (was DrawLaserBeamVariant)	
 func_L13_002C5760	hero_l13_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L13)	
-func_L13_002CEF00	hero_change_action	hero action switch (was ChangeHeroAction)	
+func_L13_002CEF00	hero_l13_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_change_action)	
 func_L13_002D5ED8	hero_l13_decide_state	hero state decider (was DecideHeroState_L13)	
 func_L13_00306F38	boldan_init_level_objects	loops level mobs (was InitBoldanLevelObjects)	
 func_L13_0035E890	menu_build_level_list	fills menu rows (was BuildLevelMenuList)	
@@ -6605,7 +6605,7 @@ func_L16_002B3250	hero_handle_contact_reaction	contact entry knockback and hurt 
 func_L16_002B59A0	hero_l16_push_out_of_collision	capsule push-out loop (was PushPlayerOutOfCollision)	
 func_L16_002B5EE0	hero_apply_movement	limits speed records motion (was ApplyPlayerMovement)	
 func_L16_002B9FF0	hero_update_state_handler	big per-state hero switch (was UpdatePlayerStateHandler)	
-func_L16_002C0BC8	hero_l16_enter_state	sets new hero state and animation (was EnterPlayerState)	
+func_L16_002C0BC8	hero_l16_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l16_enter_state)	
 func_L16_002C6378	hero_decide_state_snivelak	hero state decider (was DecideHeroStateSnivelak)	
 func_L16_002D2D10	transition_arm_shared	stores reciprocal steps once (was ArmSharedTransition)	
 func_L16_002F60B8	snivelak_room_scene_update	per-frame scene object effects (was UpdateSnivelakRoomScene)	
@@ -6779,7 +6779,7 @@ func_L18_002D0C00	hero_update_frame_input	reads input, history, calls movement (
 func_L18_002D7650	hero_l18_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L18)	
 func_L18_002DEFF8	hero_update_timers_reach	timers history reach (was UpdateHeroTimersAndReach_L18)	
 func_L18_002E0060	hero_clear_global_flag	zeroes a global returns 0 (was ClearHeroGlobalFlag)	
-func_L18_002E0070	hero_l18_set_action	changes action and animation (was SetHeroAction_L18)	
+func_L18_002E0070	hero_l18_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l18_set_action)	
 func_L18_002E4090	snd_start_mode_sound	switch on mode byte (was StartModeSound)	
 func_L18_002E42F8	hero_check_ledge_fall	starts falling state off ledge (was CheckHeroLedgeFall)	
 func_L18_002E68B0	hero_update_state_decider	hero action chooser (was UpdateHeroStateDecider)	
@@ -6957,7 +6957,7 @@ func_L19_002B0148	hero_process_button_command	command to jump/attack flags (was 
 func_L19_002B5BF0	hero_l19_apply_contact_push	contact response pushes hero (was ApplyHeroContactPush_L19)	
 func_L19_002B6278	hero_l19_update_speed_targets	eases speed channels toward targets (was UpdateHeroSpeedTargets_L19)	
 func_L19_002BCA50	hero_l19_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L19)	
-func_L19_002C44F8	hero_l19_set_state	switches hero state and anim (was SetHeroState)	
+func_L19_002C44F8	hero_l19_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l19_set_state)	
 func_L19_002CAAB0	hero_l19_decide_state_transition	hero state switch (was DecideHeroStateTransition_L19)	
 func_L19_00380918	linked_object_watcher_update	destroys self when linked objects gone (was UpdateLinkedObjectWatcherMoby)	
 func_L19_00380A98	moby_toggle_active_by_level_mode	sets flags by mode word (was ToggleMobyActiveByLevelMode)	
@@ -7003,7 +7003,7 @@ func_L20_002C5D00	hero_handle_hazard_contact	damage and push on contact (was Han
 func_L20_002C7588	hero_slide_along_wall	wall probe and velocity clip (was SlideYeedilHeroAlongWall)	
 func_L20_002CD928	hero_l20_update_state_machine	big state switch (was UpdateYeedilHeroStateMachine)	
 func_L20_002D6488	hero_l20_update_timers	frame timers and reach (was UpdateYeedilHeroTimers)	
-func_L20_002D7730	hero_l20_set_state	hero action entry jump table (was YeedilEnterHeroAction)	
+func_L20_002D7730	hero_l20_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l20_set_state)	
 func_L20_002DC390	hero_load_state_by_game_mode	wraps 002D7730 by mode (was LoadYeedilHeroStateByGameMode)	
 func_L20_002DEBE0	hero_l20_decide_state_transition	hero state decider per frame (was YeedilUpdateHeroActionDecider)	
 func_L20_00310E38	level_script_update	per frame level object and camera tweaks (was UpdateYeedilLevelScript)	
@@ -7150,7 +7150,7 @@ func_L22_002B7C70	hero_l22_update_speed_targets	eases speeds to per-mode targets
 func_L22_002B8E10	hero_slide_along_walls	wall probe adjusts hero velocity (was SlideHeroAlongWalls)	
 func_L22_002BF1B0	hero_l22_update_state_machine	per-frame hero state switch (was UpdateHeroStateMachine_L22)	
 func_L22_002C8610	hero_update_timers_and_reach	frame timers and reach state (was UpdateHeroTimersAndReach_L22)	
-func_L22_002C9898	hero_l22_set_action	changes player action and sets up movement and animation (was SetHeroAction_L22)	
+func_L22_002C9898	hero_l22_set_move_state	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l22_set_action)	
 func_L22_002CE468	text_play_mode_message	picks one of three messages (was PlayModeMessage)	
 func_L22_002D0C98	hero_update_actions	per-frame player action decider (was UpdateHeroActions)	
 func_L22_00328220	math_steer_along_direction	adjusts position by direction and speed, bends angle (was SteerAlongDirection)	
@@ -8474,7 +8474,7 @@ D_L00_001AF690	g_blitz_cooldown_ticks_b	short cooldown (medium)
 D_L00_001AF684	g_blitz_delay_ticks_a	short delay (medium)	
 D_L00_001AF688	g_blitz_delay_ticks_b	short delay (medium)	
 D_L00_001AF670	g_blitz_gun_euler_angles	euler_to_matrix input (medium)	
-D_L00_00294900	g_blitz_gun_sound_records	slot copy records (medium)	
+D_L00_00294900	g_blitz_gun_rumble_waves	wave list passed only to actuator_play_waves, by blitz_gun_update (was g_blitz_gun_sound_records)	
 D_L00_001AF680	g_blitz_startup_ticks	unsigned short startup (medium)	
 D_L00_001AF6B4	g_blitz_ticks	int ticks (medium)	
 D_L12_001B05A4	g_block_damping	velocity multiplier (medium)	
@@ -8675,7 +8675,7 @@ D_L20_001AC810	g_bounce_projectile_model	model pointer compare (medium)
 D_001AA39C	g_bounce_split_chance	random int below minus 1 (medium)	
 D_L00_001B0C2C	g_bouncer_l00_debris_scale	object scale multiplier (medium)	
 D_L00_001B0C38	g_bouncer_l00_debris_scale_2	debris object scale (medium)	
-D_L00_0029F210	g_bouncer_sound_record	slot copy records (medium)	
+D_L00_0029F210	g_bouncer_rumble_waves	wave list passed only to actuator_play_waves, by bouncer_update (was g_bouncer_sound_record)	
 D_L00_001B2BE4	g_bouncer_timer	20 (medium)	
 D_0013958D	g_bouncer_weapon_index	weapon table index (medium)	
 D_L00_001B0918	g_bouncing_explosive_bounce_damping	scales velocity on bounce (medium)	
@@ -9281,7 +9281,7 @@ D_L00_001AF5D8	g_charge_minimum	min compare and reset (medium)
 D_L00_001AF5DC	g_charge_next_step	next = charge+x (medium)	
 D_L00_001B06C0	g_charge_rate_down	charge -= (medium)	
 D_L00_001B06BC	g_charge_rate_up	charge += (medium)	
-D_L00_002960A0	g_charge_sound_records	slot copy records (medium)	
+D_L00_002960A0	g_lock_on_weapon_rumble_waves	wave list passed only to actuator_play_waves, by UpdateLockOnWeapon (was g_charge_sound_records)	
 D_L22_001AFA04	g_charge_voice_other	snd voice handle (medium)	
 D_L22_001AFA00	g_charge_voice_player	snd voice handle (medium)	
 D_L00_0024F7C0	g_charge_weapon_effect_table	ChargeWeaponEffect entries	
@@ -9320,7 +9320,7 @@ D_L22_001AF9EC	g_charged_shot_vec_scale	FastVecScale (medium)
 D_L23_001A8AB8	g_charged_shot_zero_words	long long pair (medium)	
 D_00139593	g_charging_weapon_index	weapon table index (medium)	
 D_L00_001B0F90	g_charging_weapon_initial_value	vars slot init (medium)	
-D_L00_0029FBE0	g_charging_weapon_sound_records	slot copy records (medium)	
+D_L00_0029FBE0	g_charging_weapon_rumble_waves	wave list passed only to actuator_play_waves, by charging_weapon_update (was g_charging_weapon_sound_records)	
 D_L05_00221D88	g_chase_target	camera chase pointer (medium)	
 D_001A7A44	g_cheat_flags	invulnerable element (medium)	
 D_001AB938	g_cheat_id_table	IdTable (medium)	
@@ -10129,7 +10129,7 @@ D_L16_001B15C0	g_effect_field_b	effect f4 (medium)
 D_L03_001AEC70	g_effect_flags	flags (medium)	
 D_L16_001B15B8	g_effect_float_param	stored in effect table (medium)	
 D_L06_001B1858	g_effect_group_counts	indexed count table (medium)	
-D_L00_00296120	g_effect_handle_records	slot copy records (medium)	
+D_L00_00296120	g_spread_weapon_rumble_waves	wave list passed only to actuator_play_waves, by UpdateSpreadWeapon (was g_effect_handle_records)	
 D_L00_001B0AF4	g_effect_id_max	random int range (medium)	
 D_L00_001B0AF0	g_effect_id_min	random int range (medium)	
 D_001AEF60	g_effect_init_flag	zeroed in init (medium)	
@@ -10905,9 +10905,9 @@ D_L05_001B251C	g_feltzin_target_mobys	target pool base, 256 stride
 D_L05_001B3550	g_feltzin_timer	split into minutes seconds (medium)	
 D_L01_002A45D0	g_ferry_height_offsets	float table indexed (medium)	
 D_L01_002A48B0	g_ferry_height_offsets_alt	float table indexed (medium)	
-D_L01_00297300	g_ferry_src_record_a	slot_copy_records_to_free (medium)	
-D_L01_00297380	g_ferry_src_record_b	slot_copy_records_to_free (medium)	
-D_L01_00297400	g_ferry_src_record_c	slot_copy_records_to_free (medium)	
+D_L01_00297300	g_ferry_rumble_waves_a	wave list passed only to actuator_play_waves, by path_ferry_update (was g_ferry_src_record_a)	
+D_L01_00297380	g_ferry_rumble_waves_b	wave list passed only to actuator_play_waves, by path_ferry_update (was g_ferry_src_record_b)	
+D_L01_00297400	g_ferry_rumble_waves_c	wave list passed only to actuator_play_waves, by path_ferry_update (was g_ferry_src_record_c)	
 D_0018A0B4	g_field_mob_contact	compared to self (medium)	
 D_L11_001B1D60	g_fighter_action_distance	choose action gate (medium)	
 D_L11_001B1DA4	g_fighter_close_distance	distance gate (medium)	
@@ -11259,7 +11259,7 @@ D_001B24DC	g_frame_time_base	time scales (medium)
 D_001BD370	g_frame_time_divisor	0.62 divided by it (medium)	
 D_001B168C	g_frame_time_scale	time scaled by pal ntsc (medium)	
 D_001B24E0	g_frame_time_scales	scaled times	
-D_L04_001B94C0	g_free_slot_records	slot_copy_records_to_free dst records	
+D_L04_001B94C0	g_wave_l04_channels	level 04's g_wave_l00_channels: the address actuator_play_waves forms there (was g_free_slot_records)	
 D_001A8B84	g_frontend_done_flag	loader waits until set (medium)	
 D_001A742C	g_fs_aa_buffer_table	FsAaBuffer pointer array	
 D_L03_002A11E8	g_fx_color_table	indexed by color	
@@ -11686,7 +11686,7 @@ D_L00_001B2BB0	g_gravity_bomb_fire_held	pad held latch (medium)
 D_L00_001B080C	g_gravity_bomb_launch_time	scaled by 1/60 (medium)	
 D_L00_001B082C	g_gravity_bomb_query_friction	work.query.friction	
 D_L00_001B0828	g_gravity_bomb_query_response	work.query.response	
-D_L00_0029AE70	g_gravity_bomb_sound_records	slot copy records (medium)	
+D_L00_0029AE70	g_gravity_bomb_rumble_waves	wave list passed only to actuator_play_waves, by gravity_bomb_launcher_update (was g_gravity_bomb_sound_records)	
 D_L00_001B0808	g_gravity_bomb_speed	scaled by 1/3600, velocity (medium)	
 D_00139592	g_gravity_bomb_weapon_index	weapon table index (medium)	
 D_L00_001A9000	g_gravity_center_point	position arg in gravity (medium)	
@@ -13510,8 +13510,8 @@ D_L00_001AEC90	g_lamp_piece_vectors	Vector4 array to part explode (medium)
 D_L00_001B2874	g_lancer_fire_held	pad held latch (medium)	
 D_L00_001B2868	g_lancer_horizontal_arc	radians (medium)	
 D_L00_001B286C	g_lancer_range	20/30 (medium)	
-D_L00_00294980	g_lancer_sound_records_a	slot copy records (medium)	
-D_L00_00294A00	g_lancer_sound_records_b	slot copy records (medium)	
+D_L00_00294980	g_lancer_shot_rumble_waves	wave list passed only to actuator_play_waves, by lancer_update, a shot of MOBY_CLASS_LANCER (was g_lancer_sound_records_a)	
+D_L00_00294A00	g_lancer_held_rumble_waves	wave list passed only to actuator_play_waves, by lancer_update for its other class, kept until the button is let go (actuator_end_looping_waves) (was g_lancer_sound_records_b)	
 D_L00_001AF6C4	g_lancer_state_int	state+0x34 for lancer (medium)	
 D_L00_001AF6C0	g_lancer_state_short	state+6 for lancer (medium)	
 D_L00_001B2870	g_lancer_vertical_arc	radians (medium)	
@@ -14360,7 +14360,7 @@ D_001430C0	g_mc_rpc_result	rpc receive buffer (medium)
 D_00137E6C	g_mc_sema	PollSema/SignalSema	
 D_00141BB0	g_mc_set_file_info_request	request in sceMcSetFileInfo (medium)	
 D_L00_001B1270	g_megarocket_nozzle_offset	vector transformed (medium)	
-D_0029FCC8	g_megarocket_sound_records	slot_copy_records_to_free arg (medium)	
+D_0029FCC8	g_megarocket_rumble_waves	wave list passed only to actuator_play_waves, by megarocket_cannon_update (was g_megarocket_sound_records)	
 D_001AEC68	g_megaturret_shot_param	stored in vars (medium)	
 D_L00_001AEFA8	g_megaturret_shot_value	stored in work field (medium)	
 D_001AEC0C	g_megaturret_slot_counter	mod 100 counter	
@@ -14642,7 +14642,7 @@ D_001AD908	g_meter_vtable_b	object table pointer (medium)
 D_L00_001B05DC	g_mini_nuke_blast_moby	current blast moby	
 D_L00_001B0644	g_mini_nuke_collision_friction	query.friction	
 D_L00_001B0640	g_mini_nuke_collision_response	query.response	
-D_L00_00296020	g_mini_nuke_sound_records	slot copy records (medium)	
+D_L00_00296020	g_mini_nuke_rumble_waves	wave list passed only to actuator_play_waves, by mini_l00_nuke_update (was g_mini_nuke_sound_records)	
 D_L08_001B1B64	g_mining_hit_cooldown	hitCooldown assigned	
 D_L08_001B1B4C	g_mining_hit_float_c	float vec arg (medium)	
 D_L08_001B1B50	g_mining_hit_float_d	float vec arg (medium)	
@@ -14718,7 +14718,7 @@ D_L08_001B1938	g_mining_vehicle_turn_push	push from turn (medium)
 D_L08_001B18F8	g_mining_vehicle_turn_rate	yaw rate	
 D_L08_001B1900	g_mining_vehicle_vertical_damping	vel[1] multiplier (medium)	
 D_L00_001B2864	g_minirocket_fire_held	pad held latch (medium)	
-D_00294880	g_minirocket_sound_records	slot_copy_records_to_free arg (medium)	
+D_00294880	g_minirocket_rumble_waves	wave list passed only to actuator_play_waves, by minirocket_tube_update (was g_minirocket_sound_records)	
 D_L03_001AEFCC	g_miniturret_counter	mod 100 counter	
 D_L03_001AEFB0	g_miniturret_move_speed	speed scale (medium)	
 D_L03_001ADAAC	g_miniturret_l03_owner_table	owner list (medium)	
@@ -15238,7 +15238,7 @@ D_L00_001AFEC0	g_nuke_l00_launch_speed	launch velocity arg (medium)
 D_L04_001B01A8	g_nuke_l04_launch_speed	scaled per tick (medium)	
 D_L00_001AFEC8	g_nuke_move_speed	scaled direction step (medium)	
 D_L04_001B2F38	g_nuke_pressed_flag	mini nuke state (medium)	
-D_L04_002BA6C0	g_nuke_src_records	slot_copy_records_to_free	
+D_L04_002BA6C0	g_mini_nuke_l04_rumble_waves	wave list passed only to actuator_play_waves, by mini_l04_nuke_update (was g_nuke_src_records)	
 D_L01_001AA550	g_number_separators	Sep6 in number formatting (medium)	
 D_L04_002AF630	g_object_anim_sparks_table	frame interpolation (medium)	
 D_001ADA78	g_object_base_table	object base table pointer (medium)	
@@ -16150,7 +16150,7 @@ D_L01_001AEEE8	g_quad_vertex_index_c	index table column (medium)
 D_L01_001AEEEC	g_quad_vertex_index_d	index table column (medium)	
 D_L11_001B18F8	g_quad_wave_amplitude	sin multiplier (medium)	
 D_001A9EA0	g_quat_next_axis_table	Ord3 in mat_to_quaternion (medium)	
-D_L00_0025E120	g_queue_source_records	record pointers by index (medium)	
+D_L00_0025E120	g_actuator_patterns	48 pointers to wave lists, read by actuator_play_pattern (was g_queue_source_records)	
 D_L04_001B09F8	g_race_banner_keys_end	banner end (medium)	
 D_L04_001B09E0	g_race_banner_keys_start	banner start (medium)	
 D_L04_001B09B0	g_race_banner_keys_x	banner copy x (medium)	
@@ -17603,7 +17603,7 @@ D_L00_001B19E8	g_slot_count	loop bound over slots (medium)
 D_L23_001B3900	g_slot_effect_alpha_table	int array set 0xFF per slot (medium)	
 D_L02_001B0A18	g_slot_effect_rate_range	use in function (medium)	
 D_L23_001B38E8	g_slot_effect_scale_table	float array indexed by state slot (medium)	
-D_L24_001B8500	g_slot_entry_table	16 byte entries nonzero test (medium)	
+D_L24_001B8500	g_wave_l24_channels	level 24's g_wave_l00_channels: the address actuator_is_channel_active forms there (was g_slot_entry_table)	
 D_L04_0021DA00	g_slot_flag_view_a	active flags clear (medium)	
 D_L04_0021E670	g_slot_flag_view_b	active flags clear (medium)	
 D_0018C0E8	g_slot_index_first	request slot state 0 (medium)	
@@ -17616,7 +17616,7 @@ D_L08_002603E0	g_slot_pane_matrices	4x4 matrices per slot (medium)
 D_L08_002604A0	g_slot_pane_points	point rows per slot (medium)	
 D_001A73E0	g_slot_play_counters	indexed by slot or mission (medium)	
 D_L08_00260410	g_slot_positions	position vec per index (medium)	
-D_L05_002B8770	g_slot_record_source	slot_copy_records_to_free (medium)	
+D_L05_002B8770	g_ship_l05_rumble_waves	wave list passed only to actuator_play_waves, by UpdateTimedTransformState, ResolveLinkedMobyMovementCollisions (was g_slot_record_source)	
 D_L02_002A53B0	g_slot_reel_symbol_table	reel symbols	
 D_L02_002A52F0	g_slot_strip_geometry	strip geometry copy (medium)	
 D_PAL_001B09B8	g_slot_t_increment	added to slot t (medium)	
@@ -19253,7 +19253,7 @@ D_L03_001B2750	g_target_counters	TargetCounters struct
 D_001A85CC	g_target_fade_speed	ApproachValue fade	
 D_001A861C	g_target_height	scaled height (medium)	
 D_L03_001B0464	g_target_height_speed	target z times 1/60 (medium)	
-D_L00_00294800	g_target_hud_records	slot copy records (medium)	
+D_L00_00294800	g_scoped_weapon_rumble_waves	wave list passed only to actuator_play_waves, by UpdateScopedWeapon (was g_target_hud_records)	
 D_L06_001B2970	g_target_index_list	count then moby indices (medium)	
 D_001EE960	g_target_list	candidate pointers null ended (medium)	
 D_L00_001FACE0	g_target_l00_list	null-terminated target pointers	
@@ -21030,7 +21030,7 @@ D_L00_001B09B0	g_vaporizer_ring_c_width	side vector length (medium)
 D_L00_001B097C	g_vaporizer_ring_side_u_offset	added to phase (medium)	
 D_L00_001B0980	g_vaporizer_ring_u_step	added to u (medium)	
 D_L00_001B0984	g_vaporizer_ring_vec_scale	FastVecScale (medium)	
-D_L00_00296AA0	g_vaporizer_sound_records	slot copy records (medium)	
+D_L00_00296AA0	g_vaporizer_rumble_waves	wave list passed only to actuator_play_waves, by vaporizer_update (was g_vaporizer_sound_records)	
 D_L00_001B09F0	g_vaporizer_spark_alpha	alpha value (medium)	
 D_L00_001B09F8	g_vaporizer_spark_angle_max	angle range	
 D_L00_001B09F4	g_vaporizer_spark_angle_min	angle range	
@@ -24627,8 +24627,8 @@ func_US2_L22_002D0F48	hero_action_state_update_us2	per-frame hero action state m
 func_PAL_L00_002CB6A8	hero_apply_pending_change_pal	v1.01 CB2D8 per file comment	
 func_PAL_L01_002B6870	hero_approach_velocity_pal	approaches requested velocity with rate (medium)	
 func_PAL_L18_002CFC50	hero_attach_to_object_pal	copy of func_L18_002CFD68	
-func_US2_L00_002C4560	hero_l00_change_action_us2	changes player action; same as hero_change_action	
-func_US2_L13_002CF1F8	hero_l13_change_action_us2	copy of hero_change_action L13_002CEF00	
+func_US2_L00_002C4560	hero_l00_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l00_change_action_us2)	
+func_US2_L13_002CF1F8	hero_l13_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l13_change_action_us2)	
 func_PAL_L00_002CB138	hero_check_step_ahead_pal	v1.01 CAD90-qcopy	
 func_PAL_L00_002CA888	hero_choose_idle_anim_pal	v1.01 CA4E0 same C	
 func_PAL_L00_002CAEB0	hero_choose_jump_or_roll_move_pal	v1.01 CAB08	
@@ -24643,7 +24643,7 @@ func_PAL_L01_0039A520	hero_enter_from_pad_pal	places hero and camera at pad, arr
 func_US2_L00_003ACCF0	hero_fire_effect_from_facing_us2	copy of func_L00_003AB8B8	
 func_PAL_L01_003BFAF4	hero_grabber_update_pal	PAL copy of hero_grabber_update	
 func_PAL_L00_002CB7A0	hero_l00_decide_state_pal	v1.01 CB3A8 decider	
-func_PAL_L00_002C4480	hero_l00_set_action_pal	v1.01 C42E0 set action	
+func_PAL_L00_002C4480	hero_l00_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l00_set_action_pal)	
 func_US2_L00_002A6DD0	hero_l00_update_frame_2_us2	same address as func_L00_002A6DD0 hero_l00_update_frame_2	
 func_US2_L00_002CB650	hero_l00_update_move_decider_us2	per-state input decider switching move state (medium)	
 func_PAL_L00_002BA750	hero_l00_update_state_machine_pal	v1.01 BA7D8 state machine	
@@ -24654,39 +24654,39 @@ func_US2_L01_002BA3C8	hero_l01_update_state_machine_us2	address next to v1.01 st
 func_PAL_L01_002C3A10	hero_l01_update_state_transitions_pal	identical locals to v1.01 002C37C8	
 func_PAL_L03_002CCED8	hero_l03_decide_state_pal	PAL copy of v1.01 002CCB70	
 func_US2_L03_002CCF18	hero_l03_decide_state_us2	counterpart func_L03_002CCB70	
-func_PAL_L03_002C7068	hero_l03_enter_state_pal	PAL copy of v1.01 002C6F08	
-func_US2_L03_002C7288	hero_l03_enter_state_us2	counterpart func_L03_002C6F08, same comment	
+func_PAL_L03_002C7068	hero_l03_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l03_enter_state_pal)	
+func_US2_L03_002C7288	hero_l03_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l03_enter_state_us2)	
 func_PAL_L03_002BF860	hero_l03_update_state_machine_pal	PAL copy of v1.01 002BF8F0	
 func_US2_L03_002BFAF8	hero_l03_update_state_machine_us2	counterpart func_L03_002BF8F0	
 func_PAL_L04_002EDFB8	hero_l04_decide_state_transition_pal	counterpart func_L04_002EDBC8	
-func_PAL_L04_002E7DA8	hero_l04_enter_state_pal	counterpart func_L04_002E7C08	
-func_US2_L04_002E7F28	hero_l04_enter_state_us2	counterpart func_L04_002E7C08	
+func_PAL_L04_002E7DA8	hero_l04_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l04_enter_state_pal)	
+func_US2_L04_002E7F28	hero_l04_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l04_enter_state_us2)	
 func_PAL_L04_002E04A0	hero_l04_update_state_machine_pal	counterpart func_L04_002E04A8	
 func_US2_L04_002E06B0	hero_l04_update_state_machine_us2	counterpart func_L04_002E04A8	
 func_PAL_L07_002C4018	hero_l07_decide_state_transition_pal	same code as func_L07_002C3CC0	
-func_PAL_L07_002BE8C8	hero_l07_enter_state_pal	same code as func_L07_002BE770	
-func_US2_L07_002BE988	hero_l07_enter_state_us2	v2.00 copy of hero_l07_enter_state	
+func_PAL_L07_002BE8C8	hero_l07_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l07_enter_state_pal)	
+func_US2_L07_002BE988	hero_l07_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l07_enter_state_us2)	
 func_PAL_L07_002B8608	hero_l07_update_state_machine_pal	same code as func_L07_002B8618	
 func_US2_L07_002B8720	hero_l07_update_state_machine_us2	v2.00 copy of hero_l07_update_state_machine	
-func_PAL_L08_002D3078	hero_l08_enter_state_pal	v1.01 hero_l08_enter_state	
-func_US2_L08_002D31F8	hero_l08_enter_state_us2	v2.00 copy of hero_l08_enter_state	
+func_PAL_L08_002D3078	hero_l08_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l08_enter_state_pal)	
+func_US2_L08_002D31F8	hero_l08_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l08_enter_state_us2)	
 func_PAL_L08_003A6850	hero_l08_lock_on_tether_update_pal	tether rope targets (medium)	
 func_PAL_L08_002CB6E0	hero_l08_update_state_machine_pal	v1.01 hero_l08_update_state_machine same switch	
 func_US2_L08_002CB8F0	hero_l08_update_state_machine_us2	v2.00 copy of hero_l08_update_state_machine	
 func_PAL_L08_002D94C0	hero_l08_update_state_transitions_pal	v1.01 hero_l08_update_state_transitions	
 func_PAL_L09_002C9B18	hero_l09_decide_state_transition_pal	file L09_002C9738	
-func_PAL_L09_002C3708	hero_l09_set_state_pal	same signature as v1.01	
-func_US2_L09_002C3818	hero_l09_set_state_us2	changes action, sets animation; v1.01 hero_l09_set_state	
+func_PAL_L09_002C3708	hero_l09_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l09_set_state_pal)	
+func_US2_L09_002C3818	hero_l09_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l09_set_state_us2)	
 func_PAL_L09_002B5C80	hero_l09_update_blend_channels_pal	counterpart func_L09_002B5CE8	
 func_PAL_L09_00394290	hero_l09_update_lock_on_tether_pal	file L09_003910F8-tether	
 func_PAL_L09_002BC480	hero_l09_update_state_machine_pal	file L09_002BC490	
 func_US2_L09_002BC618	hero_l09_update_state_machine_us2	v1.01 func_L09_002BC490 counterpart	
-func_PAL_L11_002D9038	hero_l11_enter_state_pal	counterpart func_L11_002D8EF8	
-func_US2_L11_002D9208	hero_l11_enter_state_us2	copy of func_L11_002D8EF8	
+func_PAL_L11_002D9038	hero_l11_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l11_enter_state_pal)	
+func_US2_L11_002D9208	hero_l11_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l11_enter_state_us2)	
 func_PAL_L11_002D22B8	hero_l11_update_state_machine_pal	counterpart func_L11_002D22C8	
 func_US2_L11_002D24D0	hero_l11_update_state_machine_us2	copy of func_L11_002D22C8	
-func_PAL_L12_002C8C58	hero_l12_set_action_pal	PAL copy of func_L12_002C8BD0	
-func_US2_L12_002C8DD8	hero_l12_set_action_us2	v2.00 copy of func_L12_002C8BD0 set action	
+func_PAL_L12_002C8C58	hero_l12_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l12_set_action_pal)	
+func_US2_L12_002C8DD8	hero_l12_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l12_set_action_us2)	
 func_PAL_L12_002BFF00	hero_l12_update_state_machine_pal	PAL copy of func_L12_002C0008	
 func_US2_L12_002C0110	hero_l12_update_state_machine_us2	v2.00 copy of func_L12_002C0008 hero state logic	
 func_PAL_L13_002D62D0	hero_l13_decide_state_pal	PAL copy of func_L13_002D5ED8	
@@ -24694,29 +24694,29 @@ func_US2_L13_002D61F8	hero_l13_decide_state_us2	copy of hero_l13_decide_state L1
 func_PAL_L13_002C56D8	hero_l13_update_state_machine_pal	PAL copy of func_L13_002C5760	
 func_US2_L13_002C58E8	hero_l13_update_state_machine_us2	copy of hero_l13_update_state_machine	
 func_PAL_L15_003B2BE8	hero_l15_lock_on_tether_update_pal	PAL copy of hero_l15_lock_on_tether_update	
-func_PAL_L16_002C0CB0	hero_l16_enter_state_pal	PAL copy of hero_l16_enter_state	
-func_US2_L16_002C0E50	hero_l16_enter_state_us2	v2.00 copy of hero_l16_enter_state	
+func_PAL_L16_002C0CB0	hero_l16_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l16_enter_state_pal)	
+func_US2_L16_002C0E50	hero_l16_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l16_enter_state_us2)	
 func_PAL_L16_00390B70	hero_l16_lock_on_tether_update_pal	tether chain like other levels	
-func_PAL_L18_002E01E0	hero_l18_set_action_pal	copy of hero_l18_set_action	
-func_US2_L18_002E02E8	hero_l18_set_action_us2	copy of hero_l18_set_action, same comment/structure	
+func_PAL_L18_002E01E0	hero_l18_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l18_set_action_pal)	
+func_US2_L18_002E02E8	hero_l18_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l18_set_action_us2)	
 func_PAL_L18_002C4000	hero_l18_update_frame_pal	copy of func_L18_002C41F0	
 func_PAL_L18_002D0738	hero_l18_update_speed_targets_pal	header: copy of hero_l18_update_speed_targets	
 func_PAL_L18_002D7598	hero_l18_update_state_machine_pal	copy of hero_l18_update_state_machine	
 func_US2_L18_002D7758	hero_l18_update_state_machine_us2	copy of func_L18_002D7650, same shift as contact fn	
 func_PAL_L19_002CADE8	hero_l19_decide_state_transition_pal	PAL copy of func_L19_002CAAB0	
-func_PAL_L19_002C45D0	hero_l19_set_state_pal	PAL copy of func_L19_002C44F8	
-func_US2_L19_002C4708	hero_l19_set_state_us2	copy of func_L19_002C44F8, same comment	
+func_PAL_L19_002C45D0	hero_l19_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l19_set_state_pal)	
+func_US2_L19_002C4708	hero_l19_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l19_set_state_us2)	
 func_PAL_L19_002B6160	hero_l19_update_speed_targets_pal	PAL copy of func_L19_002B6278	
 func_PAL_L19_002BC990	hero_l19_update_state_machine_pal	PAL copy of func_L19_002BCA50	
 func_US2_L19_002BCB58	hero_l19_update_state_machine_us2	copy of func_L19_002BCA50	
 func_PAL_L20_002DF028	hero_l20_decide_state_transition_pal	PAL of func_L20_002DEBE0, identical locals	
 func_US2_L20_002DEE88	hero_l20_decide_state_transition_us2	copy of hero_l20_decide_state_transition	
-func_PAL_L20_002D7920	hero_l20_set_state_pal	PAL of func_L20_002D7730 hero_l20_set_state	
-func_US2_L20_002D79B0	hero_l20_set_state_us2	copy of hero_l20_set_state	
+func_PAL_L20_002D7920	hero_l20_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l20_set_state_pal)	
+func_US2_L20_002D79B0	hero_l20_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l20_set_state_us2)	
 func_PAL_L20_002B9270	hero_l20_update_frame_pal	PAL copy of func_L20_002B93E0 hero_l20_update_frame	
 func_PAL_L20_002CD8F0	hero_l20_update_state_machine_pal	PAL of func_L20_002CD928, identical locals	
 func_US2_L20_002CDA30	hero_l20_update_state_machine_us2	copy of hero_l20_update_state_machine	
-func_PAL_L22_002C99C8	hero_l22_set_action_pal	same code as hero_l22_set_action	
+func_PAL_L22_002C99C8	hero_l22_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_l22_set_action_pal)	
 func_PAL_L22_002B7B08	hero_l22_update_speed_targets_pal	PAL copy of func_L22_002B7C70	
 func_PAL_L22_002BF0A8	hero_l22_update_state_machine_pal	PAL copy of func_L22_002BF1B0 state switch	
 func_US2_L22_002BF2B8	hero_l22_update_state_machine_us2	copy of hero_l22_update_state_machine	
@@ -24734,11 +24734,11 @@ func_US2_L00_002B22D0	hero_play_collection_voice_line_us2	voice lines at collect
 func_PAL_L00_002B20F8	hero_play_voice_line_for_progress_pal	PAL copy of func_L00_002B2200	
 func_US2_L01_002C1D90	hero_process_item_action_input_us2	copy of ProcessHeroItemActionInput	
 func_US2_L00_002C96D0	hero_select_context_action_us2	context-sensitive actions from buffered input (medium)	
-func_PAL_L13_002CF0A0	hero_set_action_state_pal	changes hero action, sets params and animation (medium)	
-func_US2_L22_002C9B20	hero_set_action_us2	changes player action and animation (medium)	
+func_PAL_L13_002CF0A0	hero_l13_set_move_state_pal	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_set_action_state_pal)	
+func_US2_L22_002C9B20	hero_l22_set_move_state_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_set_action_us2)	
 func_PAL_L00_002D29D0	hero_set_anim_mode_pal	v1.01 D24D0	
 func_PAL_L00_002D1FE8	hero_set_linked_objects_anim_pal	v1.01 same comment	
-func_US2_L01_002BEEA8	hero_set_move_state_us2	copy of SetHeroMoveState, same comment	
+func_US2_L01_002BEEA8	SetHeroMoveState_us2	the level's copy of SetHeroMoveState: the hero's action change (stops the vibration unless hero 0x1FA is set) (was hero_set_move_state_us2)	
 func_PAL_L00_002BA480	hero_setup_attached_object_transform_pal	v1.01 BA508 counterpart	
 func_PAL_L04_002DCE68	hero_steer_airborne_by_state_pal	copy of hero_steer_airborne_by_state	
 func_PAL_L00_003A1688	hero_steer_along_rail_paths_pal	v1.01 func_L00_0039E158 rail steering	

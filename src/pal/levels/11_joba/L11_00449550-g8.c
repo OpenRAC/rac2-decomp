@@ -12,7 +12,7 @@ typedef struct {
     char pad1[0xDB];
 } L11_00445990_Rec;
 extern L11_00445990_Rec g_item_l11_record_table[];
-extern s32 hero_l11_enter_state_pal(s32, s32);
+extern s32 hero_l11_set_move_state_pal(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_flag_index(s32);
 extern s32 flag_is_byte_set(void);
@@ -28,7 +28,7 @@ void joba_menu_select_next_pal(char *object) {
     L11_00445990_Rec *record;
 
     if (g_game_mode != 0x6F)
-        hero_l11_enter_state_pal(0x6F, 1);
+        hero_l11_set_move_state_pal(0x6F, 1);
     if (PadPressedWithin(0x40, 0x32, 0) != 0) {
         moby_set_state(object, 7, -1);
         *(s16 *)(state + 0x1E8) = *(u16 *)(state + 0x1F0);

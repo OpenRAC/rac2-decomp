@@ -60,7 +60,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
 extern int StartAttachedEffect_pal(void *, int, void *);
-extern s32 hero_l07_enter_state_pal(int, int);
+extern s32 hero_l07_set_move_state_pal(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(void *, void *, void *, float);
@@ -185,7 +185,7 @@ void UpdateHeldBeamWeapon_pal(unsigned char *object)
         math_spring_float_to_goal((float *)(data + 0x50), (float *)(data + 0x54), 0.0f, 0.072000004f, 0.012f, 0.15f);
         UI(data, 0x60) = 0;
     }
-    if (g_hero_state.weapon == 1) hero_l07_enter_state_pal(0x1D, 1);
+    if (g_hero_state.weapon == 1) hero_l07_set_move_state_pal(0x1D, 1);
     moby_transform_joint_to_world(object, 0, data);
     vec_clear_128(&vector);
     vector.f[1] = -1.0f;

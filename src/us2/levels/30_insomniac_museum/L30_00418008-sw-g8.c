@@ -53,7 +53,7 @@ extern void museum_effect_object_spawn(char *),museum_effect_holder_update(char 
 extern int ForceClaimNotice(int,int,int);
 extern int load_is_class_cached(int);
 extern void LoadClassIntoFreeCacheSlot(int), hero_start_loader_state(int);
-extern s32 hero_l00_change_action_us2(int,int);
+extern s32 hero_l00_set_move_state_us2(int,int);
 extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
 extern void hero_start_target_state(void *,int,float);
@@ -150,7 +150,7 @@ void museum_exhibit_display_update_us2(char *obj) {
     }
     case 3:
         if (flag_set_first_pending(obj)) {
-            hero_l00_change_action_us2(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            hero_l00_set_move_state_us2(0x6F,0);set_hero_animation(0x54,0,20.0f);
             FastVecSub(vec,g_camera_l30_position,g_hero_state.position);
             matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
             SetCamera5Pose(g_camera_l30_position,g_camera_l30_position,3,120,0);

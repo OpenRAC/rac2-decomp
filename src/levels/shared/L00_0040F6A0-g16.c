@@ -65,9 +65,9 @@ extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_table_2[];
-extern u8 g_megarocket_sound_records[];
+extern u8 g_megarocket_rumble_waves[];
 
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -96,9 +96,9 @@ extern int coll_process_hit(float, void *, int, void *, void *);
 extern void SpawnOrientedParticleBursts(Moby *, int);
 extern void charge_shot_start_effect(Moby *, Vector *, int);
 extern void start_equipped_item_animation(void);
-extern int slot_copy_records_to_free(void *);
+extern int actuator_play_waves(void *);
 extern int subtitle_request_voice_line(int, int);
-extern void slot_reset_active(int);
+extern void actuator_end_looping_waves(int);
 extern void sequenced_child_spawn(Moby *, Vector *);
 extern void light_flash_update(Moby *, Vector *);
 
@@ -130,7 +130,7 @@ void megarocket_cannon_update(Moby *moby)
         vars->chargeSound = -1;
     }
     if (HERO->i[0x2294 / 4] == 1)
-        hero_l00_set_action(0x1D, 1);
+        hero_l00_set_move_state(0x1D, 1);
     matrix_mul_vec3(&nozzle, &g_megarocket_nozzle_offset, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
@@ -299,7 +299,7 @@ void megarocket_cannon_update(Moby *moby)
             charge_shot_start_effect(moby, &nozzle, charged);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             start_equipped_item_animation();
-            vars->sound = slot_copy_records_to_free(g_megarocket_sound_records);
+            vars->sound = actuator_play_waves(g_megarocket_rumble_waves);
             if (charged)
                 g_subtitle_history[0x3A8 / 2] = 0xFFFF;
             else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
@@ -307,7 +307,7 @@ void megarocket_cannon_update(Moby *moby)
         }
         if (!((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
             vars->sound >= 0) {
-            slot_reset_active(vars->sound);
+            actuator_end_looping_waves(vars->sound);
             vars->sound = -1;
         }
         {

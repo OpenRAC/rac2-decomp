@@ -448,7 +448,7 @@
 #define hero_l18_update_state_machine         func_L18_002D7650
 #define hero_update_timers_reach              func_L18_002DEFF8
 #define hero_clear_global_flag                func_L18_002E0060
-#define hero_l18_set_action                   func_L18_002E0070
+#define hero_l18_set_move_state               func_L18_002E0070
 #define snd_start_mode_sound                  func_L18_002E4090
 #define hero_check_ledge_fall                 func_L18_002E42F8
 #define hero_update_state_decider             func_L18_002E68B0

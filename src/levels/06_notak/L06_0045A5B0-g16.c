@@ -46,7 +46,7 @@ extern int IsPointInCuboid(void *, int);
 extern void *part_spawn_drifting(void *, void *, int, float, float);
 extern int PlayMobySound(int, int, void *);
 extern void RippleDisturb(int, int, int, float, float, float, float);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern void moby_update_empty_alt(void *, void *, void *);
 extern float math_turn_angle_toward_target(void *, float, float, float, float, float);
 extern int math_blend_scaled_count(void *, void *, int, int, float, float);
@@ -334,7 +334,7 @@ void UpdateMoby4070(u8 *self) {
             FastVecSub(vars + 0xC0, self_pos_c, &vec_prev_pos);
             if (F(vars, 0x13C) >= 1.0f) {
                 ((Hero *)g_hero_state)->i[0x24CC / 4] = 0;
-                hero_l00_set_action(0x39, 1);
+                hero_l00_set_move_state(0x39, 1);
                 W(((Hero *)g_hero_state)->ptr[0x2290 / 4], 0x9C) = -1;
                 ((Hero *)g_hero_state)->b[0x22B5] = 1;
                 B(self, 0x20) = 6;

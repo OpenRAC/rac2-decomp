@@ -11,7 +11,7 @@ extern int level_run_slot_callback(s32);
 extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, char *);
-extern int hero_l22_set_action(s32, s32);
+extern int hero_l22_set_move_state(s32, s32);
 extern char g_str_hud_slot_text_c[];
 extern char g_str_hud_slot_text_b[];
 extern char g_str_hud_slot_text_a[];
@@ -65,5 +65,5 @@ void hero_reset_for_restart(void)
         *(s32 *)(*(char **)(hero3 + 0x2290) + 0x58) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x42), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x40), g_hero_anim_buffer_upper);
     *(s32 *)(*(char **)(hero3 + 0x2290) + 0x5C) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x43), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x41), g_hero_anim_buffer_lower);
     if (*(s32 *)(hero3 + 0x2294) != 0x61 || ((mode = g_hero_mode_state[0]) != 2 && mode != 6))
-        hero_l22_set_action(0, 1);
+        hero_l22_set_move_state(0, 1);
 }

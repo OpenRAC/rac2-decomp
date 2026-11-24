@@ -535,7 +535,7 @@
 #define UpdateEndakoHeroGroundContacts      func_L03_002BA278
 #define hero_l03_push_out_of_collision      func_L03_002BAEA0
 #define hero_l03_update_state_machine       func_L03_002BF8F0
-#define hero_l03_enter_state                func_L03_002C6F08
+#define hero_l03_set_move_state             func_L03_002C6F08
 #define hero_l03_decide_state               func_L03_002CCB70
 #define hero_solve_motion_collision_time    func_L03_002D3498
 #define register_camera_update_callback     func_L03_002D84F0

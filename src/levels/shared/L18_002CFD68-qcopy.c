@@ -12,7 +12,7 @@ extern void attachment_reset_all(void);
 extern void hero_l18_update_speed_targets(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(void *);
-extern s32 hero_l18_set_action(s32, s32);
+extern s32 hero_l18_set_move_state(s32, s32);
 extern void set_hero_animation(s32, s32, float);
 extern u8 g_hero_state[];
 /* Puts the hero under control of another object (for example a vehicle) and saves the hero position. */
@@ -49,7 +49,7 @@ void hero_attach_to_object(s32 mode, s32 index, u8 *object)
         *(s16 *)(g_hero_state + 0x24D4) = *(u16 *)(g_hero_state + 0x24CC);
         *(s32 *)(g_hero_state + 0x24CC) = 3;
     }
-    hero_l18_set_action(index, 2);
+    hero_l18_set_move_state(index, 2);
     if (mode == 4) set_hero_animation(15, 0, 5.0f);
 }
 
@@ -124,7 +124,7 @@ void hero_detach_from_object(s32 keep)
         goto done;
     }
 reset:
-    hero_l18_set_action(0, 1);
+    hero_l18_set_move_state(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

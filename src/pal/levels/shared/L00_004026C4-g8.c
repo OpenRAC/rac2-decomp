@@ -28,7 +28,7 @@ extern int g_game_l00_mode;
 extern int g_bouncer_timer;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 hero_l00_set_action_pal(int a0, int a1);
+extern s32 hero_l00_set_move_state_pal(int a0, int a1);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
@@ -44,9 +44,9 @@ extern int coll_trace_projectile_to_impact_pal(float, void *, void *, void *, vo
 extern void part_spawn_muzzle_spark_burst_pal(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
-extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern void slot_reset_active(int);
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_rumble_waves;
+extern int actuator_play_waves(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void actuator_end_looping_waves(int);
 extern void ref_L00_003FDE48_00(void *, void *);
 extern void moby_draw_attached_effect_pal(void *);
 
@@ -70,7 +70,7 @@ void bouncer_update_pal(unsigned char *object) {
         *(int *)(state + 0x2C) = 0;
         g_bouncer_timer = 17;
     }
-    if (g_hero_state.level == 1) hero_l00_set_action_pal(29, 1);
+    if (g_hero_state.level == 1) hero_l00_set_move_state_pal(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
     moby_compute_offset_point(object, (char *)origin);
     target = 0;
@@ -103,12 +103,12 @@ void bouncer_update_pal(unsigned char *object) {
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
             start_equipped_item_animation_pal();
             *(int *)(state + 0x2C) = 13;
-            *(int *)(state + 0x28) = slot_copy_records_to_free(&g_bouncer_sound_record);
+            *(int *)(state + 0x28) = actuator_play_waves(&g_bouncer_rumble_waves);
         }
         if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.unk_22B8 == 0) {
             handle = *(int *)(state + 0x28);
             if (handle >= 0) {
-                slot_reset_active(handle);
+                actuator_end_looping_waves(handle);
                 *(int *)(state + 0x28) = -1;
             }
         }

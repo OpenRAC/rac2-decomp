@@ -124,7 +124,7 @@ extern void gfx_queue_draw_callback(void *, void *);
 extern void protopet_start_enter_anim(char *, int);
 extern void part_spawn_upward(char *);
 extern void part_spawn_spray(char *);
-extern s32 hero_l18_set_action(int, int);
+extern s32 hero_l18_set_move_state(int, int);
 
 /* Updates the train: it rides its rail path or follows another object, speeds up
    and slows down, falls when released, and plays its sounds and effects. */
@@ -259,7 +259,7 @@ void train_l18_update(char *moby)
                         FastVecScale(vm[1], moby + 0xC0, -g_train_push_speed_back);
                         vm[1][2] = g_train_push_speed_back * 4.0f;
                         vm[1][3] = 5627.9248f;
-                        hero_l18_set_action(0, 1);
+                        hero_l18_set_move_state(0, 1);
                         g = (f32)g_player_stats[0] * 30.0f;
                         part_queue_impact_effect(target, moby, 0x10001, g_hero_state + 0x80, vm[1], g > 100.0f ? g : 100.0f);
                         vars->iE0 = g_train_timer_start;

@@ -189,7 +189,7 @@ extern void moby_update_ground_check(void *),func_002A0F48(void *);
 extern void cam_compute_view_direction(void *,void *,int), vec_negate_and_forward(void *,void *,int);
 extern int moby_apply_damage_to_object(void *,void *,int);
 extern void moby_set_state(void *,int,int), cancel_hero_item_animation(void), release_moby_animation_slot(void *,void *);
-extern s32 hero_set_action_us2(int,int);
+extern s32 hero_l22_set_move_state_us2(int,int);
 
 /* Sets the record up on the first update (health scaled by difficulty, the object table
    scan, then the tuning block) and keeps the three child objects in step. The tuning
@@ -329,7 +329,7 @@ health_done:
         } else if(g_space_ship_timer<30) {
             g_hero_state.field2294=0; cancel_hero_item_animation();
             release_moby_animation_slot(g_hero_state.field2290,&g_hero_state.field1870);
-            g_hero_state.field187C=0; hero_set_action_us2(0,1);
+            g_hero_state.field187C=0; hero_l22_set_move_state_us2(0,1);
         }
     } else if(g_hero_state.health<=0 && obj->f95!=1) {
         p->f350=0; p->f3E4=p->f3E8=0.0f;

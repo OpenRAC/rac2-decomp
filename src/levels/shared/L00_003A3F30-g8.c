@@ -16,7 +16,7 @@ typedef struct { char prefix[0x54]; float fireRate; char tail[0x88]; } WeaponEnt
 extern WeaponEntry g_weapon_l00_table[];
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void ReleaseDeadOrExpiredSlots(void *);
-extern s32 hero_l00_set_action(int, int);
+extern s32 hero_l00_set_move_state(int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);
@@ -42,7 +42,7 @@ void seeker_gun_update(char *moby)
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * g_seeker_gun_speed_scale;
     g_weapon_effect_scale = 0.1f;
     if (H->i[0x2294 / 4] == 1)
-        hero_l00_set_action(29, 1);
+        hero_l00_set_move_state(29, 1);
     if (H->i[0x2294 / 4] == 29) {
         unsigned int color;
         if (*cooldown > 0.0f && get_ammo(-1))

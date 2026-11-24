@@ -110,7 +110,7 @@ extern void hero_set_state_value_b(s32 value);
 extern void level_select_random_object(void);
 extern void level_store_pair_with_increment(s32 a0, s32 a1);
 extern void moby_set_flag_bit(Moby *moby, s32 enabled);
-extern s32 hero_l00_change_action_us2(s32 action, s32 animate);
+extern s32 hero_l00_set_move_state_us2(s32 action, s32 animate);
 extern void hero_set_state_value_c(s32 value);
 extern s32 LockedEntryMenuInput_us2(void);
 extern void ship_save_transform_state(void);
@@ -216,7 +216,7 @@ void hrugis_controller_update_us2(Moby *moby)
         if (g_state_frame_count++ < 5 || g_mission_reward_state == 2)
             break;
 
-        hero_l00_change_action_us2(0x31, 0);
+        hero_l00_set_move_state_us2(0x31, 0);
         if (g_kind_choosing_flag) {
             hero_set_state_value_c(on);
             g_selected_mission_kind = LockedEntryMenuInput_us2();

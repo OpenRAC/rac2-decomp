@@ -11,7 +11,7 @@ extern float fade_reduce_value_pal(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
-extern s32 hero_l04_enter_state_pal(int,int);
+extern s32 hero_l04_set_move_state_pal(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern void AdjustPlayerHealth_pal(int);
 extern int hero_play_sound(int,int);
@@ -147,7 +147,7 @@ int hero_check_surface_contact_pal(int update) {
     if (!GROUND_HERO.b[0x22B4]) {
         char *moby = GROUND_HERO.p[0x249C / 4];
         if (moby && (AH(moby, 0xAA) == 0x4EB || AH(moby, 0xAA) == 0x558)) {
-            hero_l04_enter_state_pal(0x7D, 1);
+            hero_l04_set_move_state_pal(0x7D, 1);
             return 1;
         }
         if ((GROUND_HERO.i[0x2294 / 4] == 1 ||
@@ -155,16 +155,16 @@ int hero_check_surface_contact_pal(int update) {
             !(AI(surface_entry, 0x24) & 8)) {
             char *moby = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
             if (moby) AdjustPlayerHealth_pal(FloatToInt(AF(moby, 0x2C)));
-            if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_enter_state_pal(0x16, 1);
+            if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_set_move_state_pal(0x16, 1);
             GROUND_HERO.h[0x1DC / 2] = 0x40;
             if (!GROUND_HERO.h[0x21C / 2]) GROUND_HERO.h[0x21C / 2] = 0xF;
             hero_play_sound(20, 0);
             return 0;
         }
-        if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_enter_state_pal(0x72, 1);
-        else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_enter_state_pal(0x73, 1);
-        else if (AI(surface_entry, 0x24) & 8) hero_l04_enter_state_pal(0x8C, 1);
-        else hero_l04_enter_state_pal(0x16, 1);
+        if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_set_move_state_pal(0x72, 1);
+        else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_set_move_state_pal(0x73, 1);
+        else if (AI(surface_entry, 0x24) & 8) hero_l04_set_move_state_pal(0x8C, 1);
+        else hero_l04_set_move_state_pal(0x16, 1);
         if (GROUND_HERO.i[0x2294 / 4] == 0x8C) {
             qzero(&push);
         } else {

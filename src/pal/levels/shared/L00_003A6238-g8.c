@@ -44,7 +44,7 @@ extern char g_camera_l00_position[];
 extern char *g_hit_l00_result[];
 extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_l00_table[];
-extern TargetRecord g_target_hud_records[];
+extern TargetRecord g_scoped_weapon_rumble_waves[];
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, int, void *);
@@ -66,11 +66,11 @@ extern int moby_is_in_special_class_range(void *);
 extern void snd_stop_voice(s32);
 extern int PlayMobySound(int, int, void *);
 extern void start_equipped_item_animation_pal(void);
-extern s32 hero_l00_set_action_pal(int, int);
+extern s32 hero_l00_set_move_state_pal(int, int);
 extern int weapon_spend_ammo(int, int);
 extern int get_ammo(int);
-extern int slot_copy_records_to_free(TargetRecord *);
-extern void slot_reset_active(int);
+extern int actuator_play_waves(TargetRecord *);
+extern void actuator_end_looping_waves(int);
 extern int AcquireEntitySlot(void *, int, int *);
 extern char *mem_round_up_to_16(char *);
 extern char *level_get_slot_body(int, int);
@@ -191,7 +191,7 @@ void UpdateScopedWeapon_pal(u8 *moby)
     case 1: {
         float t;
         if (HERO->i[0x2294 / 4] == 1)
-            hero_l00_set_action_pal(0x1D, 1);
+            hero_l00_set_move_state_pal(0x1D, 1);
         fire = 1;
         if (HERO->i[0x1500 / 4] != 0) {
             fire = 0;
@@ -257,7 +257,7 @@ void UpdateScopedWeapon_pal(u8 *moby)
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
                 start_equipped_item_animation_pal();
-                scope->hud = slot_copy_records_to_free(g_target_hud_records);
+                scope->hud = actuator_play_waves(g_scoped_weapon_rumble_waves);
                 scope->fire_timer = 2;
                 moby[0x20] = 2;
                 anim_start_blended_pal(moby, 2, 0, 0);
@@ -267,7 +267,7 @@ void UpdateScopedWeapon_pal(u8 *moby)
         }
         if (!(GAME->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || get_ammo(-1) == 0 || HERO->b[0x22B8] == 0) {
             if (scope->hud >= 0) {
-                slot_reset_active(scope->hud);
+                actuator_end_looping_waves(scope->hud);
                 scope->hud = -1;
             }
         }

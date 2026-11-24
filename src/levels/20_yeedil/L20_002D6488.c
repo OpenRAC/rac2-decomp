@@ -9,7 +9,7 @@
 
 extern unsigned char g_hero_load_mode_switch;
 
-extern int hero_l20_set_state(int a0, int a1);
+extern int hero_l20_set_move_state(int a0, int a1);
 
 /* Picks the variant of the shared loader the current game state selects. */
 void hero_load_state_by_game_mode(int flag)
@@ -18,13 +18,13 @@ void hero_load_state_by_game_mode(int flag)
 
     switch (g_hero_load_mode_switch) {
     case 0:
-        hero_l20_set_state(0, a1);
+        hero_l20_set_move_state(0, a1);
         break;
     case 1:
-        hero_l20_set_state(0x3F, a1);
+        hero_l20_set_move_state(0x3F, a1);
         break;
     case 4:
-        hero_l20_set_state(0x8D, a1);
+        hero_l20_set_move_state(0x8D, a1);
         break;
     }
 }

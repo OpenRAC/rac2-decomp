@@ -93,7 +93,7 @@ extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,f
 extern void matrix_from_basis_rows(void *,void *),transform_vector(void *,void *,void *);
 extern float mat_fast_helper_a(float,float),FastAddRotations(float,float),vec_length_xy(void *);
 extern void moby_update_eased_node(void *,void *,int,float,float);
-extern s32 hero_l00_set_action_pal(int,int);
+extern s32 hero_l00_set_move_state_pal(int,int);
 extern void start_equipped_item_animation_pal(void),cancel_hero_item_animation_pal(void),gfx_add_draw_callback_first(void (*)(void),void *);
 extern void target_tether_draw_beam_pal(void);
 extern int PlayMobySound(int,int,void *);
@@ -207,7 +207,7 @@ void target_lock_on_update_pal(unsigned char *object,AimState *state)
         }
     }
     if (state->mode==1 && g_hero_state.f2294!=28 && g_hero_state.f2294!=49) {
-        if (g_hero_state.f2294==1) hero_l00_set_action_pal(29,1);
+        if (g_hero_state.f2294==1) hero_l00_set_move_state_pal(29,1);
         if (g_hero_state.f22b4!=4) moby_update_eased_node(object,&g_target_lock_aim_angles,g_hero_state.f22b4==4?5:0,ref_L00_003B9310_02*1.44f,ref_L00_003B9310_03*1.44f);
         if (g_hero_state.f340 && !g_hero_state.f34e && !g_target_lock_disabled && !g_hero_state.f22bc && (g_pad_state.held&g_hero_state.f1230) && (g_hero_state.f1240>=13 || g_hero_state.f22b4==4)) {
             if (!state->held) {

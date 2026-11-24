@@ -728,7 +728,7 @@
 #define hero_handle_contact_hit                  func_L11_002CB130
 #define HeroApplyMotionCollision                 func_L11_002CDE10
 #define hero_l11_update_state_machine            func_L11_002D22C8
-#define hero_l11_enter_state                     func_L11_002D8EF8
+#define hero_l11_set_move_state                  func_L11_002D8EF8
 #define hero_decide_next_state                   func_L11_002DE9E0
 #define level_start_progress_cue                 func_L11_0030ED58
 #define moby_update_list_flags                   func_L11_0030F060

@@ -3,7 +3,7 @@
 #include "common.h"
 
 extern char g_hero_state[];
-extern int hero_set_move_state_us2(int, int);
+extern int SetHeroMoveState_us2(int, int);
 extern void set_hero_animation(int, int, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecSub(void *, void *, void *), vec_clamp_length(void *, float);
@@ -24,7 +24,7 @@ void swamp_monster_hold_hero_us2(char *object)
     if (*(int *)(hero + 0x2294) != 0x6F) {
         saved_flag = *(unsigned char *)(hero + 0x22B5) != 0;
         *(int *)(object + 0x98) = 0;
-        hero_set_move_state_us2(0x6F, 1);
+        SetHeroMoveState_us2(0x6F, 1);
         set_hero_animation(10, 0, 10.0f);
         *(unsigned char *)(hero + 0x22B5) = saved_flag;
     }

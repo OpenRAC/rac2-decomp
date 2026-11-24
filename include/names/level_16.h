@@ -348,7 +348,7 @@
 #define hero_l16_push_out_of_collision          func_L16_002B59A0
 #define hero_apply_movement                     func_L16_002B5EE0
 #define hero_update_state_handler               func_L16_002B9FF0
-#define hero_l16_enter_state                    func_L16_002C0BC8
+#define hero_l16_set_move_state                 func_L16_002C0BC8
 #define hero_decide_state_snivelak              func_L16_002C6378
 #define transition_arm_shared                   func_L16_002D2D10
 #define snivelak_room_scene_update              func_L16_002F60B8
