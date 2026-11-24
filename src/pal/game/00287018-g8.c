@@ -146,7 +146,7 @@ extern void lerp_vector(void *, const void *, const void *, float);
 extern void mat_build_rotation_from_angles(void *, float *);
 extern void vec_fast_normalize3(void *, const void *, const void *, float);
 extern void quaternion_to_rotation_basis(const void *, void *);
-extern void stub_empty_20(void);
+extern void level_hook_hero_button_hold_timers(void);
 extern void hud_request_letterbox_bars(void);
 extern void menu_set_state_word_three(void);
 extern int hud_set_slot_contents(int, int, void (*)(unsigned char *), void (*)(), void (*)(), int, int);
@@ -598,12 +598,15 @@ accept_reload:
         }
         break;
     case 7:
+        /* The weapon quick select's paused mode. level_hook_hero_button_hold_timers is the level's
+         * hero_update_button_hold_timers (USA v2.00 level 0: 0x2CB4C0), so each of its phases
+         * runs the hero's double-tap timers, which the hero's own update does not while it is up. */
         switch (g_modal_state.phase) {
         case 0:
             g_modal_state.camera_active = 1;
             g_modal_state.phase = 1;
             if (g_screen_mode_flag != 1)
-                stub_empty_20();
+                level_hook_hero_button_hold_timers();
             g_modal_clear_flag = 0;
             g_modal_counter = ref_00286738_00;
             hud_request_letterbox_bars();
@@ -611,7 +614,7 @@ accept_reload:
             break;
         case 1:
             if (g_screen_mode_flag != 1) {
-                stub_empty_20();
+                level_hook_hero_button_hold_timers();
                 hud_set_slot_contents(0x23, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
             } else {
                 hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
@@ -636,7 +639,7 @@ accept_reload:
             break;
         case 2:
             if (g_screen_mode_flag != 1) {
-                stub_empty_20();
+                level_hook_hero_button_hold_timers();
                 hud_set_slot_contents(0x23, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
             } else {
                 hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
@@ -660,7 +663,7 @@ accept_reload:
             break;
         case 3:
             if (g_screen_mode_flag != 1)
-                stub_empty_20();
+                level_hook_hero_button_hold_timers();
             hud_clear_flag_b();
             hud_clear_flag_a();
             { request_end_slot(0, 0); break; }

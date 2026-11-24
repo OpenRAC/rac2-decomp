@@ -301,7 +301,10 @@ unsigned int stub_empty_19(void)
     return 0;
 }
 
-void stub_empty_20(void)
+/* Empty in the boot: a level hook. Each level's program has its own function at this symbol, the
+ * hero's double-tap timers (hero_update_button_hold_timers): in USA v2.00 its value is 0x2CB4C0 in
+ * level 0's program, 0x2EDD80 in level 4's, and that function's place in all 27. */
+void level_hook_hero_button_hold_timers(void)
 {
 }
 

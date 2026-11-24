@@ -1855,7 +1855,7 @@ func_0026F788	stub_empty_16	descriptive	config/names_local.tsv
 func_0026F790	stub_empty_17	descriptive	config/names_local.tsv		
 func_0026F798	stub_empty_18	descriptive	config/names_local.tsv		
 func_0026F7A0	stub_empty_19	descriptive	config/names_local.tsv		
-func_0026F7B0	stub_empty_20	descriptive	config/names_local.tsv		
+func_0026F7B0	level_hook_hero_button_hold_timers	descriptive	config/names_local.tsv		stub_empty_20
 func_0026F7B8	stub_empty_21	descriptive	config/names_local.tsv		
 func_0026F7C0	stub_empty_22	descriptive	config/names_local.tsv		
 func_0026F7C8	stub_empty_23	descriptive	config/names_local.tsv		

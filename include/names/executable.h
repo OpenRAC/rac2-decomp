@@ -3464,7 +3464,7 @@
 #define stub_empty_17                                func_0026F790
 #define stub_empty_18                                func_0026F798
 #define stub_empty_19                                func_0026F7A0
-#define stub_empty_20                                func_0026F7B0
+#define level_hook_hero_button_hold_timers           func_0026F7B0
 #define stub_empty_21                                func_0026F7B8
 #define stub_empty_22                                func_0026F7C0
 #define stub_empty_23                                func_0026F7C8
