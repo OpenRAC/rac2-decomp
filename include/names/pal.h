@@ -60,8 +60,6 @@
 #define g_child_params_e                               D_PAL_001ADF10
 #define g_child_params_f                               D_PAL_001ADF20
 #define g_child_params_g                               D_PAL_001ADF30
-#define g_level_child_params_a                         D_PAL_001AE200
-#define g_level_child_params_b                         D_PAL_001AE220
 #define g_level_child_params_c                         D_PAL_001AE230
 #define g_object_offset_x_a                            D_PAL_001AE330
 #define g_object_offset_y_a                            D_PAL_001AE334
@@ -86,11 +84,8 @@
 #define g_menu_field_eight_b                           D_PAL_001AE3F8
 #define g_menu_field_nine_b                            D_PAL_001AE400
 #define g_object_direction_scale                       D_PAL_001AECC0
-#define g_particle_params_a                            D_PAL_001B0800
-#define g_particle_params_b                            D_PAL_001B0810
 #define g_particle_params_c                            D_PAL_001B0820
 #define g_slot_t_increment                             D_PAL_001B09B8
-#define g_rotation_length_scale                        D_PAL_001B09CC
 #define g_slot_u_increment                             D_PAL_001B09F0
 #define g_level_data_pointer                           D_PAL_001B0CD0
 #define g_mark_particle_params_a                       D_PAL_001B0EF8
@@ -98,12 +93,10 @@
 #define g_mark_particle_params_c                       D_PAL_001B0F18
 #define g_level_float_scale_a                          D_PAL_001B1420
 #define g_level_float_scale_b                          D_PAL_001B1424
-#define g_target_object                                D_PAL_001B1510
 #define g_level_toggle_flag                            D_PAL_001B16F8
 #define g_pending_value                                D_PAL_001B1A3C
 #define g_class_float_scale                            D_PAL_001B1A48
 #define g_class_float_base                             D_PAL_001B1A4C
-#define g_class_float_random_scale                     D_PAL_001B1A50
 #define g_class_rotation_scale                         D_PAL_001B1A64
 #define g_class_random_range                           D_PAL_001B1A88
 #define g_level_return_value                           D_PAL_001B1D7C
@@ -117,6 +110,8 @@
 #define g_lift_sound_table                             D_PAL_00701818
 #define g_lift_sound_table_alt                         D_PAL_00702018
 #define g_level_base_pointer                           D_PAL_FFFF001B
+#define g_particle_params_a                            D_PAL_L00_001B0800
+#define g_particle_params_b                            D_PAL_L00_001B0810
 #define g_str_level_debug_format                       D_PAL_L02_001B1258
 #define g_text_l02_print_scale                         D_PAL_L02_001B14C8
 #define g_text_l02_print_color                         D_PAL_L02_001B14CC
@@ -142,6 +137,7 @@
 #define g_debug_l04_tune_value_c                       D_PAL_L04_001B0BCC
 #define g_debug_l04_tune_value_d                       D_PAL_L04_001B0BD0
 #define g_str_l04_debug_tune_format                    D_PAL_L04_001B0BD8
+#define g_target_object                                D_PAL_L05_001B1510
 #define console_get_region_pal                         func_PAL_00131620
 #define gfx_append_splash_packet_pal                   func_PAL_0026E780
 #define ShowSplashImage_pal                            func_PAL_0026E838

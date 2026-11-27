@@ -11,7 +11,7 @@ extern void prompt_bar_set_text_offsets_us2(void *, float, float, float, float, 
 extern int menu_handle_page_input_c_us2(void *, int);
 extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
-extern int g_child_param_pair_e[2] __attribute__((sda));
+extern int g_prompt_bar_params_a[2] __attribute__((sda));
 
 /* Initialises a menu page with a prompt bar of three texts (confirm, back, extra), a sizing cell and the page's first state. */
 void menu_l00_init_page_record_g_us2(char *menu, void *parent)
@@ -31,7 +31,7 @@ void menu_l00_init_page_record_g_us2(char *menu, void *parent)
     **(float **)(menu + 0x2DC) = 255.0f;
     (*(float **)(menu + 0x2DC))[1] = 195.0f;
     prompt_bar = menu + 8;
-    prompt_bar_init_us2(prompt_bar, parent, g_child_param_pair_e);
+    prompt_bar_init_us2(prompt_bar, parent, g_prompt_bar_params_a);
     first_text = GetLocalizedString(0x2BF7);
     second_text = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts_us2(prompt_bar, first_text, second_text, GetLocalizedString(0x2BE5));
@@ -45,7 +45,7 @@ void menu_l00_init_page_record_g_us2(char *menu, void *parent)
 
 extern int menu_handle_page_input_e_us2(void *, int);
 
-extern int g_child_param_pair_f[2] __attribute__((sda));
+extern int g_prompt_bar_params_b[2] __attribute__((sda));
 
 /* Initialises a menu page with a prompt bar of three texts (confirm, back, extra), a sizing cell and the page's first state. */
 void menu_l00_init_page_record_h_us2(char *menu, void *parent)
@@ -65,7 +65,7 @@ void menu_l00_init_page_record_h_us2(char *menu, void *parent)
     **(float **)(menu + 0x2DC) = 255.0f;
     (*(float **)(menu + 0x2DC))[1] = 195.0f;
     prompt_bar = menu + 8;
-    prompt_bar_init_us2(prompt_bar, parent, g_child_param_pair_f);
+    prompt_bar_init_us2(prompt_bar, parent, g_prompt_bar_params_b);
     first_text = GetLocalizedString(0x2BF7);
     second_text = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts_us2(prompt_bar, first_text, second_text, GetLocalizedString(0x2BE5));
@@ -79,7 +79,7 @@ void menu_l00_init_page_record_h_us2(char *menu, void *parent)
 
 extern int menu_handle_page_input_f_us2(void *, int);
 
-extern int g_child_param_pair_g[2] __attribute__((sda));
+extern int g_prompt_bar_params_c[2] __attribute__((sda));
 
 /* Initialises a menu page with a prompt bar of three texts (confirm, back, extra), a sizing cell and the page's first state. */
 void menu_l00_init_page_record_i_us2(char *menu, void *parent)
@@ -99,7 +99,7 @@ void menu_l00_init_page_record_i_us2(char *menu, void *parent)
     **(float **)(menu + 0x2DC) = 255.0f;
     (*(float **)(menu + 0x2DC))[1] = 195.0f;
     prompt_bar = menu + 8;
-    prompt_bar_init_us2(prompt_bar, parent, g_child_param_pair_g);
+    prompt_bar_init_us2(prompt_bar, parent, g_prompt_bar_params_c);
     first_text = GetLocalizedString(0x2BF7);
     second_text = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts_us2(prompt_bar, first_text, second_text, GetLocalizedString(0x2BE5));

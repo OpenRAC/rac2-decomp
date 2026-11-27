@@ -43,7 +43,7 @@ extern void gfx_draw_glow_rings_pal(Obj_397870 *);
 
 extern float g_class_float_scale __attribute__((sda));
 extern float g_class_float_base __attribute__((sda));
-extern float g_class_float_random_scale __attribute__((sda));
+extern float g_bobbing_amplitude __attribute__((sda));
 extern float g_class_rotation_scale __attribute__((sda));
 extern int g_class_random_range __attribute__((sda));
 
@@ -57,7 +57,7 @@ void bobbing_l01_moby_update_2_pal(Obj_397870 *moby)
 
     if (moby->b20 == 1) {
         sine = math_fast_sin_or_cos_b(moby->fFC);
-        moby->f18 = vars->f18 + g_class_float_base + g_class_float_random_scale * sine;
+        moby->f18 = vars->f18 + g_class_float_base + g_bobbing_amplitude * sine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
         moby->fF8 = FastAddRotations(moby->fF8, vars->f60);
