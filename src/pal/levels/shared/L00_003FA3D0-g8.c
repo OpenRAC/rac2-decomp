@@ -36,7 +36,7 @@ extern void FastVecAdd(void *, void *, void *);
 
 extern float g_slot_t_increment __attribute__((sda));
 extern float g_slot_u_increment __attribute__((sda));
-extern float g_rotation_length_scale __attribute__((sda));
+extern float g_vaporizer_trail_step_speed __attribute__((sda));
 
 /* Advances one vaporizer trail sample each frame: scrolls its texture coordinates and moves it along its direction, and frees it when it has expired (PAL: 50 Hz steps). */
 int vaporizer_bolt_update_trail_sample_pal(TrailActor *self)
@@ -60,7 +60,7 @@ int vaporizer_bolt_update_trail_sample_pal(TrailActor *self)
     slots[source->index].u += g_slot_u_increment;
     if (slots[source->index].u >= 4.0f)
         slots[source->index].u -= 4.0f;
-    vec_scale_to_length(rot, source, g_rotation_length_scale * 0.020000001f);
+    vec_scale_to_length(rot, source, g_vaporizer_trail_step_speed * 0.020000001f);
     FastVecAdd(&slots[source->index], &slots[source->index], rot);
     FastVecAdd(&slots[source->index].a, &slots[source->index].a, rot);
     return 1;

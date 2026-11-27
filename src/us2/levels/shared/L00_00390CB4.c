@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 /* func_US2_L00_00390CB4, the v2.00 copy of func_L00_0038F8B8: the same C with one test added
- * after the level 111/98 gate, on D_US2_001B1860. */
+ * after the level 111/98 gate, on g_hero_scalar_transition_value. */
 #include "common.h"
 /* Partial resident view: only fields observed by the launch gate are named. */
 typedef struct { char pad00[0xA8]; u16 launches; char padAA[2]; u32 best_time, mask; } LaunchStats;
@@ -20,7 +20,7 @@ extern LaunchInput g_pad_state;
 extern u32 g_frame_counter MACRO_ADDR;
 extern u32 g_current_map_index[] __attribute__((sda));
 extern char *g_follow_camera_object;
-extern float g_level_float_flag __attribute__((sda));
+extern float g_hero_scalar_transition_value __attribute__((sda));
 extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
 extern float vec_length_xy(void *), mat_fast_helper_a(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float), FastVecAdd(void *, void *, void *);
@@ -42,7 +42,7 @@ void visibomb_gun_update_us2(char *actor) {
     else g_hero_state.cooldown = 40;
     if (g_game_l00_mode[0] || g_input_lock_state[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
     if (g_hero_state.state == 7 || g_hero_state.state == 2 || g_hero_state.state == 3 || g_hero_state.state == 4 || g_hero_state.state == 5 || g_hero_state.state == 6 || g_hero_state.state == 16 || g_hero_state.state == 14 || g_hero_state.state == 9 || g_hero_state.state == 10 || g_hero_state.state == 11 || g_hero_state.state >= 13 || g_hero_state.level == 111 || g_hero_state.level == 98) goto finish;
-    if (g_level_float_flag != 0.0f) goto finish;
+    if (g_hero_scalar_transition_value != 0.0f) goto finish;
     if ((g_follow_camera_object && *(short *)(g_follow_camera_object + 0x86) == 5) || !g_hero_state.grounded || g_hero_state.resource < 23) goto finish;
     if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E || *(short *)(g_hero_state.support + 0xAA) == 0x46F) && ready) goto finish;
     if (!weapon_spend_ammo(-1, 1)) goto denied;

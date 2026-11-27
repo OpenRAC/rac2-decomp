@@ -10390,9 +10390,6 @@ D_US2_001ADE60	g_child_param_pair_a	descriptive	config/names_local.tsv
 D_US2_001ADE70	g_child_param_pair_b	descriptive	config/names_local.tsv		
 D_US2_001ADE80	g_child_param_pair_c	descriptive	config/names_local.tsv		
 D_US2_001ADE90	g_child_param_pair_d	descriptive	config/names_local.tsv		
-D_US2_001AE1A0	g_child_param_pair_e	descriptive	config/names_local.tsv		
-D_US2_001AE1C0	g_child_param_pair_f	descriptive	config/names_local.tsv		
-D_US2_001AE1D0	g_child_param_pair_g	descriptive	config/names_local.tsv		
 D_PAL_001ADE68	g_child_params_a	descriptive	config/names_local.tsv		
 D_PAL_001ADEB0	g_child_params_b	descriptive	config/names_local.tsv		
 D_PAL_001ADEF0	g_child_params_c	descriptive	config/names_local.tsv		
@@ -10444,7 +10441,6 @@ D_0018C0D7	g_class_flag_byte	descriptive	config/names_local.tsv
 D_L00_001B1CE0	g_class_l00_flags_table	descriptive	config/names_local.tsv		
 D_L00_001DD180	g_class_l00_flags_table_2	descriptive	config/names_local.tsv		
 D_PAL_001B1A4C	g_class_float_base	descriptive	config/names_local.tsv		
-D_PAL_001B1A50	g_class_float_random_scale	descriptive	config/names_local.tsv		
 D_PAL_001B1A48	g_class_float_scale	descriptive	config/names_local.tsv		
 D_L00_001DA680	g_class_ids_by_slot	descriptive	config/names_local.tsv		
 D_L20_001DBA60	g_class_index_table	descriptive	config/names_local.tsv		
@@ -14715,8 +14711,6 @@ D_L01_0025C274	g_level_byte_data	descriptive	config/names_local.tsv
 D_L01_001A7A6F	g_level_l01_byte_flag	descriptive	config/names_local.tsv		
 D_L05_001B4568	g_level_l05_byte_flag	descriptive	config/names_local.tsv		
 D_L05_0020B220	g_level_byte_ptr_table	descriptive	config/names_local.tsv		
-D_PAL_001AE200	g_level_child_params_a	descriptive	config/names_local.tsv		
-D_PAL_001AE220	g_level_child_params_b	descriptive	config/names_local.tsv		
 D_PAL_001AE230	g_level_child_params_c	descriptive	config/names_local.tsv		
 D_L00_001B1944	g_level_chunk_base	descriptive	config/names_local.tsv		
 D_L00_001B1E8C	g_level_chunk_count_a	descriptive	config/names_local.tsv		
@@ -14772,7 +14766,6 @@ D_L03_001B2AC8	g_level_flag_word_a	descriptive	config/names_local.tsv
 D_L03_001B3730	g_level_flag_word_b	descriptive	config/names_local.tsv		
 D_L03_001B3738	g_level_flag_word_c	descriptive	config/names_local.tsv		
 D_L11_0021F8B0	g_level_flags	descriptive	config/names_local.tsv		
-D_US2_001B1860	g_level_float_flag	descriptive	config/names_local.tsv		
 D_001B2350	g_level_float_param	descriptive	config/names_local.tsv		
 D_001B2EF4	g_level_float_param_2	descriptive	config/names_local.tsv		
 D_L16_001B3AAC	g_level_l16_float_param	descriptive	config/names_local.tsv		
@@ -16630,8 +16623,8 @@ D_L07_001B0AB4	g_particle_pair_lift_speed	descriptive	config/names_local.tsv
 D_L07_001B0AC0	g_particle_pair_scale_range	descriptive	config/names_local.tsv		
 D_L07_001B0AB0	g_particle_pair_speed	descriptive	config/names_local.tsv		
 D_L07_001B0AD0	g_particle_pair_value_range	descriptive	config/names_local.tsv		
-D_PAL_001B0800	g_particle_params_a	descriptive	config/names_local.tsv		
-D_PAL_001B0810	g_particle_params_b	descriptive	config/names_local.tsv		
+D_PAL_L00_001B0800	g_particle_params_a	descriptive	config/names_local.tsv		
+D_PAL_L00_001B0810	g_particle_params_b	descriptive	config/names_local.tsv		
 D_PAL_001B0820	g_particle_params_c	descriptive	config/names_local.tsv		
 D_L05_001AFC60	g_particle_params_first	descriptive	config/names_local.tsv		
 D_L05_001AFC70	g_particle_params_second	descriptive	config/names_local.tsv		
@@ -17846,7 +17839,6 @@ D_L03_001B1C04	g_robot_turn_scale	descriptive	config/names_local.tsv
 D_L03_00238040	g_rope_strand_points	descriptive	config/names_local.tsv		
 D_001B5358	g_rotation_base_angle	descriptive	config/names_local.tsv		
 D_L07_001B0C6C	g_rotation_base_step	descriptive	config/names_local.tsv		
-D_PAL_001B09CC	g_rotation_length_scale	descriptive	config/names_local.tsv		
 D_L07_001B0C70	g_rotation_step_a	descriptive	config/names_local.tsv		
 D_L07_001B0C74	g_rotation_step_b	descriptive	config/names_local.tsv		
 D_L16_001B0C78	g_rotation_step_degrees	descriptive	config/names_local.tsv		
@@ -20327,7 +20319,7 @@ D_L00_001AFCE0	g_target_lock_disabled	descriptive	config/names_local.tsv
 D_L00_001B28E4	g_target_lock_range	descriptive	config/names_local.tsv		
 D_L00_001AFCE8	g_target_lock_timer	descriptive	config/names_local.tsv		
 D_0018A3E0	g_target_moby	descriptive	config/names_local.tsv		
-D_PAL_001B1510	g_target_object	descriptive	config/names_local.tsv		
+D_PAL_L05_001B1510	g_target_object	descriptive	config/names_local.tsv		
 D_L00_001AA300	g_target_point	descriptive	config/names_local.tsv		
 D_L23_001AFAB4	g_target_point_dot_threshold	descriptive	config/names_local.tsv		
 D_001A85C0	g_target_scale_factor	descriptive	config/names_local.tsv		

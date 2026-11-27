@@ -51,9 +51,6 @@
 #define g_child_param_pair_c                           D_US2_001ADE80
 #define g_child_param_pair_d                           D_US2_001ADE90
 #define g_str_status_format                            D_US2_001ADF70
-#define g_child_param_pair_e                           D_US2_001AE1A0
-#define g_child_param_pair_f                           D_US2_001AE1C0
-#define g_child_param_pair_g                           D_US2_001AE1D0
 #define g_object_offset_x_a_2                          D_US2_001AE298
 #define g_object_offset_y_a_2                          D_US2_001AE29C
 #define g_object_offset_x_b_2                          D_US2_001AE2A0
@@ -83,7 +80,6 @@
 #define g_level_init_flag_c                            D_US2_001B03EC
 #define g_level_init_flag_d                            D_US2_001B0C60
 #define g_level_init_flag_e                            D_US2_001B0D58
-#define g_level_float_flag                             D_US2_001B1860
 #define g_pending_request_flag                         D_US2_001B19BC
 #define g_level_int_value_b                            D_US2_001B1CFC
 #define g_hero_sound_flag                              D_US2_001C9700
