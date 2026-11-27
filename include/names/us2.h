@@ -83,7 +83,6 @@
 #define g_level_init_flag_c                            D_US2_001B03EC
 #define g_level_init_flag_d                            D_US2_001B0C60
 #define g_level_init_flag_e                            D_US2_001B0D58
-#define g_level_float_flag                             D_US2_001B1860
 #define g_pending_request_flag                         D_US2_001B19BC
 #define g_level_int_value_b                            D_US2_001B1CFC
 #define g_hero_sound_flag                              D_US2_001C9700

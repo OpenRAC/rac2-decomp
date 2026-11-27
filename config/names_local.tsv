@@ -13727,7 +13727,6 @@ D_L03_001B2AC8	g_level_flag_word_a	declared only (medium)
 D_L03_001B3730	g_level_flag_word_b	declared only (medium)	
 D_L03_001B3738	g_level_flag_word_c	declared only (medium)	
 D_L11_0021F8B0	g_level_flags	LevelFlags	
-D_US2_001B1860	g_level_float_flag	use in source (medium)	
 D_001B2350	g_level_float_param	compared to 0.9 (medium)	
 D_001B2EF4	g_level_float_param_2	declared only float (medium)	
 D_L16_001B3AAC	g_level_l16_float_param	declared only (medium)	

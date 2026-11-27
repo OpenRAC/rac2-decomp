@@ -14772,7 +14772,6 @@ D_L03_001B2AC8	g_level_flag_word_a	descriptive	config/names_local.tsv
 D_L03_001B3730	g_level_flag_word_b	descriptive	config/names_local.tsv		
 D_L03_001B3738	g_level_flag_word_c	descriptive	config/names_local.tsv		
 D_L11_0021F8B0	g_level_flags	descriptive	config/names_local.tsv		
-D_US2_001B1860	g_level_float_flag	descriptive	config/names_local.tsv		
 D_001B2350	g_level_float_param	descriptive	config/names_local.tsv		
 D_001B2EF4	g_level_float_param_2	descriptive	config/names_local.tsv		
 D_L16_001B3AAC	g_level_l16_float_param	descriptive	config/names_local.tsv		
